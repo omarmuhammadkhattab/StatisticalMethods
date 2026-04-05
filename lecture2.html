@@ -170,6 +170,158 @@
     .page-wrap { padding: 2rem 1.2rem; }
     .missing-demo { grid-template-columns: 1fr; }
   }
+
+  /* ═══════════════════════════════════════
+     MOBILE / RESPONSIVE ENHANCEMENTS
+  ═══════════════════════════════════════ */
+
+  /* Hamburger button */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+    border: none;
+    background: transparent;
+  }
+  .hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--gold, #e8a230);
+    border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Mobile nav overlay */
+  .mobile-nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(8,13,30,0.98);
+    z-index: 300;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.8rem;
+    backdrop-filter: blur(20px);
+  }
+  .mobile-nav-overlay.open { display: flex; }
+  .mobile-nav-overlay a {
+    color: var(--white, #f0eee8);
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+    border: 1px solid transparent;
+  }
+  .mobile-nav-overlay a:hover {
+    color: var(--gold, #e8a230);
+    border-color: rgba(232,162,48,0.3);
+    background: rgba(232,162,48,0.06);
+  }
+  .mnav-close {
+    position: absolute;
+    top: 1rem; right: 1.2rem;
+    background: none; border: none;
+    color: var(--muted, #8a96b8);
+    font-size: 1.6rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.3rem;
+  }
+
+  /* Scrollable table wrapper */
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 1.5rem 0;
+    border-radius: 8px;
+  }
+  .table-scroll > table { margin: 0 !important; }
+
+  /* Code / pre blocks */
+  pre {
+    overflow-x: auto;
+    white-space: pre;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+  code { font-size: 0.85em; }
+
+  /* ── 768px breakpoint ── */
+  @media (max-width: 768px) {
+    .hamburger { display: flex; }
+    .nav-links  { display: none !important; }
+    nav { padding: 0.9rem 1.2rem; }
+
+    .page-wrap { padding: 2rem 1rem; }
+
+    .lecture-hero {
+      grid-template-columns: 1fr !important;
+      gap: 2rem !important;
+      padding: 2rem 0 1.5rem !important;
+    }
+    .lecture-title { font-size: clamp(1.7rem, 7vw, 2.4rem) !important; }
+    .lecture-desc { font-size: 0.92rem; }
+
+    .section-h2   { font-size: 1.3rem !important; }
+    .section-icon { width: 36px !important; height: 36px !important; font-size: 1rem !important; }
+    .section-header { gap: 0.7rem; }
+
+    /* All 2-col / 3-col named grid classes → 1 col */
+    .levels-grid, .errors-list, .rule-cards, .eda-list,
+    .missing-demo, .ops-grid, .chart-types-grid { grid-template-columns: 1fr !important; }
+
+    .def-box  { padding: 1rem 1.2rem; }
+    .info-box { padding: 0.9rem 1rem; flex-direction: column; gap: 0.4rem; }
+    .quiz-wrap { padding: 1.2rem 1rem; }
+
+    .chart-wrap     { padding: 1rem 0.8rem; }
+    .chart-controls { flex-wrap: wrap; gap: 0.4rem; }
+    .chart-btn      { font-size: 0.72rem; padding: 0.3rem 0.7rem; }
+    canvas          { max-width: 100% !important; height: auto !important; min-height: 160px; }
+
+    .steps-list li  { padding-left: 2.4rem; font-size: 0.85rem; }
+    .toc-item       { font-size: 0.82rem; }
+    pre             { font-size: 0.72rem; padding: 0.8rem !important; }
+
+    /* Inline-style grids (attribute selector fallback) */
+    [style*="grid-template-columns:1fr 1fr"],
+    [style*="grid-template-columns: 1fr 1fr"] {
+      grid-template-columns: 1fr !important;
+    }
+    [style*="grid-template-columns:repeat(2"],
+    [style*="grid-template-columns: repeat(2"] {
+      grid-template-columns: 1fr !important;
+    }
+    [style*="grid-template-columns:repeat(3"],
+    [style*="grid-template-columns: repeat(3"] {
+      grid-template-columns: 1fr !important;
+    }
+    [style*="grid-template-columns:1fr 1fr 1fr"] {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  /* ── 480px breakpoint (small phones) ── */
+  @media (max-width: 480px) {
+    .page-wrap { padding: 1.5rem 0.8rem; }
+    .section-h2 { font-size: 1.15rem !important; }
+    .quiz-opt   { font-size: 0.82rem; padding: 0.65rem 0.9rem; }
+    canvas      { min-height: 130px; }
+    pre         { font-size: 0.65rem; }
+    .chart-btn  { font-size: 0.67rem; padding: 0.25rem 0.55rem; }
+  }
+
 </style>
 </head>
 <body>
@@ -185,7 +337,20 @@
     <a href="#compute">Compute</a>
     <a href="#quiz">Quiz</a>
   </div>
+
+  <button class="hamburger" id="hamburgerBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
 </nav>
+
+<div class="mobile-nav-overlay" id="mobileNavOverlay">
+  <button class="mnav-close" id="mnavClose">✕</button>
+  <a href="index.html">← Home</a>
+    <a href="lecture1.html">← Lecture 1</a>
+    <a href="#merge">Merge</a>
+    <a href="#sort">Sort</a>
+    <a href="#recode">Recode</a>
+    <a href="#compute">Compute</a>
+    <a href="#quiz">Quiz</a>
+</div>
 
 <div class="page-wrap">
 
@@ -413,21 +578,21 @@ EXECUTE.</pre>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin:1.5rem 0;">
       <div>
         <div style="font-weight:600; color:var(--teal); margin-bottom:1rem; font-size:0.9rem;">📋 File A (50 patients, Hospital X)</div>
-        <table class="spss-table" style="font-size:0.78rem;">
+        <div class="table-scroll"><table class="spss-table" style="font-size:0.78rem;">
           <tr><th>ID</th><th>Age</th><th>BP</th></tr>
           <tr><td>1</td><td>25</td><td>120</td></tr>
           <tr><td>2</td><td>30</td><td>130</td></tr>
           <tr><td style="color:var(--muted)">...</td><td style="color:var(--muted)">...</td><td style="color:var(--muted)">...</td></tr>
-        </table>
+        </table></div>
       </div>
       <div>
         <div style="font-weight:600; color:var(--pink); margin-bottom:1rem; font-size:0.9rem;">📋 File B (60 patients, Hospital Y)</div>
-        <table class="spss-table" style="font-size:0.78rem;">
+        <div class="table-scroll"><table class="spss-table" style="font-size:0.78rem;">
           <tr><th>ID</th><th>Age</th><th>BP</th></tr>
           <tr><td>51</td><td>22</td><td>115</td></tr>
           <tr><td>52</td><td>45</td><td>140</td></tr>
           <tr><td style="color:var(--muted)">...</td><td style="color:var(--muted)">...</td><td style="color:var(--muted)">...</td></tr>
-        </table>
+        </table></div>
       </div>
     </div>
     <div class="info-box">
@@ -453,14 +618,14 @@ EXECUTE.</pre>
         <div id="afterGrid"></div>
       </div>
     </div>
-    <table class="spss-table">
+    <div class="table-scroll"><table class="spss-table">
       <tr><th>Method</th><th>How It Works</th><th>Best For</th></tr>
       <tr><td>Series Mean</td><td>Replaces with the overall mean of the variable</td><td>Stable, non-trended data</td></tr>
       <tr><td>Mean of Nearby Points</td><td>Average of the n closest non-missing values</td><td>Locally stable data</td></tr>
       <tr><td>Median of Nearby Points</td><td>Median of nearby values (robust to outliers)</td><td>Skewed or outlier-prone data</td></tr>
       <tr><td>Linear Interpolation</td><td>Draws a straight line between neighboring values</td><td>Linearly trending time series</td></tr>
       <tr><td>Linear Trend at Point</td><td>Fits a regression trend line and uses it</td><td>Strong linear trends</td></tr>
-    </table>
+    </table></div>
   </div>
 
   <!-- ── 4. SORT ── -->
@@ -536,13 +701,13 @@ EXECUTE.</pre>
     <div class="def-box">
       <p>Sometimes you only want to run analysis on a <strong>subset</strong> of your data. The Select Cases function lets you filter data without permanently deleting the excluded rows.</p>
     </div>
-    <table class="spss-table">
+    <div class="table-scroll"><table class="spss-table">
       <tr><th>Selection Type</th><th>Description</th><th>Example</th></tr>
       <tr><td>If condition is satisfied</td><td>Filter by a logical condition on any variable</td><td>Analyze only Female patients: <code>Gender = 2</code></td></tr>
       <tr><td>Random sample</td><td>Randomly select a % of all cases</td><td>Select 5% for spot-checking</td></tr>
       <tr><td>Based on time or case range</td><td>Select consecutive rows from N to M</td><td>Cases 100 to 130 only</td></tr>
       <tr><td>Use filter variable</td><td>A 0/1 variable indicates which cases to include</td><td>Include case if <code>valid_response = 1</code></td></tr>
-    </table>
+    </table></div>
     <div class="info-box">
       <div class="info-icon">⚠️</div>
       <p><strong>Important:</strong> Unselected cases are NOT deleted — they are filtered out (a diagonal line appears on their row number). You can restore all cases by selecting "All Cases" again. OR you can permanently delete them or copy selected to a new dataset.</p>
@@ -565,7 +730,7 @@ EXECUTE.</pre>
     </div>
     <div id="tsDesc" style="background:rgba(62,207,178,0.06); border:1px solid rgba(62,207,178,0.2); border-radius:8px; padding:1rem 1.5rem; font-size:0.88rem; color:var(--muted); line-height:1.7;"></div>
 
-    <table class="spss-table" style="margin-top:1.5rem;">
+    <div class="table-scroll"><table class="spss-table" style="margin-top:1.5rem;">
       <tr><th>Function</th><th>Formula</th><th>Purpose</th></tr>
       <tr><td>Difference</td><td>Yₜ - Yₜ₋₁</td><td>Remove trends, make series stationary</td></tr>
       <tr><td>Seasonal Difference</td><td>Yₜ - Yₜ₋ₛ</td><td>Remove seasonal patterns (s = season length)</td></tr>
@@ -573,7 +738,7 @@ EXECUTE.</pre>
       <tr><td>Cumulative Sum</td><td>Σ Yᵢ (from i=1 to t)</td><td>Running total over time</td></tr>
       <tr><td>Lag (n)</td><td>Yₜ₋ₙ</td><td>Use past values as predictors</td></tr>
       <tr><td>Lead (n)</td><td>Yₜ₊ₙ</td><td>Use future values (rare, for analysis only)</td></tr>
-    </table>
+    </table></div>
   </div>
 
   <!-- ── QUIZ ── -->
@@ -826,5 +991,18 @@ function renderQ2() {
 function nextQuestion2() { qIdx2++; renderQ2(); }
 renderQ2();
 </script>
+<script>
+(function(){
+  var btn = document.getElementById('hamburgerBtn');
+  var overlay = document.getElementById('mobileNavOverlay');
+  if(!btn || !overlay) return;
+  function open()  { overlay.classList.add('open');  btn.classList.add('open');  document.body.style.overflow='hidden'; }
+  function close() { overlay.classList.remove('open'); btn.classList.remove('open'); document.body.style.overflow=''; }
+  btn.addEventListener('click', open);
+  document.querySelector('.mnav-close') && document.querySelector('.mnav-close').addEventListener('click', close);
+  overlay.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', close); });
+})();
+</script>
+
 </body>
 </html>
