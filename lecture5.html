@@ -149,6 +149,158 @@
     .page-wrap { padding: 2rem 1.2rem; }
     .eda-list { grid-template-columns: 1fr; }
   }
+
+  /* ═══════════════════════════════════════
+     MOBILE / RESPONSIVE ENHANCEMENTS
+  ═══════════════════════════════════════ */
+
+  /* Hamburger button */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+    border: none;
+    background: transparent;
+  }
+  .hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--gold, #e8a230);
+    border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Mobile nav overlay */
+  .mobile-nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(8,13,30,0.98);
+    z-index: 300;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.8rem;
+    backdrop-filter: blur(20px);
+  }
+  .mobile-nav-overlay.open { display: flex; }
+  .mobile-nav-overlay a {
+    color: var(--white, #f0eee8);
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+    border: 1px solid transparent;
+  }
+  .mobile-nav-overlay a:hover {
+    color: var(--gold, #e8a230);
+    border-color: rgba(232,162,48,0.3);
+    background: rgba(232,162,48,0.06);
+  }
+  .mnav-close {
+    position: absolute;
+    top: 1rem; right: 1.2rem;
+    background: none; border: none;
+    color: var(--muted, #8a96b8);
+    font-size: 1.6rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.3rem;
+  }
+
+  /* Scrollable table wrapper */
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 1.5rem 0;
+    border-radius: 8px;
+  }
+  .table-scroll > table { margin: 0 !important; }
+
+  /* Code / pre blocks */
+  pre {
+    overflow-x: auto;
+    white-space: pre;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+  code { font-size: 0.85em; }
+
+  /* ── 768px breakpoint ── */
+  @media (max-width: 768px) {
+    .hamburger { display: flex; }
+    .nav-links  { display: none !important; }
+    nav { padding: 0.9rem 1.2rem; }
+
+    .page-wrap { padding: 2rem 1rem; }
+
+    .lecture-hero {
+      grid-template-columns: 1fr !important;
+      gap: 2rem !important;
+      padding: 2rem 0 1.5rem !important;
+    }
+    .lecture-title { font-size: clamp(1.7rem, 7vw, 2.4rem) !important; }
+    .lecture-desc { font-size: 0.92rem; }
+
+    .section-h2   { font-size: 1.3rem !important; }
+    .section-icon { width: 36px !important; height: 36px !important; font-size: 1rem !important; }
+    .section-header { gap: 0.7rem; }
+
+    /* All 2-col / 3-col named grid classes → 1 col */
+    .levels-grid, .errors-list, .rule-cards, .eda-list,
+    .missing-demo, .ops-grid, .chart-types-grid { grid-template-columns: 1fr !important; }
+
+    .def-box  { padding: 1rem 1.2rem; }
+    .info-box { padding: 0.9rem 1rem; flex-direction: column; gap: 0.4rem; }
+    .quiz-wrap { padding: 1.2rem 1rem; }
+
+    .chart-wrap     { padding: 1rem 0.8rem; }
+    .chart-controls { flex-wrap: wrap; gap: 0.4rem; }
+    .chart-btn      { font-size: 0.72rem; padding: 0.3rem 0.7rem; }
+    canvas          { max-width: 100% !important; height: auto !important; min-height: 160px; }
+
+    .steps-list li  { padding-left: 2.4rem; font-size: 0.85rem; }
+    .toc-item       { font-size: 0.82rem; }
+    pre             { font-size: 0.72rem; padding: 0.8rem !important; }
+
+    /* Inline-style grids (attribute selector fallback) */
+    [style*="grid-template-columns:1fr 1fr"],
+    [style*="grid-template-columns: 1fr 1fr"] {
+      grid-template-columns: 1fr !important;
+    }
+    [style*="grid-template-columns:repeat(2"],
+    [style*="grid-template-columns: repeat(2"] {
+      grid-template-columns: 1fr !important;
+    }
+    [style*="grid-template-columns:repeat(3"],
+    [style*="grid-template-columns: repeat(3"] {
+      grid-template-columns: 1fr !important;
+    }
+    [style*="grid-template-columns:1fr 1fr 1fr"] {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  /* ── 480px breakpoint (small phones) ── */
+  @media (max-width: 480px) {
+    .page-wrap { padding: 1.5rem 0.8rem; }
+    .section-h2 { font-size: 1.15rem !important; }
+    .quiz-opt   { font-size: 0.82rem; padding: 0.65rem 0.9rem; }
+    canvas      { min-height: 130px; }
+    pre         { font-size: 0.65rem; }
+    .chart-btn  { font-size: 0.67rem; padding: 0.25rem 0.55rem; }
+  }
+
 </style>
 </head>
 <body>
@@ -167,7 +319,23 @@
     <a href="#scatter">Scatter</a>
     <a href="#quiz">Quiz</a>
   </div>
+
+  <button class="hamburger" id="hamburgerBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
 </nav>
+
+<div class="mobile-nav-overlay" id="mobileNavOverlay">
+  <button class="mnav-close" id="mnavClose">✕</button>
+  <a href="index.html">← Home</a>
+    <a href="lecture3.html">← Lecture 3&4</a>
+    <a href="lecture6.html">Lecture 6 →</a>
+    <a href="#intro">Intro</a>
+    <a href="#barchart">Bar</a>
+    <a href="#histogram">Histogram</a>
+    <a href="#stemleaf">Stem-Leaf</a>
+    <a href="#boxplot">Box Plot</a>
+    <a href="#scatter">Scatter</a>
+    <a href="#quiz">Quiz</a>
+</div>
 
 <div class="page-wrap">
 
@@ -464,12 +632,12 @@
       <p>An <strong>Error Bar Plot</strong> shows the <strong>mean</strong> of a numeric variable for each group, plus error bars that represent the <strong>uncertainty</strong> around that mean. The error bars can represent three different things — you choose which one tells the story you need.</p>
     </div>
 
-    <table class="spss-table">
+    <div class="table-scroll"><table class="spss-table">
       <tr><th>Error Bar Type</th><th>What It Shows</th><th>When to Use</th><th>SPSS Setting</th></tr>
       <tr><td>Confidence Interval (CI)</td><td>The range within which the true population mean likely falls (default: 95%)</td><td>Comparing group means — overlapping CIs suggest no significant difference</td><td>Bars Represent → Confidence interval for mean</td></tr>
       <tr><td>Standard Deviation (SD)</td><td>The spread of individual values around the mean (e.g., ±2 SD)</td><td>Showing natural variability within each group</td><td>Bars Represent → Standard deviation, multiplier = 2</td></tr>
       <tr><td>Standard Error (SE)</td><td>How precisely the sample mean estimates the population mean</td><td>Precision of estimates; smaller SE = better estimate</td><td>Bars Represent → Standard error of mean, multiplier = 2</td></tr>
-    </table>
+    </table></div>
 
     <div class="chart-wrap">
       <div class="chart-title">Error Bar: Mean Current Salary by Education Level</div>
@@ -513,12 +681,12 @@
       <div id="scatterInfo" style="font-size:0.85rem;color:var(--muted);margin-top:0.8rem;line-height:1.7;background:rgba(255,255,255,0.03);border-radius:8px;padding:0.8rem 1rem;"></div>
     </div>
 
-    <table class="spss-table" style="margin-top:1.5rem;">
+    <div class="table-scroll"><table class="spss-table" style="margin-top:1.5rem;">
       <tr><th>Scatter Pattern</th><th>Relationship</th><th>Description</th><th>Example</th></tr>
       <tr><td style="color:var(--muted)">Points scattered randomly</td><td style="color:var(--white)">No Relationship</td><td>No trend visible; knowing X tells you nothing about Y</td><td>Height vs Salary</td></tr>
       <tr><td style="color:var(--muted)">Points rise left → right</td><td style="color:var(--green)">Positive</td><td>As X increases, Y tends to increase</td><td>Bus age vs maintenance cost</td></tr>
       <tr><td style="color:var(--muted)">Points fall left → right</td><td style="color:var(--pink)">Negative</td><td>As X increases, Y tends to decrease</td><td>Meat price vs quantity purchased</td></tr>
-    </table>
+    </table></div>
 
     <div class="info-box teal" style="margin-top:1rem;">
       <div class="info-icon">🖥️</div>
@@ -541,13 +709,13 @@
     </div>
 
     <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin:1.5rem 0 1rem;">What Explore Produces</h3>
-    <table class="spss-table">
+    <div class="table-scroll"><table class="spss-table">
       <tr><th>Output</th><th>What You See</th><th>Use It For</th></tr>
       <tr><td>Descriptives Table</td><td>Mean, 95% CI, 5% Trimmed Mean, Median, Variance, SD, Min, Max, Range, IQR, Skewness, Kurtosis</td><td>Full summary — compare across groups instantly</td></tr>
       <tr><td>Stem-and-Leaf</td><td>Text-based display retaining all actual values</td><td>Shape, outliers, common values</td></tr>
       <tr><td>Box Plot</td><td>Graphical 5-number summary with outlier markers</td><td>Spread, skewness, outlier detection</td></tr>
       <tr><td>Normality Tests</td><td>Kolmogorov-Smirnov and Shapiro-Wilk tests + P-P/Q-Q plots</td><td>Formally test whether data is normally distributed</td></tr>
-    </table>
+    </table></div>
 
     <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin:1.5rem 0 1rem;">SPSS Steps: Run Explore</h3>
     <ol class="steps-list">
@@ -1154,5 +1322,18 @@ window.addEventListener('resize', ()=>{
   drawScatter(document.querySelector('#scatter .chart-btn.active')?.textContent.includes('Positive')?'positive':document.querySelector('#scatter .chart-btn.active')?.textContent.includes('Negative')?'negative':'none');
 });
 </script>
+<script>
+(function(){
+  var btn = document.getElementById('hamburgerBtn');
+  var overlay = document.getElementById('mobileNavOverlay');
+  if(!btn || !overlay) return;
+  function open()  { overlay.classList.add('open');  btn.classList.add('open');  document.body.style.overflow='hidden'; }
+  function close() { overlay.classList.remove('open'); btn.classList.remove('open'); document.body.style.overflow=''; }
+  btn.addEventListener('click', open);
+  document.querySelector('.mnav-close') && document.querySelector('.mnav-close').addEventListener('click', close);
+  overlay.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', close); });
+})();
+</script>
+
 </body>
 </html>
