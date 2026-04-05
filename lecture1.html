@@ -350,6 +350,158 @@
     .nav-links { display: none; }
     .page-wrap { padding: 2rem 1.2rem; }
   }
+
+  /* ═══════════════════════════════════════
+     MOBILE / RESPONSIVE ENHANCEMENTS
+  ═══════════════════════════════════════ */
+
+  /* Hamburger button */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+    border: none;
+    background: transparent;
+  }
+  .hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--gold, #e8a230);
+    border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Mobile nav overlay */
+  .mobile-nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(8,13,30,0.98);
+    z-index: 300;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.8rem;
+    backdrop-filter: blur(20px);
+  }
+  .mobile-nav-overlay.open { display: flex; }
+  .mobile-nav-overlay a {
+    color: var(--white, #f0eee8);
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+    border: 1px solid transparent;
+  }
+  .mobile-nav-overlay a:hover {
+    color: var(--gold, #e8a230);
+    border-color: rgba(232,162,48,0.3);
+    background: rgba(232,162,48,0.06);
+  }
+  .mnav-close {
+    position: absolute;
+    top: 1rem; right: 1.2rem;
+    background: none; border: none;
+    color: var(--muted, #8a96b8);
+    font-size: 1.6rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.3rem;
+  }
+
+  /* Scrollable table wrapper */
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 1.5rem 0;
+    border-radius: 8px;
+  }
+  .table-scroll > table { margin: 0 !important; }
+
+  /* Code / pre blocks */
+  pre {
+    overflow-x: auto;
+    white-space: pre;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+  code { font-size: 0.85em; }
+
+  /* ── 768px breakpoint ── */
+  @media (max-width: 768px) {
+    .hamburger { display: flex; }
+    .nav-links  { display: none !important; }
+    nav { padding: 0.9rem 1.2rem; }
+
+    .page-wrap { padding: 2rem 1rem; }
+
+    .lecture-hero {
+      grid-template-columns: 1fr !important;
+      gap: 2rem !important;
+      padding: 2rem 0 1.5rem !important;
+    }
+    .lecture-title { font-size: clamp(1.7rem, 7vw, 2.4rem) !important; }
+    .lecture-desc { font-size: 0.92rem; }
+
+    .section-h2   { font-size: 1.3rem !important; }
+    .section-icon { width: 36px !important; height: 36px !important; font-size: 1rem !important; }
+    .section-header { gap: 0.7rem; }
+
+    /* All 2-col / 3-col named grid classes → 1 col */
+    .levels-grid, .errors-list, .rule-cards, .eda-list,
+    .missing-demo, .ops-grid, .chart-types-grid { grid-template-columns: 1fr !important; }
+
+    .def-box  { padding: 1rem 1.2rem; }
+    .info-box { padding: 0.9rem 1rem; flex-direction: column; gap: 0.4rem; }
+    .quiz-wrap { padding: 1.2rem 1rem; }
+
+    .chart-wrap     { padding: 1rem 0.8rem; }
+    .chart-controls { flex-wrap: wrap; gap: 0.4rem; }
+    .chart-btn      { font-size: 0.72rem; padding: 0.3rem 0.7rem; }
+    canvas          { max-width: 100% !important; height: auto !important; min-height: 160px; }
+
+    .steps-list li  { padding-left: 2.4rem; font-size: 0.85rem; }
+    .toc-item       { font-size: 0.82rem; }
+    pre             { font-size: 0.72rem; padding: 0.8rem !important; }
+
+    /* Inline-style grids (attribute selector fallback) */
+    [style*="grid-template-columns:1fr 1fr"],
+    [style*="grid-template-columns: 1fr 1fr"] {
+      grid-template-columns: 1fr !important;
+    }
+    [style*="grid-template-columns:repeat(2"],
+    [style*="grid-template-columns: repeat(2"] {
+      grid-template-columns: 1fr !important;
+    }
+    [style*="grid-template-columns:repeat(3"],
+    [style*="grid-template-columns: repeat(3"] {
+      grid-template-columns: 1fr !important;
+    }
+    [style*="grid-template-columns:1fr 1fr 1fr"] {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  /* ── 480px breakpoint (small phones) ── */
+  @media (max-width: 480px) {
+    .page-wrap { padding: 1.5rem 0.8rem; }
+    .section-h2 { font-size: 1.15rem !important; }
+    .quiz-opt   { font-size: 0.82rem; padding: 0.65rem 0.9rem; }
+    canvas      { min-height: 130px; }
+    pre         { font-size: 0.65rem; }
+    .chart-btn  { font-size: 0.67rem; padding: 0.25rem 0.55rem; }
+  }
+
 </style>
 </head>
 <body>
@@ -365,7 +517,20 @@
     <a href="#spss">SPSS</a>
     <a href="lecture2.html">Lecture 2 →</a>
   </div>
+
+  <button class="hamburger" id="hamburgerBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
 </nav>
+
+<div class="mobile-nav-overlay" id="mobileNavOverlay">
+  <button class="mnav-close" id="mnavClose">✕</button>
+  <a href="index.html">← Home</a>
+    <a href="#definition">Definition</a>
+    <a href="#data-types">Data Types</a>
+    <a href="#distributions">Distributions</a>
+    <a href="#measurement">Measurement</a>
+    <a href="#spss">SPSS</a>
+    <a href="lecture2.html">Lecture 2 →</a>
+</div>
 
 <div class="page-wrap">
 
@@ -478,7 +643,7 @@
     </div>
 
     <!-- Quick comparison table -->
-    <table class="spss-table" style="margin-top:2rem;">
+    <div class="table-scroll"><table class="spss-table" style="margin-top:2rem;">
       <tr>
         <th>Data Type</th>
         <th>Can Rank?</th>
@@ -489,7 +654,7 @@
       <tr><td>Ordinal</td><td style="color:var(--green)">✓ Yes</td><td style="color:var(--pink)">✗ No</td><td>Satisfaction, Edu. Level</td></tr>
       <tr><td>Discrete</td><td style="color:var(--green)">✓ Yes</td><td style="color:var(--green)">✓ Yes</td><td># Patients, # Accidents</td></tr>
       <tr><td>Continuous</td><td style="color:var(--green)">✓ Yes</td><td style="color:var(--green)">✓ Yes</td><td>Age, Weight, Income</td></tr>
-    </table>
+    </table></div>
 
     <!-- Other data types -->
     <h3 style="font-family:'Playfair Display',serif; margin:2.5rem 0 1rem; font-size:1.3rem;">Other Data Types</h3>
@@ -563,14 +728,14 @@
       We then use SPSS or other tools to decide which hypothesis to accept.</p>
     </div>
 
-    <table class="spss-table">
+    <div class="table-scroll"><table class="spss-table">
       <tr><th>Distribution</th><th>When Used</th><th>Variable Range</th></tr>
       <tr><td>Normal</td><td>Continuous symmetric data (height, weight, IQ)</td><td>-∞ to +∞</td></tr>
       <tr><td>Poisson</td><td>Rare events (accidents, earthquakes per year)</td><td>0 to ∞ (integers)</td></tr>
       <tr><td>Gamma</td><td>Time until an event (waiting time, lifespan)</td><td>0 to ∞</td></tr>
       <tr><td>Binomial</td><td>Count of successes in n trials</td><td>0 to n (integers)</td></tr>
       <tr><td>Bernoulli</td><td>Single trial with success/failure</td><td>0 or 1 only</td></tr>
-    </table>
+    </table></div>
   </div>
 
   <!-- ── 4. MEASUREMENT LEVELS ── -->
@@ -665,15 +830,15 @@
       <p><strong>SPSS</strong> stands for <strong>Statistical Package for Social Sciences</strong>. Despite its name, it is used across many branches of science. It is one of the best packages for statistical presentation and analysis in the world.</p>
     </div>
     <h3 style="font-family:'Playfair Display',serif; margin:1.5rem 0 1rem; font-size:1.2rem;">Main Windows in SPSS</h3>
-    <table class="spss-table">
+    <div class="table-scroll"><table class="spss-table">
       <tr><th>Window</th><th>Arabic Name</th><th>Purpose</th></tr>
       <tr><td>Data View</td><td>نافذة تحرير البيانات</td><td>Display, enter, and store data in rows (cases) and columns (variables)</td></tr>
       <tr><td>Variable View</td><td>نافذة تحرير المتغيرات</td><td>Define variables: type, label, values, missing, format, measurement level</td></tr>
       <tr><td>Output Viewer</td><td>نافذة عرض المخرجات</td><td>Shows results of statistical analysis — saved separately from data file</td></tr>
-    </table>
+    </table></div>
 
     <h3 style="font-family:'Playfair Display',serif; margin:2rem 0 1rem; font-size:1.2rem;">Defining Variables in SPSS — 7 Steps</h3>
-    <table class="spss-table">
+    <div class="table-scroll"><table class="spss-table">
       <tr><th>Step</th><th>What You Do</th><th>Notes</th></tr>
       <tr><td>1. Name</td><td>Give the variable a name</td><td>Must start with a letter. No spaces, no special chars (!?*). Max 8 chars in older versions.</td></tr>
       <tr><td>2. Type</td><td>Set data type</td><td>Numeric (default), String (text), Date, Dollar, etc.</td></tr>
@@ -682,7 +847,7 @@
       <tr><td>5. Values</td><td>Assign codes to categories</td><td>e.g. Gender: 1 = Male, 2 = Female</td></tr>
       <tr><td>6. Missing</td><td>Define missing value codes</td><td>Tell SPSS which values to treat as missing data</td></tr>
       <tr><td>7. Measure</td><td>Set measurement level</td><td>Nominal, Ordinal, or Scale (Ratio/Interval)</td></tr>
-    </table>
+    </table></div>
 
     <div class="info-box" style="margin-top:1.5rem;">
       <div class="info-icon">💡</div>
@@ -991,5 +1156,18 @@ function renderQ() {
 function nextQuestion() { qIdx++; renderQ(); }
 renderQ();
 </script>
+<script>
+(function(){
+  var btn = document.getElementById('hamburgerBtn');
+  var overlay = document.getElementById('mobileNavOverlay');
+  if(!btn || !overlay) return;
+  function open()  { overlay.classList.add('open');  btn.classList.add('open');  document.body.style.overflow='hidden'; }
+  function close() { overlay.classList.remove('open'); btn.classList.remove('open'); document.body.style.overflow=''; }
+  btn.addEventListener('click', open);
+  document.querySelector('.mnav-close') && document.querySelector('.mnav-close').addEventListener('click', close);
+  overlay.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', close); });
+})();
+</script>
+
 </body>
 </html>
