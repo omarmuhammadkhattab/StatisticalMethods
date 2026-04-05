@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 1 – Types of Data | DS 501</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #080d1e;
+    --navy2: #0f1630;
+    --navy3: #1a2248;
+    --gold: #e8a230;
+    --gold2: #f5c060;
+    --teal: #3ecfb2;
+    --pink: #e8507a;
+    --white: #f0eee8;
+    --muted: #8a96b8;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --green: #4ecb71;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(232,162,48,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(232,162,48,0.03) 1px, transparent 1px);
+    background-size: 60px 60px; pointer-events: none; z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 3rem;
+    background: rgba(8,13,30,0.9); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--gold); }
+  .nav-links { display: flex; gap: 1.5rem; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+
+  /* LAYOUT */
+  .page-wrap { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; position: relative; z-index: 1; }
+
+  /* HERO SECTION */
+  .lecture-hero {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+    align-items: center; padding: 4rem 0 3rem;
+  }
+  .lecture-badge {
+    font-family: 'DM Mono', monospace; font-size: 0.75rem;
+    color: var(--gold); letter-spacing: 0.12em;
+    background: rgba(232,162,48,0.1); border: 1px solid rgba(232,162,48,0.25);
+    display: inline-block; padding: 0.3rem 1rem; border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  .lecture-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    font-weight: 900; line-height: 1.1;
+  }
+  .lecture-title em { font-style: italic; color: var(--gold); }
+  .lecture-desc { color: var(--muted); font-size: 1rem; line-height: 1.8; margin-top: 1.2rem; font-weight: 300; }
+  .toc { margin-top: 2rem; }
+  .toc-title { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.8rem; }
+  .toc-item {
+    display: flex; align-items: center; gap: 0.7rem;
+    padding: 0.5rem 0; border-bottom: 1px solid var(--border);
+    text-decoration: none; color: var(--white);
+    font-size: 0.88rem; transition: color 0.2s;
+  }
+  .toc-item:hover { color: var(--gold); }
+  .toc-num { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); width: 24px; }
+  .toc-arrow { margin-left: auto; color: var(--muted); font-size: 0.8rem; }
+
+  /* RIGHT PANEL – mini stats card */
+  .hero-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2rem;
+  }
+  .hero-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; color: var(--muted); margin-bottom: 1.5rem;
+    padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+  }
+  .mini-stat { display: flex; justify-content: space-between; align-items: center; padding: 0.7rem 0; border-bottom: 1px solid var(--border); }
+  .mini-stat:last-child { border-bottom: none; }
+  .mini-stat-label { font-size: 0.85rem; color: var(--muted); }
+  .mini-stat-val { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--gold); }
+
+  /* ── SECTIONS ── */
+  .content-section {
+    margin-bottom: 4rem;
+    animation: fadeUp 0.6s ease both;
+  }
+  .section-header {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem; border-bottom: 1px solid var(--border);
+  }
+  .section-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: rgba(232,162,48,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; flex-shrink: 0;
+  }
+  .section-label-sm { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--gold); letter-spacing: 0.12em; }
+  .section-h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; }
+
+  /* DEFINITION BOX */
+  .def-box {
+    background: rgba(232,162,48,0.06);
+    border: 1px solid rgba(232,162,48,0.2);
+    border-left: 4px solid var(--gold);
+    border-radius: 8px; padding: 1.5rem 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+  .def-box p { color: var(--white); line-height: 1.8; font-size: 0.95rem; }
+  .def-box strong { color: var(--gold); }
+
+  /* INFO BOX */
+  .info-box {
+    background: rgba(62,207,178,0.06);
+    border: 1px solid rgba(62,207,178,0.2);
+    border-radius: 8px; padding: 1.2rem 1.5rem;
+    margin-bottom: 1rem;
+    display: flex; gap: 1rem; align-items: flex-start;
+  }
+  .info-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .info-box p { color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+  .info-box p strong { color: var(--white); }
+
+  /* ── DATA TYPE TREE ── */
+  .tree-wrap { margin: 2rem 0; overflow-x: auto; }
+  .tree {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0;
+    font-family: 'DM Sans', sans-serif;
+    min-width: 700px;
+  }
+  .tree-row { display: flex; justify-content: center; gap: 1.5rem; }
+  .tree-node {
+    padding: 0.7rem 1.2rem; border-radius: 8px;
+    text-align: center; font-size: 0.85rem; font-weight: 500;
+    position: relative; cursor: default;
+    transition: transform 0.2s;
+  }
+  .tree-node:hover { transform: translateY(-2px); }
+  .tree-node.root { background: var(--gold); color: var(--navy); font-weight: 700; font-size: 1rem; }
+  .tree-node.level1-a { background: rgba(62,207,178,0.15); border: 1px solid rgba(62,207,178,0.4); color: var(--teal); }
+  .tree-node.level1-b { background: rgba(232,80,122,0.15); border: 1px solid rgba(232,80,122,0.4); color: var(--pink); }
+  .tree-node.level2 { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--white); font-size: 0.8rem; }
+  .tree-connector { height: 28px; display: flex; justify-content: center; align-items: center; }
+  .tree-connector::before { content: ''; display: block; width: 2px; height: 100%; background: var(--border); }
+  .tree-row-wrap { display: flex; flex-direction: column; align-items: center; }
+  .tree-branches { display: flex; gap: 1.5rem; position: relative; }
+  .tree-branches::before {
+    content: ''; position: absolute;
+    top: 0; left: 50%; right: 0;
+    height: 2px; background: var(--border);
+  }
+  .tree-branch-item { display: flex; flex-direction: column; align-items: center; }
+  .v-line { width: 2px; height: 20px; background: var(--border); }
+  .h-line-row {
+    display: flex; width: 100%;
+    border-top: 2px solid var(--border);
+    justify-content: space-around;
+  }
+
+  /* INTERACTIVE TREE */
+  #dataTree { margin: 2rem 0; }
+  .itree-container {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 2rem; text-align: center;
+  }
+  .itree-root {
+    display: inline-block;
+    background: var(--gold); color: var(--navy);
+    font-weight: 700; padding: 0.7rem 2rem;
+    border-radius: 8px; font-size: 1rem;
+    cursor: pointer; margin-bottom: 1.5rem;
+  }
+  .itree-level {
+    display: flex; justify-content: center; gap: 2rem;
+    margin-bottom: 1.5rem; flex-wrap: wrap;
+  }
+  .itree-node {
+    padding: 0.6rem 1.2rem; border-radius: 8px;
+    font-size: 0.85rem; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    position: relative;
+  }
+  .itree-node:hover { transform: scale(1.05); }
+  .itree-node.qual { background: rgba(62,207,178,0.15); border: 1px solid var(--teal); color: var(--teal); }
+  .itree-node.quant { background: rgba(232,80,122,0.15); border: 1px solid var(--pink); color: var(--pink); }
+  .itree-node.sub { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--white); font-size: 0.78rem; }
+  .itree-node.sub.qual-sub { border-color: rgba(62,207,178,0.3); }
+  .itree-node.sub.quant-sub { border-color: rgba(232,80,122,0.3); }
+  .node-tooltip {
+    position: absolute; bottom: calc(100% + 10px); left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    background: var(--navy3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.8rem 1rem;
+    width: 220px; text-align: left;
+    font-size: 0.78rem; color: var(--muted); line-height: 1.5;
+    pointer-events: none;
+    opacity: 0; transition: all 0.2s; z-index: 10;
+  }
+  .node-tooltip strong { color: var(--white); display: block; margin-bottom: 0.3rem; }
+  .itree-node:hover .node-tooltip { opacity: 1; transform: translateX(-50%) scale(1); }
+  .connector-h {
+    display: flex; justify-content: center;
+    position: relative; margin-bottom: 1rem;
+  }
+  .connector-v { width: 2px; height: 20px; background: var(--border); margin: 0 auto; }
+
+  /* DISTRIBUTION CHART */
+  .dist-canvas-wrap {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+  .dist-controls {
+    display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.2rem;
+    align-items: center;
+  }
+  .dist-btn {
+    padding: 0.4rem 1rem; border-radius: 6px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted); font-size: 0.82rem; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .dist-btn.active, .dist-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(232,162,48,0.08); }
+  .dist-canvas { width: 100%; height: 200px; display: block; }
+
+  /* MEASUREMENT LEVELS */
+  .levels-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem; margin: 1.5rem 0;
+  }
+  .level-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1.4rem;
+    transition: all 0.2s; cursor: default;
+  }
+  .level-card:hover { border-color: rgba(232,162,48,0.3); background: rgba(232,162,48,0.04); }
+  .level-badge {
+    display: inline-block; font-family: 'DM Mono', monospace;
+    font-size: 0.68rem; letter-spacing: 0.1em;
+    padding: 0.25rem 0.7rem; border-radius: 4px;
+    margin-bottom: 0.8rem;
+  }
+  .level-badge.nominal { background: rgba(62,207,178,0.15); color: var(--teal); }
+  .level-badge.ordinal { background: rgba(232,162,48,0.15); color: var(--gold); }
+  .level-badge.interval { background: rgba(232,80,122,0.15); color: var(--pink); }
+  .level-badge.ratio { background: rgba(78,203,113,0.15); color: var(--green); }
+  .level-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .level-desc { font-size: 0.84rem; color: var(--muted); line-height: 1.6; }
+  .level-example { font-size: 0.78rem; color: var(--gold); margin-top: 0.6rem; font-family: 'DM Mono', monospace; }
+
+  /* QUIZ */
+  .quiz-wrap {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 2rem; margin: 2rem 0;
+  }
+  .quiz-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 0.5rem; }
+  .quiz-q { color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.5rem; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 0.6rem; }
+  .quiz-opt {
+    padding: 0.8rem 1.2rem; border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer; font-size: 0.88rem;
+    transition: all 0.2s; text-align: left;
+    background: transparent; color: var(--white);
+    font-family: 'DM Sans', sans-serif; width: 100%;
+  }
+  .quiz-opt:hover { border-color: var(--gold); }
+  .quiz-opt.correct { background: rgba(78,203,113,0.15); border-color: var(--green); color: var(--green); }
+  .quiz-opt.wrong { background: rgba(232,80,122,0.12); border-color: var(--pink); color: var(--pink); }
+  .quiz-feedback { margin-top: 1rem; font-size: 0.88rem; line-height: 1.6; color: var(--muted); display: none; }
+  .quiz-feedback.show { display: block; }
+  .quiz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; }
+  .quiz-counter { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--muted); }
+  .quiz-next { background: var(--gold); color: var(--navy); border: none; padding: 0.6rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: 'DM Sans', sans-serif; display: none; }
+
+  /* RESEARCH STAGES */
+  .stages { display: flex; flex-direction: column; gap: 0; margin: 1.5rem 0; }
+  .stage-item {
+    display: flex; align-items: flex-start; gap: 1.2rem;
+    padding: 1rem 0; border-bottom: 1px solid var(--border);
+    transition: background 0.2s; cursor: default;
+    border-radius: 4px;
+  }
+  .stage-item:hover { background: rgba(232,162,48,0.04); }
+  .stage-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(232,162,48,0.1); border: 1px solid rgba(232,162,48,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace; font-size: 0.78rem;
+    color: var(--gold); flex-shrink: 0;
+  }
+  .stage-content {}
+  .stage-title { font-weight: 600; font-size: 0.92rem; margin-bottom: 0.2rem; }
+  .stage-desc { font-size: 0.83rem; color: var(--muted); }
+
+  /* SPSS TABLE */
+  .spss-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.86rem; }
+  .spss-table th { background: rgba(232,162,48,0.1); color: var(--gold); font-weight: 600; padding: 0.8rem 1rem; text-align: left; border-bottom: 1px solid rgba(232,162,48,0.2); }
+  .spss-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+  .spss-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .spss-table td:first-child { color: var(--white); font-weight: 500; font-family: 'DM Mono', monospace; font-size: 0.8rem; }
+
+  /* ERRORS LIST */
+  .errors-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin: 1.5rem 0; }
+  .error-item {
+    background: rgba(232,80,122,0.06); border: 1px solid rgba(232,80,122,0.2);
+    border-radius: 8px; padding: 1rem 1.2rem;
+    font-size: 0.84rem; color: var(--muted); line-height: 1.5;
+    display: flex; gap: 0.6rem; align-items: flex-start;
+  }
+  .error-icon { color: var(--pink); font-size: 0.9rem; flex-shrink: 0; margin-top: 0.1rem; }
+
+  /* CANVAS STYLING */
+  canvas { border-radius: 8px; }
+
+  /* PROGRESS BAR */
+  .progress-bar-wrap { background: var(--border); border-radius: 4px; height: 4px; margin-top: 3rem; margin-bottom: 2rem; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--gold), var(--teal)); border-radius: 4px; width: 50%; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 768px) {
+    .lecture-hero { grid-template-columns: 1fr; }
+    .levels-grid { grid-template-columns: 1fr; }
+    .errors-list { grid-template-columns: 1fr; }
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .page-wrap { padding: 2rem 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">DS 501 · Lecture 01</div>
+  <div class="nav-links">
+    <a href="index.html">← Home</a>
+    <a href="#definition">Definition</a>
+    <a href="#data-types">Data Types</a>
+    <a href="#distributions">Distributions</a>
+    <a href="#measurement">Measurement</a>
+    <a href="#spss">SPSS</a>
+    <a href="lecture2.html">Lecture 2 →</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <div class="lecture-hero">
+    <div>
+      <div class="lecture-badge">LECTURE 01 — DS 501</div>
+      <h1 class="lecture-title">Types of Data &<em>Introduction to SPSS</em></h1>
+      <p class="lecture-desc">Understand how statisticians classify and think about data — from defining populations and samples, to recognizing different data distributions, measurement levels, and how to work in SPSS.</p>
+      <div class="toc">
+        <div class="toc-title">In this lecture</div>
+        <a href="#definition" class="toc-item"><span class="toc-num">01</span> What is Statistics? <span class="toc-arrow">↓</span></a>
+        <a href="#data-types" class="toc-item"><span class="toc-num">02</span> Types of Data <span class="toc-arrow">↓</span></a>
+        <a href="#distributions" class="toc-item"><span class="toc-num">03</span> Distributions <span class="toc-arrow">↓</span></a>
+        <a href="#measurement" class="toc-item"><span class="toc-num">04</span> Measurement Levels <span class="toc-arrow">↓</span></a>
+        <a href="#research" class="toc-item"><span class="toc-num">05</span> Research Stages <span class="toc-arrow">↓</span></a>
+        <a href="#spss" class="toc-item"><span class="toc-num">06</span> SPSS Basics <span class="toc-arrow">↓</span></a>
+        <a href="#quiz" class="toc-item"><span class="toc-num">07</span> Test Yourself <span class="toc-arrow">↓</span></a>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-title">Lecture Overview</div>
+      <div class="mini-stat"><span class="mini-stat-label">Course</span><span class="mini-stat-val">DS 501</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">University</span><span class="mini-stat-val">Cairo University</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Key Topics</span><span class="mini-stat-val">Data, SPSS</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Main Software</span><span class="mini-stat-val">IBM SPSS v25</span></div>
+    </div>
+  </div>
+
+  <div class="progress-bar-wrap"><div class="progress-bar"></div></div>
+
+  <!-- ── 1. DEFINITION ── -->
+  <div class="content-section" id="definition">
+    <div class="section-header">
+      <div class="section-icon">📖</div>
+      <div>
+        <div class="section-label-sm">SECTION 01</div>
+        <div class="section-h2">What is Statistics?</div>
+      </div>
+    </div>
+    <div class="def-box">
+      <p><strong>Statistics</strong> is the science concerned with designing data collection methods, and various techniques for <strong>classifying, organizing, summarizing, displaying and analyzing</strong> these data in order to obtain statistical indicators and information necessary for making appropriate decisions.</p>
+    </div>
+    <div class="info-box">
+      <div class="info-icon">💡</div>
+      <p>Think of statistics as a <strong>pipeline</strong>: you start with raw <strong>Data</strong>, then you classify, summarize, organize, display, and analyze it — and the output is useful <strong>Information</strong> to make decisions.</p>
+    </div>
+
+    <!-- Data flow visualization -->
+    <div style="display:flex; align-items:center; gap:0; overflow-x:auto; padding:1.5rem 0; flex-wrap:nowrap; margin:1.5rem 0;">
+      <div id="flow-items"></div>
+    </div>
+    <canvas id="flowCanvas" width="700" height="60" style="width:100%; max-width:700px; display:block; margin:0 auto;"></canvas>
+
+    <h3 style="font-family:'Playfair Display',serif; margin:2rem 0 1rem; font-size:1.3rem;">Population vs Sample</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.2rem;">
+      <div class="info-box" style="flex-direction:column;">
+        <div style="font-weight:600; color:var(--teal); margin-bottom:0.5rem;">🌍 Population</div>
+        <p>The <strong>total group</strong> of elements under study. It can be <strong>limited</strong> (countable) or <strong>unlimited</strong> (cannot be fully counted). Example: All hospitals in Cairo.</p>
+      </div>
+      <div class="info-box" style="flex-direction:column;">
+        <div style="font-weight:600; color:var(--pink); margin-bottom:0.5rem;">🔬 Sample</div>
+        <p>A <strong>subset</strong> of the population. We use samples when it's impractical to study the entire population. Example: 500 families selected to estimate Egypt's average family income.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. DATA TYPES ── -->
+  <div class="content-section" id="data-types">
+    <div class="section-header">
+      <div class="section-icon">🗂️</div>
+      <div>
+        <div class="section-label-sm">SECTION 02</div>
+        <div class="section-h2">Types of Statistical Data</div>
+      </div>
+    </div>
+    <p style="color:var(--muted); margin-bottom:1.5rem; line-height:1.8;">Hover over each node below to see its definition and examples.</p>
+
+    <!-- Interactive Tree -->
+    <div class="itree-container" id="dataTree">
+      <div class="itree-root">📊 Statistical Data</div>
+      <div class="connector-v"></div>
+      <div class="itree-level">
+        <div class="itree-node qual">
+          🏷️ Qualitative Data
+          <div class="node-tooltip"><strong>Qualitative (Categorical)</strong>Descriptive data that cannot have math operations (addition, subtraction) performed on it. It describes categories or qualities.</div>
+        </div>
+        <div class="itree-node quant">
+          🔢 Quantitative Data
+          <div class="node-tooltip"><strong>Quantitative (Numerical)</strong>Data that comes in the form of numbers. You can perform mathematical calculations on it and arrange it.</div>
+        </div>
+      </div>
+      <div class="connector-v"></div>
+      <div class="itree-level">
+        <div class="itree-node sub qual-sub">
+          🏷️ Nominal
+          <div class="node-tooltip"><strong>Nominal Data</strong>Descriptive categories with NO natural order. Examples: Blood type (A, B, O, AB), Gender (Male/Female), Nationality.</div>
+        </div>
+        <div class="itree-node sub qual-sub">
+          🔀 Ordinal
+          <div class="node-tooltip"><strong>Ordinal Data</strong>Descriptive categories WITH a meaningful order/ranking. Examples: Satisfaction (Poor, Good, Excellent), Education level, Service quality.</div>
+        </div>
+        <div class="itree-node sub quant-sub">
+          🔵 Discrete
+          <div class="node-tooltip"><strong>Discrete Data</strong>Countable, separate values. You can list each possible value. Examples: Number of patients, Number of accidents, Number of crimes.</div>
+        </div>
+        <div class="itree-node sub quant-sub">
+          〰️ Continuous
+          <div class="node-tooltip"><strong>Continuous Data</strong>Measured values that can take any value in a range. Examples: Age, Weight, Height, Income, Temperature.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick comparison table -->
+    <table class="spss-table" style="margin-top:2rem;">
+      <tr>
+        <th>Data Type</th>
+        <th>Can Rank?</th>
+        <th>Math Operations?</th>
+        <th>Examples</th>
+      </tr>
+      <tr><td>Nominal</td><td style="color:var(--pink)">✗ No</td><td style="color:var(--pink)">✗ No</td><td>Gender, Blood Type, Color</td></tr>
+      <tr><td>Ordinal</td><td style="color:var(--green)">✓ Yes</td><td style="color:var(--pink)">✗ No</td><td>Satisfaction, Edu. Level</td></tr>
+      <tr><td>Discrete</td><td style="color:var(--green)">✓ Yes</td><td style="color:var(--green)">✓ Yes</td><td># Patients, # Accidents</td></tr>
+      <tr><td>Continuous</td><td style="color:var(--green)">✓ Yes</td><td style="color:var(--green)">✓ Yes</td><td>Age, Weight, Income</td></tr>
+    </table>
+
+    <!-- Other data types -->
+    <h3 style="font-family:'Playfair Display',serif; margin:2.5rem 0 1rem; font-size:1.3rem;">Other Data Types</h3>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem;">
+      <div class="level-card">
+        <div class="level-badge nominal">TIME SERIES</div>
+        <div class="level-title" style="font-size:1rem;">Time Series</div>
+        <div class="level-desc">Data collected at successive time periods. Used to discover patterns and forecast the future.</div>
+        <div class="level-example">→ Daily surgeries over a year</div>
+      </div>
+      <div class="level-card">
+        <div class="level-badge ordinal">CROSS-SECTION</div>
+        <div class="level-title" style="font-size:1rem;">Cross-Sectional</div>
+        <div class="level-desc">Data collected at a single point in time across multiple subjects or units.</div>
+        <div class="level-example">→ Patients in all hospitals in October</div>
+      </div>
+      <div class="level-card">
+        <div class="level-badge ratio" style="background:rgba(78,203,113,0.15);color:var(--green)">PANEL</div>
+        <div class="level-title" style="font-size:1rem;">Panel / Longitudinal</div>
+        <div class="level-desc">A mix of time series AND cross-section. Multiple subjects tracked over multiple time periods.</div>
+        <div class="level-example">→ 20 patients tracked for 10 weeks</div>
+      </div>
+      <div class="level-card">
+        <div class="level-badge interval">BINARY</div>
+        <div class="level-title" style="font-size:1rem;">Binary</div>
+        <div class="level-desc">Data with only two values: 0 (failure) or 1 (success). Follows Bernoulli distribution.</div>
+        <div class="level-example">→ Treated (1) / Not treated (0)</div>
+      </div>
+      <div class="level-card">
+        <div class="level-badge nominal">COUNT</div>
+        <div class="level-title" style="font-size:1rem;">Count Data</div>
+        <div class="level-desc">Non-negative integers from counting rather than measuring. Binomial or Poisson.</div>
+        <div class="level-example">→ # patients cured out of 5</div>
+      </div>
+      <div class="level-card">
+        <div class="level-badge ordinal">BIG DATA</div>
+        <div class="level-title" style="font-size:1rem;">Big vs Small Data</div>
+        <div class="level-desc">Big data exceeds traditional tools' capacity. Small data fits standard statistical methods.</div>
+        <div class="level-example">→ IoT sensor logs vs. hospital survey</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. DISTRIBUTIONS ── -->
+  <div class="content-section" id="distributions">
+    <div class="section-header">
+      <div class="section-icon">📈</div>
+      <div>
+        <div class="section-label-sm">SECTION 03</div>
+        <div class="section-h2">Data Distributions</div>
+      </div>
+    </div>
+    <p style="color:var(--muted); margin-bottom:1.5rem; line-height:1.8;">Choose a distribution to see its shape and learn when it applies.</p>
+
+    <div class="dist-canvas-wrap">
+      <div class="dist-controls">
+        <button class="dist-btn active" onclick="showDist('normal',this)">Normal</button>
+        <button class="dist-btn" onclick="showDist('poisson',this)">Poisson</button>
+        <button class="dist-btn" onclick="showDist('gamma',this)">Gamma</button>
+        <button class="dist-btn" onclick="showDist('binomial',this)">Binomial</button>
+        <button class="dist-btn" onclick="showDist('bernoulli',this)">Bernoulli</button>
+      </div>
+      <canvas id="distCanvas" class="dist-canvas" width="700" height="200"></canvas>
+      <div id="distInfo" style="margin-top:1rem; padding:1rem; background:rgba(255,255,255,0.03); border-radius:8px; font-size:0.88rem; color:var(--muted); line-height:1.7;"></div>
+    </div>
+
+    <div class="def-box" style="margin-top:1.5rem;">
+      <p><strong>Testing for Normality:</strong> We use hypothesis testing:<br>
+      H₀ (Null): The data IS normally distributed<br>
+      H₁ (Alternative): The data is NOT normally distributed<br>
+      We then use SPSS or other tools to decide which hypothesis to accept.</p>
+    </div>
+
+    <table class="spss-table">
+      <tr><th>Distribution</th><th>When Used</th><th>Variable Range</th></tr>
+      <tr><td>Normal</td><td>Continuous symmetric data (height, weight, IQ)</td><td>-∞ to +∞</td></tr>
+      <tr><td>Poisson</td><td>Rare events (accidents, earthquakes per year)</td><td>0 to ∞ (integers)</td></tr>
+      <tr><td>Gamma</td><td>Time until an event (waiting time, lifespan)</td><td>0 to ∞</td></tr>
+      <tr><td>Binomial</td><td>Count of successes in n trials</td><td>0 to n (integers)</td></tr>
+      <tr><td>Bernoulli</td><td>Single trial with success/failure</td><td>0 or 1 only</td></tr>
+    </table>
+  </div>
+
+  <!-- ── 4. MEASUREMENT LEVELS ── -->
+  <div class="content-section" id="measurement">
+    <div class="section-header">
+      <div class="section-icon">📏</div>
+      <div>
+        <div class="section-label-sm">SECTION 04</div>
+        <div class="section-h2">Levels of Measurement</div>
+      </div>
+    </div>
+    <p style="color:var(--muted); margin-bottom:1.5rem; line-height:1.8;">The level of measurement determines what statistical tests you can use. They go from least to most informative.</p>
+
+    <!-- Pyramid visualization -->
+    <canvas id="pyramidCanvas" width="600" height="220" style="width:100%; max-width:600px; display:block; margin:0 auto 2rem;"></canvas>
+
+    <div class="levels-grid">
+      <div class="level-card">
+        <div class="level-badge nominal">NOMINAL — Level 1</div>
+        <div class="level-title">Nominal</div>
+        <div class="level-desc">The lowest level. Numbers are used only for identification — categories have no meaningful order or difference in magnitude.</div>
+        <div class="level-example">Examples: Marital status, Blood type, Car type, Nationality</div>
+      </div>
+      <div class="level-card">
+        <div class="level-badge ordinal">ORDINAL — Level 2</div>
+        <div class="level-title">Ordinal</div>
+        <div class="level-desc">Has a logical order or preference between categories, but the differences between ranks are NOT equal or meaningful.</div>
+        <div class="level-example">Examples: Education level, Consumer satisfaction, Service quality</div>
+      </div>
+      <div class="level-card">
+        <div class="level-badge interval">INTERVAL — Level 3</div>
+        <div class="level-title">Interval</div>
+        <div class="level-desc">Has meaningful differences between values, but NO true zero point. Zero is just an agreed reference, not absence of the quality.</div>
+        <div class="level-example">Examples: Temperature (°C), Intelligence scores, Aggression scale</div>
+      </div>
+      <div class="level-card">
+        <div class="level-badge ratio">RATIO — Level 4</div>
+        <div class="level-title">Ratio</div>
+        <div class="level-desc">The highest level. Has a true zero (zero = absence). Differences AND ratios are meaningful. You can say "twice as much."</div>
+        <div class="level-example">Examples: Weight, Number of patients, Distance, Income</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. RESEARCH STAGES ── -->
+  <div class="content-section" id="research">
+    <div class="section-header">
+      <div class="section-icon">🔬</div>
+      <div>
+        <div class="section-label-sm">SECTION 05</div>
+        <div class="section-h2">Stages of Scientific Research</div>
+      </div>
+    </div>
+    <div class="stages">
+      <div class="stage-item"><div class="stage-num">01</div><div class="stage-content"><div class="stage-title">Define the Study Problem</div><div class="stage-desc">Clearly state what question you're trying to answer.</div></div></div>
+      <div class="stage-item"><div class="stage-num">02</div><div class="stage-content"><div class="stage-title">Define the Study Population</div><div class="stage-desc">Identify who or what your study is about.</div></div></div>
+      <div class="stage-item"><div class="stage-num">03</div><div class="stage-content"><div class="stage-title">Define Study Variables</div><div class="stage-desc">Decide which characteristics you will measure.</div></div></div>
+      <div class="stage-item"><div class="stage-num">04</div><div class="stage-content"><div class="stage-title">State Study Hypotheses</div><div class="stage-desc">Formulate H₀ (null) and H₁ (alternative) hypotheses.</div></div></div>
+      <div class="stage-item"><div class="stage-num">05</div><div class="stage-content"><div class="stage-title">Collect Data</div><div class="stage-desc">Use appropriate methods (surveys, experiments, etc.).</div></div></div>
+      <div class="stage-item"><div class="stage-num">06</div><div class="stage-content"><div class="stage-title">Enter Data into Computer</div><div class="stage-desc">Input the collected data into software like SPSS or Excel.</div></div></div>
+      <div class="stage-item"><div class="stage-num">07</div><div class="stage-content"><div class="stage-title">Process Statistical Data</div><div class="stage-desc">Clean, transform, and prepare data for analysis.</div></div></div>
+      <div class="stage-item"><div class="stage-num">08</div><div class="stage-content"><div class="stage-title">Choose Appropriate Statistical Methods</div><div class="stage-desc">Select the right test based on your data type and question.</div></div></div>
+      <div class="stage-item"><div class="stage-num">09</div><div class="stage-content"><div class="stage-title">Interpret Results</div><div class="stage-desc">Understand what the output means in real-world terms.</div></div></div>
+      <div class="stage-item"><div class="stage-num">10</div><div class="stage-content"><div class="stage-title">Decision-Making & Forecasting</div><div class="stage-desc">Use the insights to make decisions and predict future outcomes.</div></div></div>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif; margin:2.5rem 0 1rem; font-size:1.3rem;">Common Errors Statisticians Make</h3>
+    <div class="errors-list">
+      <div class="error-item"><div class="error-icon">⚠</div>Wrong definition of the study population</div>
+      <div class="error-item"><div class="error-icon">⚠</div>Choosing irrelevant variables for the study</div>
+      <div class="error-item"><div class="error-icon">⚠</div>Using an unsuitable sampling method</div>
+      <div class="error-item"><div class="error-icon">⚠</div>Relying on voluntary responses in surveys</div>
+      <div class="error-item"><div class="error-icon">⚠</div>Errors in experiment design</div>
+      <div class="error-item"><div class="error-icon">⚠</div>Insufficient available data</div>
+      <div class="error-item"><div class="error-icon">⚠</div>Data entry errors into the computer</div>
+      <div class="error-item"><div class="error-icon">⚠</div>Wrong statistical method chosen</div>
+      <div class="error-item"><div class="error-icon">⚠</div>Misinterpreting results</div>
+      <div class="error-item"><div class="error-icon">⚠</div>Mistakes in generalization & decisions</div>
+    </div>
+  </div>
+
+  <!-- ── 6. SPSS ── -->
+  <div class="content-section" id="spss">
+    <div class="section-header">
+      <div class="section-icon">🖥️</div>
+      <div>
+        <div class="section-label-sm">SECTION 06</div>
+        <div class="section-h2">Introduction to SPSS</div>
+      </div>
+    </div>
+    <div class="def-box">
+      <p><strong>SPSS</strong> stands for <strong>Statistical Package for Social Sciences</strong>. Despite its name, it is used across many branches of science. It is one of the best packages for statistical presentation and analysis in the world.</p>
+    </div>
+    <h3 style="font-family:'Playfair Display',serif; margin:1.5rem 0 1rem; font-size:1.2rem;">Main Windows in SPSS</h3>
+    <table class="spss-table">
+      <tr><th>Window</th><th>Arabic Name</th><th>Purpose</th></tr>
+      <tr><td>Data View</td><td>نافذة تحرير البيانات</td><td>Display, enter, and store data in rows (cases) and columns (variables)</td></tr>
+      <tr><td>Variable View</td><td>نافذة تحرير المتغيرات</td><td>Define variables: type, label, values, missing, format, measurement level</td></tr>
+      <tr><td>Output Viewer</td><td>نافذة عرض المخرجات</td><td>Shows results of statistical analysis — saved separately from data file</td></tr>
+    </table>
+
+    <h3 style="font-family:'Playfair Display',serif; margin:2rem 0 1rem; font-size:1.2rem;">Defining Variables in SPSS — 7 Steps</h3>
+    <table class="spss-table">
+      <tr><th>Step</th><th>What You Do</th><th>Notes</th></tr>
+      <tr><td>1. Name</td><td>Give the variable a name</td><td>Must start with a letter. No spaces, no special chars (!?*). Max 8 chars in older versions.</td></tr>
+      <tr><td>2. Type</td><td>Set data type</td><td>Numeric (default), String (text), Date, Dollar, etc.</td></tr>
+      <tr><td>3. Width & Decimals</td><td>Column width and decimal places</td><td>Default: width=8, decimals=2</td></tr>
+      <tr><td>4. Label</td><td>Full description of the variable</td><td>e.g. variable named "x1" → label is the full survey question</td></tr>
+      <tr><td>5. Values</td><td>Assign codes to categories</td><td>e.g. Gender: 1 = Male, 2 = Female</td></tr>
+      <tr><td>6. Missing</td><td>Define missing value codes</td><td>Tell SPSS which values to treat as missing data</td></tr>
+      <tr><td>7. Measure</td><td>Set measurement level</td><td>Nominal, Ordinal, or Scale (Ratio/Interval)</td></tr>
+    </table>
+
+    <div class="info-box" style="margin-top:1.5rem;">
+      <div class="info-icon">💡</div>
+      <p><strong>Tip:</strong> Use numeric codes for categorical variables whenever possible (e.g., 1 = Male, 2 = Female). This allows SPSS to process them more efficiently than text strings.</p>
+    </div>
+  </div>
+
+  <!-- ── 7. QUIZ ── -->
+  <div class="content-section" id="quiz">
+    <div class="section-header">
+      <div class="section-icon">🎯</div>
+      <div>
+        <div class="section-label-sm">SECTION 07</div>
+        <div class="section-h2">Test Yourself</div>
+      </div>
+    </div>
+    <div class="quiz-wrap">
+      <div class="quiz-title" id="qTitle">Question 1 of 6</div>
+      <div class="quiz-q" id="qText"></div>
+      <div class="quiz-opts" id="qOpts"></div>
+      <div class="quiz-feedback" id="qFeedback"></div>
+      <div class="quiz-nav">
+        <div class="quiz-counter" id="qScore">Score: 0</div>
+        <button class="quiz-next" id="qNext" onclick="nextQuestion()">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center; padding:3rem 0; border-top:1px solid var(--border);">
+    <a href="lecture2.html" style="background:var(--gold); color:var(--navy); padding:0.9rem 2.5rem; border-radius:8px; text-decoration:none; font-weight:700; font-size:1rem;">Continue to Lecture 2 →</a>
+  </div>
+
+</div><!-- end page-wrap -->
+
+<script>
+// ── FLOW CANVAS ──
+(function(){
+  const c = document.getElementById('flowCanvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const steps = ['Data','Classify','Organize','Summarize','Display','Analyze','Information'];
+  const colors = ['#e8a230','#3ecfb2','#3ecfb2','#3ecfb2','#3ecfb2','#3ecfb2','#4ecb71'];
+  const w = c.width, h = c.height;
+  const stepW = w / steps.length;
+
+  steps.forEach((s, i) => {
+    const x = stepW * i + stepW / 2;
+    ctx.beginPath();
+    ctx.arc(x, h / 2, 22, 0, Math.PI * 2);
+    ctx.fillStyle = colors[i] + '22';
+    ctx.fill();
+    ctx.strokeStyle = colors[i];
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = '#f0eee8';
+    ctx.font = '9px DM Sans';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(s, x, h / 2);
+
+    if (i < steps.length - 1) {
+      ctx.beginPath();
+      ctx.moveTo(x + 22, h / 2);
+      ctx.lineTo(x + stepW - 22, h / 2);
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillText('→', x + stepW / 2, h / 2);
+    }
+  });
+})();
+
+// ── DISTRIBUTION CANVAS ──
+const distCanvas = document.getElementById('distCanvas');
+const distCtx = distCanvas.getContext('2d');
+const distInfo = document.getElementById('distInfo');
+
+const distData = {
+  normal: {
+    info: '<strong style="color:white">Normal Distribution</strong><br>Bell-shaped and symmetric around the mean (μ). About 68% of data falls within 1σ, 95% within 2σ, and virtually all data within 3σ. Used when data is naturally symmetric (e.g., height, test scores).',
+    draw(ctx, w, h) {
+      const mu = w/2, sigma = w/7;
+      const grad = ctx.createLinearGradient(0,0,w,0);
+      grad.addColorStop(0,'rgba(62,207,178,0.1)');
+      grad.addColorStop(0.5,'rgba(232,162,48,0.35)');
+      grad.addColorStop(1,'rgba(62,207,178,0.1)');
+      ctx.beginPath(); ctx.moveTo(0,h-10);
+      for(let x=0;x<=w;x++){
+        const y=(h-20)-Math.exp(-0.5*((x-mu)/sigma)**2)*(h-40);
+        ctx.lineTo(x,y);
+      }
+      ctx.lineTo(w,h-10); ctx.closePath();
+      ctx.fillStyle=grad; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(0,h-10);
+      for(let x=0;x<=w;x++){
+        const y=(h-20)-Math.exp(-0.5*((x-mu)/sigma)**2)*(h-40);
+        ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle='rgba(232,162,48,0.9)'; ctx.lineWidth=2; ctx.stroke();
+      // Labels
+      ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='11px DM Mono'; ctx.textAlign='center';
+      ['μ-3σ','μ-2σ','μ-1σ','μ','μ+1σ','μ+2σ','μ+3σ'].forEach((l,i)=>{
+        const x=mu+sigma*(i-3);
+        ctx.fillText(l, x, h-2);
+        ctx.beginPath(); ctx.moveTo(x,h-14); ctx.lineTo(x,h-18); ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1; ctx.stroke();
+      });
+    }
+  },
+  poisson: {
+    info: '<strong style="color:white">Poisson Distribution</strong><br>Used for rare, random events occurring in a fixed interval. Right-skewed for small λ (mean). Examples: earthquakes per year, accidents in water systems, child suicide rates, boat arrivals at port.',
+    draw(ctx, w, h) {
+      const lambda=5; const maxK=15;
+      const barW=(w-60)/(maxK+1);
+      function poissonPMF(k,l){let r=Math.exp(-l)*Math.pow(l,k);let f=1;for(let i=1;i<=k;i++)f*=i;return r/f;}
+      const maxP=poissonPMF(Math.floor(lambda),lambda);
+      for(let k=0;k<=maxK;k++){
+        const p=poissonPMF(k,lambda);
+        const bh=(p/maxP)*(h-40);
+        const x=30+k*barW;
+        const grad=ctx.createLinearGradient(0,h-10-bh,0,h-10);
+        grad.addColorStop(0,'rgba(232,80,122,0.8)');
+        grad.addColorStop(1,'rgba(232,80,122,0.2)');
+        ctx.fillStyle=grad;
+        ctx.fillRect(x,h-10-bh,barW-2,bh);
+      }
+      ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='10px DM Mono'; ctx.textAlign='center';
+      for(let k=0;k<=maxK;k+=2){
+        ctx.fillText(k, 30+k*barW+barW/2, h-2);
+      }
+      ctx.fillText('λ=5', w-30, 20);
+    }
+  },
+  gamma: {
+    info: '<strong style="color:white">Gamma Distribution</strong><br>Used to model the time until an event occurs. Common in reliability and queuing theory. Examples: average life expectancy, waiting time for services, time to complete a process. Takes non-negative values (0 to ∞).',
+    draw(ctx, w, h) {
+      function gamma(x, alpha, beta){
+        if(x<=0)return 0;
+        return Math.pow(x,alpha-1)*Math.exp(-x/beta);
+      }
+      const alpha=3, beta=10;
+      const max=gamma(alpha*beta-beta,alpha,beta);
+      const colors=['rgba(62,207,178,','rgba(232,162,48,','rgba(232,80,122,'];
+      [[2,8],[3,10],[5,12]].forEach((p,i)=>{
+        ctx.beginPath(); ctx.moveTo(0,h-10);
+        for(let xi=0;xi<=w;xi++){
+          const xv=xi/w*120;
+          const yv=gamma(xv,p[0],p[1]);
+          const norm=gamma((p[0]-1)*p[1],p[0],p[1]);
+          const y=(h-20)-yv/norm*(h-50);
+          if(xi===0)ctx.moveTo(xi,y); else ctx.lineTo(xi,y);
+        }
+        ctx.strokeStyle=colors[i]+'0.8)'; ctx.lineWidth=2; ctx.stroke();
+      });
+      ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='10px DM Mono'; ctx.textAlign='left';
+      ['α=2','α=3','α=5'].forEach((l,i)=>{
+        ctx.fillStyle=[colors[0],colors[1],colors[2]][i]+'0.9)';
+        ctx.fillRect(w-80,12+i*18,12,2);
+        ctx.fillStyle='rgba(255,255,255,0.5)';
+        ctx.fillText(l, w-64, 17+i*18);
+      });
+    }
+  },
+  binomial: {
+    info: '<strong style="color:white">Binomial Distribution</strong><br>The general case of binary data when an experiment is repeated n times. Each trial has probability p of success. Example: If 5 patients enter intensive care, the possible outcomes (cured patients) are 0, 1, 2, 3, 4, 5.',
+    draw(ctx, w, h) {
+      const n=10, p=0.5;
+      function binom(n,k){let r=1;for(let i=0;i<k;i++)r=r*(n-i)/(i+1);return r;}
+      function pmf(k){return binom(n,k)*Math.pow(p,k)*Math.pow(1-p,n-k);}
+      const vals=Array.from({length:n+1},(_,k)=>pmf(k));
+      const maxV=Math.max(...vals);
+      const barW=(w-60)/(n+1);
+      vals.forEach((v,k)=>{
+        const bh=(v/maxV)*(h-40);
+        const x=30+k*barW;
+        const pct=k/n;
+        const r=Math.round(62+pct*(232-62)), gr=Math.round(207+pct*(162-207)), b=Math.round(178+pct*(48-178));
+        ctx.fillStyle=`rgba(${r},${gr},${b},0.7)`;
+        ctx.fillRect(x,h-10-bh,barW-3,bh);
+        ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='10px DM Mono'; ctx.textAlign='center';
+        ctx.fillText(k, x+barW/2-1.5, h-2);
+      });
+      ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='11px DM Mono'; ctx.textAlign='right';
+      ctx.fillText('n=10, p=0.5', w-10, 18);
+    }
+  },
+  bernoulli: {
+    info: '<strong style="color:white">Bernoulli Distribution</strong><br>The simplest distribution — a single trial with two outcomes: "success" (1) with probability p, or "failure" (0) with probability 1-p. Binary data (0 and 1) follows this distribution.',
+    draw(ctx, w, h) {
+      const p=0.6;
+      const barW=100, gap=w/3;
+      [[0,1-p,'rgba(232,80,122,0.7)','0 (Failure)'],[1,p,'rgba(78,203,113,0.7)','1 (Success)']].forEach(([val,prob,color,label],i)=>{
+        const x=gap*(i+0.7);
+        const bh=prob*(h-60);
+        ctx.fillStyle=color;
+        ctx.fillRect(x,h-20-bh,barW,bh);
+        ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.font='12px DM Mono'; ctx.textAlign='center';
+        ctx.fillText(label, x+barW/2, h-5);
+        ctx.fillText((prob*100).toFixed(0)+'%', x+barW/2, h-30-bh);
+      });
+      ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='11px DM Mono'; ctx.textAlign='right';
+      ctx.fillText(`p=0.6`, w-10, 18);
+    }
+  }
+};
+
+let currentDist = 'normal';
+function showDist(name, btn) {
+  currentDist = name;
+  document.querySelectorAll('.dist-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  drawDist();
+}
+function drawDist() {
+  const w = distCanvas.width, h = distCanvas.height;
+  distCtx.clearRect(0, 0, w, h);
+  distData[currentDist].draw(distCtx, w, h);
+  distInfo.innerHTML = distData[currentDist].info;
+}
+drawDist();
+
+// ── PYRAMID CANVAS ──
+(function(){
+  const c = document.getElementById('pyramidCanvas');
+  const ctx = c.getContext('2d');
+  const w = c.width, h = c.height;
+  const levels = [
+    { label: 'RATIO', sublabel: 'True zero, all operations', color: '#4ecb71', pct: 0.25 },
+    { label: 'INTERVAL', sublabel: 'Meaningful differences, no true zero', color: '#e8507a', pct: 0.5 },
+    { label: 'ORDINAL', sublabel: 'Ordered categories', color: '#e8a230', pct: 0.75 },
+    { label: 'NOMINAL', sublabel: 'Labels only, no order', color: '#3ecfb2', pct: 1.0 },
+  ];
+  const totalH = h - 20, barH = totalH / levels.length - 8;
+  levels.forEach((l, i) => {
+    const bw = w * l.pct;
+    const x = (w - bw) / 2;
+    const y = i * (barH + 8) + 10;
+    ctx.fillStyle = l.color + '22';
+    ctx.strokeStyle = l.color + '88';
+    ctx.lineWidth = 1.5;
+    const r = 6;
+    ctx.beginPath();
+    ctx.roundRect(x, y, bw, barH, r);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = l.color;
+    ctx.font = 'bold 12px DM Mono';
+    ctx.textAlign = 'left';
+    ctx.fillText(l.label, x + 14, y + barH / 2 - 5);
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.font = '10px DM Sans';
+    ctx.fillText(l.sublabel, x + 14, y + barH / 2 + 9);
+    ctx.fillStyle = l.color + 'aa';
+    ctx.font = 'bold 18px Playfair Display, serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(4 - i, x + bw - 14, y + barH / 2 + 7);
+  });
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.font = '10px DM Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('← Most Restrictive               Most Informative →', w / 2, h - 2);
+})();
+
+// ── QUIZ ──
+const questions = [
+  { q: 'A researcher records whether each patient is "Male" or "Female". What type of data is this?', opts: ['Ordinal', 'Nominal', 'Continuous', 'Discrete'], ans: 1, explain: 'Gender categories have no natural order and cannot be ranked — this is Nominal data.' },
+  { q: 'A doctor records the NUMBER of surgeries performed each day. What type of variable is this?', opts: ['Continuous', 'Ordinal', 'Discrete', 'Nominal'], ans: 2, explain: 'The number of surgeries is counted in whole numbers (you can\'t have 2.5 surgeries) — this is Discrete quantitative data.' },
+  { q: 'Temperature measured in °C is an example of which measurement level?', opts: ['Nominal', 'Ordinal', 'Interval', 'Ratio'], ans: 2, explain: 'Temperature has meaningful differences, but 0°C does NOT mean "no temperature" — it\'s just an agreed reference point. This makes it Interval level.' },
+  { q: 'A study follows the SAME 30 patients over 12 months, recording their blood pressure monthly. What type of data structure is this?', opts: ['Cross-sectional', 'Time series only', 'Panel / Longitudinal', 'Experimental'], ans: 2, explain: 'Panel (longitudinal) data combines time series (monthly measurements) AND cross-sectional (multiple patients) data.' },
+  { q: 'Which distribution is used for rare events like the number of earthquakes in a year?', opts: ['Normal', 'Gamma', 'Bernoulli', 'Poisson'], ans: 3, explain: 'Poisson distribution is specifically designed for counting rare, random events occurring in a fixed time interval.' },
+  { q: 'In SPSS, which view do you use to enter and inspect the actual data values?', opts: ['Variable View', 'Output Viewer', 'Data View', 'Syntax Editor'], ans: 2, explain: 'Data View (نافذة تحرير البيانات) displays rows (cases) and columns (variables) where you enter and inspect actual data values.' },
+];
+
+let qIdx = 0, score = 0, answered = false;
+function renderQ() {
+  const q = questions[qIdx];
+  document.getElementById('qTitle').textContent = `Question ${qIdx+1} of ${questions.length}`;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('qFeedback').classList.remove('show');
+  document.getElementById('qNext').style.display = 'none';
+  answered = false;
+  const opts = document.getElementById('qOpts');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt'; btn.textContent = opt;
+    btn.onclick = () => {
+      if (answered) return;
+      answered = true;
+      document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+      if (i === q.ans) { btn.classList.add('correct'); score++; }
+      else { btn.classList.add('wrong'); document.querySelectorAll('.quiz-opt')[q.ans].classList.add('correct'); }
+      document.getElementById('qScore').textContent = `Score: ${score}/${questions.length}`;
+      const fb = document.getElementById('qFeedback');
+      fb.textContent = q.explain; fb.classList.add('show');
+      if (qIdx < questions.length - 1) document.getElementById('qNext').style.display = 'block';
+      else {
+        document.getElementById('qNext').textContent = `Done! Score: ${score}/${questions.length}`;
+        document.getElementById('qNext').style.display = 'block';
+        document.getElementById('qNext').onclick = () => { qIdx=0; score=0; renderQ(); document.getElementById('qNext').onclick=nextQuestion; document.getElementById('qNext').textContent='Next →'; };
+      }
+    };
+    opts.appendChild(btn);
+  });
+}
+function nextQuestion() { qIdx++; renderQ(); }
+renderQ();
+</script>
+</body>
+</html>

@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 5 – Displaying & Exploring Data | DS 501</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #080d1e; --navy2: #0f1630; --navy3: #1a2248;
+    --gold: #e8a230; --gold2: #f5c060;
+    --teal: #3ecfb2; --pink: #e8507a;
+    --rose: #f472b6; --rose2: #fb7185;
+    --white: #f0eee8; --muted: #8a96b8;
+    --card: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
+    --green: #4ecb71; --purple: #a78bfa;
+    --accent: #f472b6;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(244,114,182,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(244,114,182,0.03) 1px, transparent 1px);
+    background-size: 60px 60px; pointer-events: none; z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 3rem;
+    background: rgba(8,13,30,0.92); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--accent); }
+  .nav-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* LAYOUT */
+  .page-wrap { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; position: relative; z-index: 1; }
+
+  /* HERO */
+  .lecture-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; padding: 3rem 0; }
+  .lecture-badge { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--accent); letter-spacing: 0.12em; background: rgba(244,114,182,0.1); border: 1px solid rgba(244,114,182,0.25); display: inline-block; padding: 0.3rem 1rem; border-radius: 4px; margin-bottom: 1rem; }
+  .lecture-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; line-height: 1.1; }
+  .lecture-title em { font-style: italic; color: var(--accent); }
+  .lecture-desc { color: var(--muted); font-size: 1rem; line-height: 1.8; margin-top: 1.2rem; font-weight: 300; }
+  .toc-title-sm { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.8rem; margin-top: 1.5rem; }
+  .toc-item { display: flex; align-items: center; gap: 0.7rem; padding: 0.45rem 0; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--white); font-size: 0.85rem; transition: color 0.2s; }
+  .toc-item:hover { color: var(--accent); }
+  .toc-num { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); width: 24px; }
+  .hero-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; }
+  .hero-card-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--muted); margin-bottom: 1.2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .mini-stat { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0; border-bottom: 1px solid var(--border); }
+  .mini-stat:last-child { border-bottom: none; }
+  .mini-stat-label { font-size: 0.82rem; color: var(--muted); }
+  .mini-stat-val { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--accent); }
+
+  /* SECTIONS */
+  .content-section { margin-bottom: 4rem; animation: fadeUp 0.5s ease both; }
+  .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .section-icon { width: 44px; height: 44px; border-radius: 10px; background: rgba(244,114,182,0.1); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+  .section-label-sm { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--accent); letter-spacing: 0.12em; }
+  .section-h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; }
+
+  /* BOXES */
+  .def-box { background: rgba(244,114,182,0.06); border: 1px solid rgba(244,114,182,0.2); border-left: 4px solid var(--accent); border-radius: 8px; padding: 1.5rem 1.8rem; margin-bottom: 1.5rem; }
+  .def-box p { color: var(--white); line-height: 1.8; font-size: 0.95rem; }
+  .def-box strong { color: var(--accent); }
+  .info-box { background: rgba(232,162,48,0.05); border: 1px solid rgba(232,162,48,0.2); border-radius: 8px; padding: 1.2rem 1.5rem; margin-bottom: 1rem; display: flex; gap: 1rem; align-items: flex-start; }
+  .info-box.teal { background: rgba(62,207,178,0.05); border-color: rgba(62,207,178,0.2); }
+  .info-box.pink { background: rgba(244,114,182,0.05); border-color: rgba(244,114,182,0.2); }
+  .info-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .info-box p { color: var(--muted); font-size: 0.88rem; line-height: 1.7; }
+  .info-box p strong { color: var(--white); }
+
+  /* CHART WRAP */
+  .chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
+  .chart-title { font-size: 0.88rem; color: var(--muted); margin-bottom: 1rem; font-weight: 500; }
+  .chart-controls { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .chart-btn { padding: 0.4rem 1rem; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 0.8rem; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .chart-btn:hover, .chart-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(244,114,182,0.08); }
+  canvas { display: block; width: 100%; border-radius: 6px; }
+
+  /* CHART TYPE GRID */
+  .chart-types-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 1.2rem; margin: 1.5rem 0; }
+  .chart-type-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; transition: all 0.25s; cursor: default; }
+  .chart-type-card:hover { border-color: rgba(244,114,182,0.3); transform: translateY(-3px); }
+  .ct-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+  .ct-name { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .ct-tag { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--accent); background: rgba(244,114,182,0.1); border: 1px solid rgba(244,114,182,0.2); padding: 0.15rem 0.5rem; border-radius: 4px; display: inline-block; margin-bottom: 0.6rem; }
+  .ct-desc { color: var(--muted); font-size: 0.83rem; line-height: 1.6; }
+  .ct-use { font-size: 0.78rem; color: var(--gold); margin-top: 0.5rem; font-family: 'DM Mono', monospace; }
+
+  /* STEM-LEAF */
+  .stem-leaf-table { font-family: 'DM Mono', monospace; font-size: 0.82rem; margin: 1.5rem 0; border-collapse: collapse; }
+  .stem-leaf-table td { padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border); }
+  .stem-leaf-table td:first-child { color: var(--accent); font-weight: 600; border-right: 2px solid rgba(244,114,182,0.3); padding-right: 1.2rem; min-width: 50px; }
+  .stem-leaf-table td:last-child { color: var(--white); letter-spacing: 0.1em; padding-left: 1.2rem; }
+  .stem-leaf-table tr:hover td { background: rgba(244,114,182,0.04); }
+
+  /* SPSS TABLE */
+  .spss-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.85rem; }
+  .spss-table th { background: rgba(244,114,182,0.08); color: var(--accent); font-weight: 600; padding: 0.8rem 1rem; text-align: left; border-bottom: 1px solid rgba(244,114,182,0.2); }
+  .spss-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; line-height: 1.5; }
+  .spss-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .spss-table td:first-child { color: var(--white); font-weight: 500; }
+
+  /* STEPS LIST */
+  .steps-list { list-style: none; counter-reset: step-c; margin: 1rem 0; }
+  .steps-list li { counter-increment: step-c; padding: 0.8rem 0 0.8rem 3rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); line-height: 1.6; position: relative; }
+  .steps-list li::before { content: counter(step-c); position: absolute; left: 0; top: 0.75rem; width: 26px; height: 26px; background: rgba(244,114,182,0.15); color: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 0.75rem; }
+  .steps-list li strong { color: var(--white); }
+
+  /* EDA BULLETS */
+  .eda-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin: 1.5rem 0; }
+  .eda-item { background: rgba(244,114,182,0.05); border: 1px solid rgba(244,114,182,0.15); border-radius: 8px; padding: 1rem 1.2rem; display: flex; gap: 0.7rem; align-items: flex-start; font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+  .eda-item::before { content: '◈'; color: var(--accent); flex-shrink: 0; margin-top: 0.05rem; }
+
+  /* QUIZ */
+  .quiz-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 2rem 0; }
+  .quiz-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 0.5rem; }
+  .quiz-q { color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.5rem; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 0.6rem; }
+  .quiz-opt { padding: 0.8rem 1.2rem; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; font-size: 0.88rem; transition: all 0.2s; text-align: left; background: transparent; color: var(--white); font-family: 'DM Sans', sans-serif; width: 100%; }
+  .quiz-opt:hover { border-color: var(--accent); }
+  .quiz-opt.correct { background: rgba(78,203,113,0.15); border-color: var(--green); color: var(--green); }
+  .quiz-opt.wrong { background: rgba(232,80,122,0.12); border-color: var(--pink); color: var(--pink); }
+  .quiz-feedback { margin-top: 1rem; font-size: 0.88rem; line-height: 1.6; color: var(--muted); display: none; }
+  .quiz-feedback.show { display: block; }
+  .quiz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; }
+  .quiz-counter { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--muted); }
+  .quiz-next { background: var(--accent); color: var(--navy); border: none; padding: 0.6rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: 'DM Sans', sans-serif; display: none; }
+
+  /* BOX PLOT LEGEND */
+  .bp-legend { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 1rem; }
+  .bp-legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; color: var(--muted); }
+  .bp-swatch { width: 16px; height: 16px; border-radius: 3px; flex-shrink: 0; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 768px) {
+    .lecture-hero { grid-template-columns: 1fr; }
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .page-wrap { padding: 2rem 1.2rem; }
+    .eda-list { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">DS 501 · Lecture 05</div>
+  <div class="nav-links">
+    <a href="index.html">← Home</a>
+    <a href="lecture3.html">← Lecture 3&4</a>
+    <a href="lecture6.html">Lecture 6 →</a>
+    <a href="#intro">Intro</a>
+    <a href="#barchart">Bar</a>
+    <a href="#histogram">Histogram</a>
+    <a href="#stemleaf">Stem-Leaf</a>
+    <a href="#boxplot">Box Plot</a>
+    <a href="#scatter">Scatter</a>
+    <a href="#quiz">Quiz</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <div class="lecture-hero">
+    <div>
+      <div class="lecture-badge">LECTURE 05 — DS 501</div>
+      <h1 class="lecture-title">Displaying &<em>Exploring Data</em></h1>
+      <p class="lecture-desc">Master the key graphical tools for exploratory data analysis in SPSS — from bar charts and histograms to stem-and-leaf displays, box plots, error bars, and scatter diagrams. Learn to reveal the hidden story inside any dataset.</p>
+      <div class="toc-title-sm">In this lecture</div>
+      <a href="#intro" class="toc-item"><span class="toc-num">01</span> Introduction to EDA</a>
+      <a href="#barchart" class="toc-item"><span class="toc-num">02</span> Bar Charts & Pie Charts</a>
+      <a href="#histogram" class="toc-item"><span class="toc-num">03</span> Histogram & Dot Plot</a>
+      <a href="#stemleaf" class="toc-item"><span class="toc-num">04</span> Stem-and-Leaf Display</a>
+      <a href="#boxplot" class="toc-item"><span class="toc-num">05</span> Box Plot</a>
+      <a href="#errorbar" class="toc-item"><span class="toc-num">06</span> Error Bar Plots</a>
+      <a href="#scatter" class="toc-item"><span class="toc-num">07</span> Scatter Diagram</a>
+      <a href="#explore" class="toc-item"><span class="toc-num">08</span> Explore in SPSS</a>
+      <a href="#quiz" class="toc-item"><span class="toc-num">09</span> Practice Quiz</a>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-title">Lecture at a Glance</div>
+      <div class="mini-stat"><span class="mini-stat-label">Charts Covered</span><span class="mini-stat-val">8 types</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Bar · Pie · Histogram</span><span class="mini-stat-val">Categorical & Scale</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Dot · Stem-Leaf</span><span class="mini-stat-val">Distribution Shape</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Box · Error · Scatter</span><span class="mini-stat-val">Spread & Relationship</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Software</span><span class="mini-stat-val">IBM SPSS v25</span></div>
+    </div>
+  </div>
+
+  <!-- ── 01. INTRO TO EDA ── -->
+  <div class="content-section" id="intro">
+    <div class="section-header">
+      <div class="section-icon">🔍</div>
+      <div>
+        <div class="section-label-sm">SECTION 01</div>
+        <h2 class="section-h2">Introduction to Exploratory Data Analysis</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>There has been a <strong>huge leap</strong> in the use of exploratory data analysis (EDA) tools, and their importance has increased with the rapid development in computing and the availability of software that enables their easy use. Some EDA tools serve as a <strong>preliminary step to create frequency distributions</strong>, others as alternatives, and still others can be used in <strong>advanced stages of research</strong>.</p>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:1rem;">Why Use EDA? Six Key Purposes</h3>
+    <div class="eda-list">
+      <div class="eda-item">Recognising the <strong style="color:var(--white)">range of data</strong> and the pattern of distribution of observations — just by looking.</div>
+      <div class="eda-item">Knowing <strong style="color:var(--white)">where data is concentrated</strong> (areas of high frequency).</div>
+      <div class="eda-item">Knowing the <strong style="color:var(--white)">direction of skewness</strong>, and thus the general level of the data.</div>
+      <div class="eda-item">Discovering <strong style="color:var(--white)">outliers and extreme values</strong> in the data.</div>
+      <div class="eda-item">Identifying <strong style="color:var(--white)">common (frequent) values</strong> in the data.</div>
+      <div class="eda-item">Knowing the <strong style="color:var(--white)">number of peaks</strong> in the distribution.</div>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin:2rem 0 1rem;">Learning Objectives</h3>
+    <p style="color:var(--muted);line-height:1.8;margin-bottom:1rem;">At the end of this lecture you will be able to:</p>
+    <div class="chart-types-grid">
+      <div class="chart-type-card"><div class="ct-icon">📊</div><div class="ct-name">Bar Chart</div><div class="ct-tag">Graphs → Bar</div><div class="ct-desc">For categorical variables — shows count or mean of groups as horizontal or vertical bars.</div><div class="ct-use">→ Education level, Gender distribution</div></div>
+      <div class="chart-type-card"><div class="ct-icon">🥧</div><div class="ct-name">Pie Chart</div><div class="ct-tag">Graphs → Pie</div><div class="ct-desc">Shows the relative proportion of each category as a slice of a whole circle.</div><div class="ct-use">→ Marital status percentages</div></div>
+      <div class="chart-type-card"><div class="ct-icon">📈</div><div class="ct-name">Histogram</div><div class="ct-tag">Graphs → Histogram</div><div class="ct-desc">For quantitative variables — bars show frequency in equal-width intervals, with optional normal curve overlay.</div><div class="ct-use">→ Salary distribution</div></div>
+      <div class="chart-type-card"><div class="ct-icon">⚫</div><div class="ct-name">Dot Plot</div><div class="ct-tag">Graphs → Scatter/Dot</div><div class="ct-desc">Stacks one dot per observation above the value axis — shows exact data concentration.</div><div class="ct-use">→ Years of experience</div></div>
+      <div class="chart-type-card"><div class="ct-icon">🌿</div><div class="ct-name">Stem-and-Leaf</div><div class="ct-tag">Analyze → Explore</div><div class="ct-desc">A modern alternative to the histogram that retains actual data values while showing shape.</div><div class="ct-use">→ Apartment areas (m²)</div></div>
+      <div class="chart-type-card"><div class="ct-icon">📦</div><div class="ct-name">Box Plot</div><div class="ct-tag">Graphs → Boxplot</div><div class="ct-desc">Shows Min, Q1, Median, Q3, Max and highlights outliers. Ideal for comparing groups.</div><div class="ct-use">→ Salary by group</div></div>
+      <div class="chart-type-card"><div class="ct-icon">⚡</div><div class="ct-name">Error Bar</div><div class="ct-tag">Graphs → Error Bar</div><div class="ct-desc">Displays mean with confidence intervals, standard deviation, or standard error bars.</div><div class="ct-use">→ Mean salary ± CI by education</div></div>
+      <div class="chart-type-card"><div class="ct-icon">🌐</div><div class="ct-name">Scatter Diagram</div><div class="ct-tag">Graphs → Scatter/Dot</div><div class="ct-desc">Plots pairs of values to reveal the relationship (positive, negative, none) between two quantitative variables.</div><div class="ct-use">→ Age of bus vs maintenance cost</div></div>
+    </div>
+  </div>
+
+  <!-- ── 02. BAR & PIE ── -->
+  <div class="content-section" id="barchart">
+    <div class="section-header">
+      <div class="section-icon">📊</div>
+      <div>
+        <div class="section-label-sm">SECTION 02</div>
+        <h2 class="section-h2">Bar Charts & Pie Charts</h2>
+      </div>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:1rem;">Bar Chart for a Categorical Variable</h3>
+    <p style="color:var(--muted);line-height:1.8;margin-bottom:1.2rem;">A simple bar chart displays the count (or percentage) of cases in each category. The example below shows the education level distribution of 59 nurses.</p>
+
+    <!-- Interactive bar chart -->
+    <div class="chart-wrap">
+      <div class="chart-title">Bar Chart: Education Level — N of Cases (Graphs → Bar → Simple → Summaries for Groups of Cases)</div>
+      <div class="chart-controls">
+        <button class="chart-btn active" onclick="showBarType('count',this)">Count (N)</button>
+        <button class="chart-btn" onclick="showBarType('pct',this)">% of Cases</button>
+        <button class="chart-btn" onclick="showBarType('mean',this)">Mean Salary by Gender</button>
+      </div>
+      <canvas id="barCanvas" height="220"></canvas>
+      <div id="barInfo" style="font-size:0.82rem;color:var(--muted);margin-top:0.8rem;line-height:1.6;"></div>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin:2rem 0 1rem;">SPSS Steps: Create a Simple Bar Chart</h3>
+    <ol class="steps-list">
+      <li>Go to <strong>Graphs → Bar</strong>.</li>
+      <li>Select <strong>Simple</strong> and choose <em>Summaries for groups of cases</em> → click <strong>Define</strong>.</li>
+      <li>In <strong>Bars Represent</strong>, choose N of cases (count) or Other statistic (e.g., mean) and move the variable to the Variable box.</li>
+      <li>Move the categorical variable (e.g., Education) to the <strong>Category Axis</strong> box.</li>
+      <li>Click <strong>OK</strong>. To add labels, double-click the chart and use <em>Elements → Show Data Labels</em>.</li>
+    </ol>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin:2rem 0 1rem;">Pie Chart for Categorical Data</h3>
+    <p style="color:var(--muted);line-height:1.8;margin-bottom:1.2rem;">A pie chart shows proportional composition. From the lecture: marital status of 60 employees — single 33.33%, married 43.33%, divorced 13.33%, widowed 10%.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Pie Chart: Marital Status — Graphs → Pie → Summaries for groups of cases</div>
+      <canvas id="pieCanvas" height="220"></canvas>
+    </div>
+
+    <div class="info-box" style="margin-top:1rem;">
+      <div class="info-icon">💡</div>
+      <p><strong>Key difference:</strong> Use a <strong>Bar chart</strong> when you want to compare counts/values across categories. Use a <strong>Pie chart</strong> when you want to emphasise each category's share of the whole (best with 2–5 categories).</p>
+    </div>
+  </div>
+
+  <!-- ── 03. HISTOGRAM & DOT PLOT ── -->
+  <div class="content-section" id="histogram">
+    <div class="section-header">
+      <div class="section-icon">📈</div>
+      <div>
+        <div class="section-label-sm">SECTION 03</div>
+        <h2 class="section-h2">Histogram & Dot Plot</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>A <strong>Histogram</strong> is used for quantitative (numeric) variables. Bars represent frequencies in equal-width intervals. You can overlay a <strong>normal curve</strong> to visually test how well the data fits a normal distribution.</p>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Histogram: Current Salary — Mean = 4698, SD = 1197.87, N = 60</div>
+      <div class="chart-controls">
+        <button class="chart-btn active" onclick="showHist('all',this)">All Cases</button>
+        <button class="chart-btn" onclick="showHist('male',this)">Male Panel</button>
+        <button class="chart-btn" onclick="showHist('female',this)">Female Panel</button>
+      </div>
+      <canvas id="histCanvas" height="220"></canvas>
+      <div id="histInfo" style="font-size:0.82rem;color:var(--muted);margin-top:0.8rem;"></div>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin:2rem 0 1rem;">Paneling a Chart</h3>
+    <div class="def-box">
+      <p>A <strong>paneled chart</strong> is a grid of sub-charts — same chart type and axes, but for different groups of a categorical variable. Example: one histogram for males, one for females side by side. Paneling helps compare data patterns across groups.</p>
+    </div>
+    <ol class="steps-list">
+      <li>Select options for the chart and click <strong>Define</strong>.</li>
+      <li>In the dialog, move one or more categorical variables to the <strong>Panel By → Rows</strong> or <strong>Columns</strong> boxes.</li>
+      <li>Check <strong>Nest variables (no empty rows/columns)</strong> if the panel variables are nested — a panel is created only for each nesting, not every combination.</li>
+      <li>Click <strong>OK</strong> — SPSS produces a paneled chart grid.</li>
+    </ol>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin:2rem 0 1rem;">Dot Plot</h3>
+    <div class="def-box">
+      <p>A <strong>Dot Plot</strong> displays the range of values on the horizontal axis and the number of observations for each value on the vertical axis — by stacking one dot per case. It reveals the exact shape of the distribution and shows where data is concentrated.</p>
+    </div>
+    <div class="info-box teal">
+      <div class="info-icon">🖥️</div>
+      <p><strong>SPSS:</strong> Go to <strong>Graphs → Scatter/Dot → Simple Dot</strong> → Define. Move the numeric variable (e.g., Experience) to the <strong>X-Axis Variable</strong> box → OK.</p>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Dot Plot: Years of Experience — each circle = one employee, stacked by value</div>
+      <canvas id="dotCanvas" height="160"></canvas>
+    </div>
+  </div>
+
+  <!-- ── 04. STEM-AND-LEAF ── -->
+  <div class="content-section" id="stemleaf">
+    <div class="section-header">
+      <div class="section-icon">🌿</div>
+      <div>
+        <div class="section-label-sm">SECTION 04</div>
+        <h2 class="section-h2">Stem-and-Leaf Display</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>The <strong>Stem-and-Leaf display</strong> is one of the modern methods used as an alternative to the histogram. It can be considered a <strong>natural image of the histogram</strong> that allows the researcher to study the pattern or behaviour of data while <strong>retaining the actual data values</strong>. This makes it more efficient than a histogram for exploring key features, and it can be used as both a tabular and a graphical method.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:1.5rem;">
+      <div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:0.8rem;">Male Patient Satisfaction</h3>
+        <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.8rem;">Stem width = 10 · Each leaf = 1 case</p>
+        <table class="stem-leaf-table">
+          <tr><td>2</td><td>6</td></tr>
+          <tr><td>3</td><td>4 6</td></tr>
+          <tr><td>4</td><td>3 6 7 8 9</td></tr>
+          <tr><td>5</td><td>1 2 4 7 7 7</td></tr>
+          <tr><td>6</td><td>0 0 3 6 6 7</td></tr>
+          <tr><td>7</td><td>0 2 7 7 9</td></tr>
+          <tr><td>8</td><td>6 8 9 9</td></tr>
+        </table>
+        <div style="font-size:0.78rem;color:var(--muted);margin-top:0.5rem;">n=29 · Mean=60.90 · SD=16.87</div>
+      </div>
+      <div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:0.8rem;">Female Patient Satisfaction</h3>
+        <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.8rem;">Stem width = 10 · Each leaf = 1 case</p>
+        <table class="stem-leaf-table">
+          <tr><td>3</td><td>6 7 7</td></tr>
+          <tr><td>4</td><td>2 7</td></tr>
+          <tr><td>5</td><td>5 9 9</td></tr>
+          <tr><td>6</td><td>4 6 8</td></tr>
+          <tr><td>7</td><td>6</td></tr>
+          <tr><td>8</td><td>0 2 3 3</td></tr>
+          <tr><td>9</td><td>2</td></tr>
+        </table>
+        <div style="font-size:0.78rem;color:var(--muted);margin-top:0.5rem;">n=17 · Mean=62.71 · SD=18.32</div>
+      </div>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin:2rem 0 1rem;">Application: Apartment Areas (n = 45)</h3>
+    <div class="info-box pink">
+      <div class="info-icon">📐</div>
+      <p>The following stem-and-leaf display shows apartment areas (m²) for 45 people sampled from the population.</p>
+    </div>
+    <table class="stem-leaf-table" style="margin:1rem 0;">
+      <tr><td>8</td><td>8 9</td></tr>
+      <tr><td>9</td><td>6 3 5 6 4 4 7</td></tr>
+      <tr><td>10</td><td>8 7 3 4 6 3</td></tr>
+      <tr><td>11</td><td>7 3 2 7 2 1 9 8 3</td></tr>
+      <tr><td>12</td><td>7 5 7 0 5 5 0 4</td></tr>
+      <tr><td>13</td><td>9 5 2 9 4 6 8</td></tr>
+      <tr><td>14</td><td>8 2 3</td></tr>
+      <tr><td>15</td><td>6 5 5</td></tr>
+    </table>
+    <div class="chart-wrap" style="margin-top:1.5rem;">
+      <div class="chart-title">Quiz: Answer these questions from the Stem-and-Leaf above</div>
+      <div id="slAnswers" style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;"></div>
+    </div>
+  </div>
+
+  <!-- ── 05. BOX PLOT ── -->
+  <div class="content-section" id="boxplot">
+    <div class="section-header">
+      <div class="section-icon">📦</div>
+      <div>
+        <div class="section-label-sm">SECTION 05</div>
+        <h2 class="section-h2">Box Plot (Box-and-Whisker)</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>A <strong>Box Plot</strong> is a graphical display that helps us understand the shape and spread of a dataset. It relies on five key statistics: <strong>Minimum, Q1, Median, Q3, Maximum</strong>. It is especially useful for <strong>comparing groups</strong> in terms of spread, median, quartiles, and outliers.</p>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin:1.5rem 0 1rem;">How to Draw a Box Plot</h3>
+    <ol class="steps-list">
+      <li>Set an appropriate scale on the <strong>vertical axis</strong> from smallest to largest value.</li>
+      <li>Mark the positions of <strong>Minimum, Q1, Median, Q3, Maximum</strong> on the axis.</li>
+      <li>Draw a <strong>rectangle (box)</strong> between Q1 and Q3. The median line appears inside the box.</li>
+      <li>Draw a <strong>whisker line</strong> from Minimum up to the lower edge of the box.</li>
+      <li>Draw a <strong>whisker line</strong> from Maximum down to the upper edge of the box.</li>
+      <li>If there are <strong>outliers</strong>, they appear as individual points above or below the whiskers.</li>
+    </ol>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Interactive Box Plot — click a dataset to display</div>
+      <div class="chart-controls">
+        <button class="chart-btn active" onclick="showBox('example',this)">Example Data (n=55)</button>
+        <button class="chart-btn" onclick="showBox('compare',this)">Compare: Group X vs Y</button>
+      </div>
+      <canvas id="boxCanvas" height="260"></canvas>
+      <div class="bp-legend" id="bpLegend">
+        <div class="bp-legend-item"><div class="bp-swatch" style="background:rgba(244,114,182,0.4);border:1px solid var(--accent)"></div>Box (IQR)</div>
+        <div class="bp-legend-item"><div class="bp-swatch" style="background:var(--accent);height:3px;width:16px;border-radius:2px;"></div>Median</div>
+        <div class="bp-legend-item"><div class="bp-swatch" style="background:var(--muted);height:2px;width:16px;"></div>Whiskers (Min–Max)</div>
+        <div class="bp-legend-item"><div class="bp-swatch" style="background:var(--gold);border-radius:50%;"></div>Outliers</div>
+      </div>
+      <div id="boxInfo" style="font-size:0.82rem;color:var(--muted);margin-top:0.8rem;line-height:1.6;"></div>
+    </div>
+
+    <div class="info-box teal" style="margin-top:1rem;">
+      <div class="info-icon">📋</div>
+      <p><strong>Reading the comparison box plot (Group X vs Group Y):</strong><br>
+      Looking at the box size: Group X is <strong>less spread</strong> than Group Y.<br>
+      Q1, Median, Q3 of Group X are all <strong>smaller</strong> than Group Y.<br>
+      No outliers appear in either group. Both distributions tend toward <strong>symmetry</strong>.</p>
+    </div>
+  </div>
+
+  <!-- ── 06. ERROR BARS ── -->
+  <div class="content-section" id="errorbar">
+    <div class="section-header">
+      <div class="section-icon">⚡</div>
+      <div>
+        <div class="section-label-sm">SECTION 06</div>
+        <h2 class="section-h2">Error Bar Plots</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>An <strong>Error Bar Plot</strong> shows the <strong>mean</strong> of a numeric variable for each group, plus error bars that represent the <strong>uncertainty</strong> around that mean. The error bars can represent three different things — you choose which one tells the story you need.</p>
+    </div>
+
+    <table class="spss-table">
+      <tr><th>Error Bar Type</th><th>What It Shows</th><th>When to Use</th><th>SPSS Setting</th></tr>
+      <tr><td>Confidence Interval (CI)</td><td>The range within which the true population mean likely falls (default: 95%)</td><td>Comparing group means — overlapping CIs suggest no significant difference</td><td>Bars Represent → Confidence interval for mean</td></tr>
+      <tr><td>Standard Deviation (SD)</td><td>The spread of individual values around the mean (e.g., ±2 SD)</td><td>Showing natural variability within each group</td><td>Bars Represent → Standard deviation, multiplier = 2</td></tr>
+      <tr><td>Standard Error (SE)</td><td>How precisely the sample mean estimates the population mean</td><td>Precision of estimates; smaller SE = better estimate</td><td>Bars Represent → Standard error of mean, multiplier = 2</td></tr>
+    </table>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Error Bar: Mean Current Salary by Education Level</div>
+      <div class="chart-controls">
+        <button class="chart-btn active" onclick="showError('ci',this)">95% Confidence Interval</button>
+        <button class="chart-btn" onclick="showError('sd',this)">±2 Standard Deviations</button>
+        <button class="chart-btn" onclick="showError('se',this)">±2 Standard Errors</button>
+      </div>
+      <canvas id="errorCanvas" height="240"></canvas>
+      <div id="errorInfo" style="font-size:0.82rem;color:var(--muted);margin-top:0.8rem;line-height:1.6;"></div>
+    </div>
+
+    <div class="info-box pink" style="margin-top:1rem;">
+      <div class="info-icon">📊</div>
+      <p>From the error bar charts: mean salary increases clearly with education level — secondary (4111.8) → high education (5324.4) → postgraduate (6043.1). The CI bars for secondary do not overlap with postgraduate, suggesting a <strong>significant salary difference</strong>.</p>
+    </div>
+  </div>
+
+  <!-- ── 07. SCATTER ── -->
+  <div class="content-section" id="scatter">
+    <div class="section-header">
+      <div class="section-icon">🌐</div>
+      <div>
+        <div class="section-label-sm">SECTION 07</div>
+        <h2 class="section-h2">Scatter Diagram</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>A <strong>Scatter Diagram</strong> is a graphical method for displaying the <strong>relationship between two quantitative variables</strong>. One variable is plotted on the horizontal X-axis, the other on the vertical Y-axis. Each observation becomes a single point on the plot. The overall pattern of points reveals the type, direction, and strength of the relationship.</p>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Scatter Diagram — click to explore different relationships</div>
+      <div class="chart-controls">
+        <button class="chart-btn active" onclick="showScatter('none',this)">No Relationship (Height vs Salary)</button>
+        <button class="chart-btn" onclick="showScatter('positive',this)">Positive (Bus Age vs Maintenance)</button>
+        <button class="chart-btn" onclick="showScatter('negative',this)">Negative (Meat Price vs Quantity)</button>
+      </div>
+      <canvas id="scatterCanvas" height="260"></canvas>
+      <div id="scatterInfo" style="font-size:0.85rem;color:var(--muted);margin-top:0.8rem;line-height:1.7;background:rgba(255,255,255,0.03);border-radius:8px;padding:0.8rem 1rem;"></div>
+    </div>
+
+    <table class="spss-table" style="margin-top:1.5rem;">
+      <tr><th>Scatter Pattern</th><th>Relationship</th><th>Description</th><th>Example</th></tr>
+      <tr><td style="color:var(--muted)">Points scattered randomly</td><td style="color:var(--white)">No Relationship</td><td>No trend visible; knowing X tells you nothing about Y</td><td>Height vs Salary</td></tr>
+      <tr><td style="color:var(--muted)">Points rise left → right</td><td style="color:var(--green)">Positive</td><td>As X increases, Y tends to increase</td><td>Bus age vs maintenance cost</td></tr>
+      <tr><td style="color:var(--muted)">Points fall left → right</td><td style="color:var(--pink)">Negative</td><td>As X increases, Y tends to decrease</td><td>Meat price vs quantity purchased</td></tr>
+    </table>
+
+    <div class="info-box teal" style="margin-top:1rem;">
+      <div class="info-icon">🖥️</div>
+      <p><strong>SPSS Steps:</strong> Go to <strong>Graphs → Scatter/Dot → Simple Scatter → Define</strong>. Move one variable to <strong>X Axis</strong> and the other to <strong>Y Axis</strong> → click <strong>OK</strong>. To add a regression line, double-click the chart and go to <strong>Elements → Fit Line at Total</strong>.</p>
+    </div>
+  </div>
+
+  <!-- ── 08. EXPLORE ── -->
+  <div class="content-section" id="explore">
+    <div class="section-header">
+      <div class="section-icon">🔭</div>
+      <div>
+        <div class="section-label-sm">SECTION 08</div>
+        <h2 class="section-h2">Explore in SPSS</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>The <strong>Analyze → Descriptive Statistics → Explore</strong> procedure is a powerful all-in-one command that produces a comprehensive summary: descriptive statistics table, stem-and-leaf display, box plot, and normality tests — all at once, optionally split by a grouping (factor) variable.</p>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin:1.5rem 0 1rem;">What Explore Produces</h3>
+    <table class="spss-table">
+      <tr><th>Output</th><th>What You See</th><th>Use It For</th></tr>
+      <tr><td>Descriptives Table</td><td>Mean, 95% CI, 5% Trimmed Mean, Median, Variance, SD, Min, Max, Range, IQR, Skewness, Kurtosis</td><td>Full summary — compare across groups instantly</td></tr>
+      <tr><td>Stem-and-Leaf</td><td>Text-based display retaining all actual values</td><td>Shape, outliers, common values</td></tr>
+      <tr><td>Box Plot</td><td>Graphical 5-number summary with outlier markers</td><td>Spread, skewness, outlier detection</td></tr>
+      <tr><td>Normality Tests</td><td>Kolmogorov-Smirnov and Shapiro-Wilk tests + P-P/Q-Q plots</td><td>Formally test whether data is normally distributed</td></tr>
+    </table>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin:1.5rem 0 1rem;">SPSS Steps: Run Explore</h3>
+    <ol class="steps-list">
+      <li>Go to <strong>Analyze → Descriptive Statistics → Explore</strong>.</li>
+      <li>Move the outcome variable(s) (e.g., patient satisfaction) to the <strong>Dependent List</strong>.</li>
+      <li>Move a grouping variable (e.g., gender) to the <strong>Factor List</strong> — Explore will split all output by group.</li>
+      <li>In <strong>Display</strong>, choose <em>Both</em> (Statistics + Plots), <em>Statistics only</em>, or <em>Plots only</em>.</li>
+      <li>Click <strong>Plots…</strong> to add normality plots or change box plot options.</li>
+      <li>Click <strong>OK</strong> — the Output Viewer shows the full Explore report.</li>
+    </ol>
+
+    <div class="info-box pink" style="margin-top:1rem;">
+      <div class="info-icon">📋</div>
+      <p><strong>Reading the Explore Descriptives Table (from lecture):</strong><br>
+      Male patient satisfaction: Mean = 60.90, Median = 60, SD = 16.87, Skewness = 0.015, Kurtosis = −0.564 (platykurtic, near-symmetric)<br>
+      Female patient satisfaction: Mean = 62.71, Median = 64, SD = 18.32, Skewness = −0.110, Kurtosis = −1.257 (more platykurtic, slightly left-skewed)</p>
+    </div>
+  </div>
+
+  <!-- ── QUIZ ── -->
+  <div class="content-section" id="quiz">
+    <div class="section-header">
+      <div class="section-icon">✏️</div>
+      <div>
+        <div class="section-label-sm">PRACTICE</div>
+        <h2 class="section-h2">Self-Assessment Quiz</h2>
+      </div>
+    </div>
+
+    <div class="quiz-wrap">
+      <div class="quiz-title" id="qTitle">Question 1 of 8</div>
+      <div class="quiz-q" id="qText"></div>
+      <div class="quiz-opts" id="qOpts"></div>
+      <div class="quiz-feedback" id="qFeedback"></div>
+      <div class="quiz-nav">
+        <div class="quiz-counter" id="qScore">Score: 0 / 8</div>
+        <button class="quiz-next" id="qNext" onclick="nextQuestion()">Next →</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end page-wrap -->
+
+<div style="text-align:center;padding:3rem;border-top:1px solid var(--border);display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;position:relative;z-index:1;">
+  <a href="lecture3.html" style="border:1px solid var(--border);color:var(--white);padding:0.9rem 2rem;border-radius:8px;text-decoration:none;font-weight:500;">← Back to Lecture 3&4</a>
+  <a href="index.html" style="background:var(--accent);color:var(--navy);padding:0.9rem 2rem;border-radius:8px;text-decoration:none;font-weight:700;">Back to Home ↩</a>
+  <a href="lecture6.html" style="border:1px solid rgba(244,114,182,0.4);color:var(--accent);padding:0.9rem 2rem;border-radius:8px;text-decoration:none;font-weight:500;">Lecture 6 →</a>
+</div>
+
+<script>
+// ── BAR CHART ──
+const barCtx = document.getElementById('barCanvas').getContext('2d');
+let barType = 'count';
+const barInfoEl = document.getElementById('barInfo');
+
+function resizeCanvas(canvas) {
+  canvas.width = canvas.offsetWidth || 700;
+}
+
+function showBarType(type, btn) {
+  barType = type;
+  document.querySelectorAll('#barchart .chart-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  drawBar();
+}
+
+function drawBar() {
+  const c = barCtx.canvas;
+  resizeCanvas(c);
+  const w = c.width, h = c.height;
+  barCtx.clearRect(0,0,w,h);
+
+  if (barType === 'count') {
+    const data = [{label:'Secondary', val:34, pct:57.63}, {label:'High Education', val:17, pct:28.81}, {label:'Postgraduate', val:8, pct:13.56}];
+    drawGroupedBars(barCtx, w, h, data, 'Count', 'Education Level', '#f472b6');
+    barInfoEl.innerHTML = '<strong style="color:white">Bar Chart: N of Cases by Education</strong> — 59 nurses total. Secondary education dominates at 57.63%.';
+  } else if (barType === 'pct') {
+    const data = [{label:'Secondary', val:57.63, pct:57.63}, {label:'High Education', val:28.81, pct:28.81}, {label:'Postgraduate', val:13.56, pct:13.56}];
+    drawGroupedBars(barCtx, w, h, data, '% of Cases', 'Education Level', '#3ecfb2');
+    barInfoEl.innerHTML = '<strong style="color:white">Bar Chart: % of Cases</strong> — Same data as "Count" but displayed as percentages.';
+  } else {
+    const data = [{label:'Male', val:4816, pct:51.58}, {label:'Female', val:4521, pct:48.42}];
+    drawGroupedBars(barCtx, w, h, data, 'Mean Current Salary', 'Gender', '#e8a230');
+    barInfoEl.innerHTML = '<strong style="color:white">Bar Chart: Mean salary by Gender</strong> — Use "Other statistic (mean)" in Bars Represent. Males: 4816 (51.58%), Females: 4521 (48.42%).';
+  }
+}
+
+function drawGroupedBars(ctx, w, h, data, yLabel, xLabel, color) {
+  const padL=60, padR=20, padT=20, padB=50;
+  const chartW = w-padL-padR, chartH = h-padT-padB;
+  const maxVal = Math.max(...data.map(d=>d.val))*1.15;
+  const barW = chartW/(data.length*1.8);
+  const gap = chartW/data.length;
+
+  // grid lines
+  for(let i=0;i<=4;i++){
+    const y = padT + (i/4)*chartH;
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(w-padR,y);
+    ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1; ctx.stroke();
+    const val = (maxVal*(1-i/4)).toFixed(0);
+    ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='10px DM Mono'; ctx.textAlign='right';
+    ctx.fillText(val, padL-6, y+3);
+  }
+
+  // bars
+  data.forEach((d,i) => {
+    const x = padL + i*gap + (gap-barW)/2;
+    const bh = (d.val/maxVal)*chartH;
+    const y = padT + chartH - bh;
+    const grad = ctx.createLinearGradient(0,y,0,y+bh);
+    grad.addColorStop(0, color+'cc');
+    grad.addColorStop(1, color+'44');
+    ctx.fillStyle = grad;
+    ctx.fillRect(x, y, barW, bh);
+
+    // label on bar
+    ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='bold 11px DM Mono'; ctx.textAlign='center';
+    ctx.fillText(d.val, x+barW/2, y-6);
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='10px DM Sans';
+    ctx.fillText(d.pct.toFixed(1)+'%', x+barW/2, y-18);
+    ctx.fillText(d.label, x+barW/2, padT+chartH+18);
+  });
+
+  // axes
+  ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(padL,padT); ctx.lineTo(padL,padT+chartH); ctx.lineTo(w-padR,padT+chartH); ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='11px DM Sans'; ctx.textAlign='center';
+  ctx.fillText(xLabel, w/2, h-5);
+  ctx.save(); ctx.translate(14, h/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText(yLabel, 0, 0); ctx.restore();
+}
+
+// ── PIE CHART ──
+(function(){
+  const c = document.getElementById('pieCanvas');
+  resizeCanvas(c);
+  const ctx = c.getContext('2d');
+  const w=c.width, h=c.height;
+  const cx=w*0.38, cy=h/2, r=Math.min(w,h)*0.35;
+  const data = [
+    {label:'Single', val:20, pct:33.33, color:'#3ecfb2'},
+    {label:'Married', val:26, pct:43.33, color:'#e8507a'},
+    {label:'Divorced', val:8, pct:13.33, color:'#4ecb71'},
+    {label:'Widowed', val:6, pct:10.00, color:'#e8a230'},
+  ];
+  let start = -Math.PI/2;
+  data.forEach(d => {
+    const angle = (d.pct/100)*2*Math.PI;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,start,start+angle);
+    ctx.closePath(); ctx.fillStyle=d.color+'cc'; ctx.fill();
+    ctx.strokeStyle='rgba(8,13,30,0.8)'; ctx.lineWidth=2; ctx.stroke();
+
+    const midA = start + angle/2;
+    const tx = cx + Math.cos(midA)*r*0.65, ty = cy + Math.sin(midA)*r*0.65;
+    ctx.fillStyle='#fff'; ctx.font='bold 11px DM Mono'; ctx.textAlign='center';
+    ctx.fillText(d.val, tx, ty-6);
+    ctx.font='10px DM Sans'; ctx.fillText(d.pct.toFixed(2)+'%', tx, ty+8);
+    start += angle;
+  });
+
+  // legend
+  const lx = w*0.72, ly = h/2 - data.length*18;
+  ctx.font='12px DM Sans'; ctx.textAlign='left';
+  data.forEach((d,i) => {
+    ctx.fillStyle=d.color; ctx.fillRect(lx, ly+i*22, 14, 14);
+    ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.fillText(d.label, lx+20, ly+i*22+11);
+  });
+  ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.font='10px DM Mono'; ctx.textAlign='center';
+  ctx.fillText('Marital Status', cx, h-8);
+})();
+
+// ── HISTOGRAM ──
+const histCtx = document.getElementById('histCanvas').getContext('2d');
+const histInfoEl = document.getElementById('histInfo');
+let histMode = 'all';
+
+const salaryBins = [
+  {range:'2000–2999',male:4,female:2},{range:'3000–3499',male:4,female:2},{range:'3500–3999',male:2,female:4},
+  {range:'4000–4499',male:4,female:4},{range:'4500–4999',male:2,female:4},{range:'5000–5499',male:6,female:2},
+  {range:'5500–5999',male:2,female:0},{range:'6000–6499',male:6,female:5},{range:'6500–6999',male:2,female:0},
+  {range:'7000–7499',male:4,female:1},{range:'7500–7999',male:0,female:0},{range:'8000+',male:0,female:0},
+];
+
+function showHist(mode, btn) {
+  histMode = mode;
+  document.querySelectorAll('#histogram .chart-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  drawHist();
+}
+
+function drawHist() {
+  const c = histCtx.canvas; resizeCanvas(c);
+  const w=c.width, h=c.height;
+  histCtx.clearRect(0,0,w,h);
+  const padL=40,padR=10,padT=20,padB=50;
+  const chartW=w-padL-padR, chartH=h-padT-padB;
+
+  let vals;
+  if(histMode==='all') vals=salaryBins.map(b=>b.male+b.female);
+  else if(histMode==='male') vals=salaryBins.map(b=>b.male);
+  else vals=salaryBins.map(b=>b.female);
+
+  const maxV=Math.max(...vals,1);
+  const barW = chartW/vals.length - 2;
+  const color = histMode==='all'?'#f472b6':histMode==='male'?'#3ecfb2':'#e8507a';
+
+  // draw bars
+  vals.forEach((v,i) => {
+    const x = padL + i*(chartW/vals.length) + 1;
+    const bh = (v/maxV)*chartH;
+    const y = padT+chartH-bh;
+    const grad = histCtx.createLinearGradient(0,y,0,y+bh);
+    grad.addColorStop(0,color+'cc'); grad.addColorStop(1,color+'33');
+    histCtx.fillStyle=grad; histCtx.fillRect(x,y,barW,bh);
+  });
+
+  // normal curve overlay
+  const mu=vals.reduce((a,b,i)=>a+b*(i+0.5),0)/vals.reduce((a,b)=>a+b,0);
+  const sig=2.5;
+  histCtx.beginPath();
+  for(let xi=0;xi<=chartW;xi++){
+    const xv=xi/chartW*vals.length;
+    const yv=maxV*Math.exp(-0.5*((xv-mu)/sig)**2)*0.95;
+    const yp=padT+chartH-(yv/maxV)*chartH;
+    if(xi===0)histCtx.moveTo(padL+xi,yp);else histCtx.lineTo(padL+xi,yp);
+  }
+  histCtx.strokeStyle='rgba(255,255,255,0.7)'; histCtx.lineWidth=2.5; histCtx.stroke();
+
+  // grid & axes
+  histCtx.fillStyle='rgba(255,255,255,0.4)'; histCtx.font='9px DM Mono'; histCtx.textAlign='center';
+  salaryBins.forEach((b,i)=>{
+    if(i%3===0) histCtx.fillText(b.range.split('–')[0], padL+i*(chartW/vals.length)+barW/2, padT+chartH+14);
+  });
+  histCtx.fillText('Current Salary (EGP)', padL+chartW/2, h-3);
+
+  const labels={'all':'All Cases (N=60) — Mean=4698, SD=1197.87', 'male':'Male group — note the flatter shape', 'female':'Female group — compare peak location with males'};
+  histInfoEl.textContent = labels[histMode];
+}
+
+// ── DOT PLOT ──
+(function(){
+  const c = document.getElementById('dotCanvas'); resizeCanvas(c);
+  const ctx = c.getContext('2d');
+  const w=c.width, h=c.height;
+  const padL=40, padR=20, padT=10, padB=30;
+  const chartW=w-padL-padR, chartH=h-padT-padB;
+  // experience values buckets
+  const expData = {1:2,2:3,3:3,4:4,5:12,6:4,7:3,8:3,10:4,11:2,12:10,13:2,14:2,15:2};
+  const maxExp=16, maxCount=Math.max(...Object.values(expData));
+  const r=6;
+  ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
+  for(let x=0;x<=maxExp;x+=2){
+    const px=padL+x/maxExp*chartW;
+    ctx.beginPath();ctx.moveTo(px,padT);ctx.lineTo(px,padT+chartH);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font='9px DM Mono';ctx.textAlign='center';
+    ctx.fillText(x,px,padT+chartH+14);
+  }
+  ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font='10px DM Sans';ctx.textAlign='center';
+  ctx.fillText('Experience (years)',padL+chartW/2,h-3);
+  Object.entries(expData).forEach(([exp,count])=>{
+    const px=padL+parseInt(exp)/maxExp*chartW;
+    for(let j=0;j<count;j++){
+      const py=padT+chartH-r-(j*(r*2+1));
+      ctx.beginPath();ctx.arc(px,py,r,0,Math.PI*2);
+      ctx.fillStyle='rgba(244,114,182,0.5)';ctx.fill();
+      ctx.strokeStyle='rgba(244,114,182,0.9)';ctx.lineWidth=1;ctx.stroke();
+    }
+  });
+})();
+
+// ── STEM-LEAF ANSWERS ──
+(function(){
+  const qs = [
+    {q:'1. How many apartments in the study?', a:'45 (count all leaves: 2+7+6+9+8+7+3+3 = 45)'},
+    {q:'2. How many in the last row (stem=15)?', a:'3 (leaves: 6, 5, 5 → areas 156, 155, 155)'},
+    {q:'3. What is the largest area?', a:'159 m² (stem=15, largest leaf=9... wait — leaf 6,5,5 → max is 156)'},
+    {q:'4. What is the smallest area?', a:'88 m² (stem=8, leaf=8)'},
+    {q:'5. Actual values in the last row?', a:'155, 155, 156 (stem=15, leaves=6,5,5)'},
+    {q:'6. What is the median?', a:'Position 23 → sorted value is 119 m²'},
+    {q:'7. How many apartments < 103 m²?', a:'9 (2 in stem 8 + 7 in stem 9 = 9 apartments)'},
+    {q:'8. How many apartments ≥ 132 m²?', a:'13 (from stem 13 leaf 2 onwards: 132–156)'},
+  ];
+  const div=document.getElementById('slAnswers');
+  qs.forEach(item=>{
+    const d=document.createElement('div');
+    d.style.cssText='background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:0.8rem 1rem;cursor:pointer;';
+    d.innerHTML=`<div style="font-size:0.82rem;color:var(--white);font-weight:500;margin-bottom:0.3rem;">${item.q}</div><div style="font-size:0.78rem;color:var(--muted);display:none;">${item.a}</div>`;
+    d.onclick=()=>{
+      const ans=d.querySelector('div:last-child');
+      const isShown=ans.style.display!=='none';
+      ans.style.display=isShown?'none':'block';
+      ans.style.color='var(--accent)';
+      d.style.borderColor=isShown?'var(--border)':'rgba(244,114,182,0.4)';
+    };
+    div.appendChild(d);
+  });
+  const hint=document.createElement('p');
+  hint.style.cssText='grid-column:1/-1;font-size:0.78rem;color:var(--muted);margin-top:0.3rem;';
+  hint.textContent='Click any question to reveal the answer.';
+  div.appendChild(hint);
+})();
+
+// ── BOX PLOT ──
+const boxCtx = document.getElementById('boxCanvas').getContext('2d');
+const boxInfoEl = document.getElementById('boxInfo');
+
+function showBox(type, btn) {
+  document.querySelectorAll('#boxplot .chart-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  drawBox(type);
+}
+
+function drawBox(type) {
+  const c = boxCtx.canvas; resizeCanvas(c);
+  const w=c.width, h=c.height;
+  boxCtx.clearRect(0,0,w,h);
+  const padL=50,padR=20,padT=20,padB=40;
+  const chartH=h-padT-padB;
+
+  if(type==='example') {
+    // single box: min=33,Q1=46,med=57,Q3=66,max=79
+    const stats={min:33,q1:46,med:57,q3:66,max:79};
+    const minV=25,maxV=85;
+    drawSingleBox(boxCtx,w/2,padL,padT,chartH,minV,maxV,stats,'#f472b6');
+    // y axis
+    drawBoxAxis(boxCtx,padL,padT,chartH,minV,maxV);
+    boxInfoEl.innerHTML='<strong style="color:white">Example dataset (n=55):</strong> Min=33, Q1=46, Median=57, Q3=66, Max=79. IQR = Q3−Q1 = 20. No outliers. The distribution is roughly symmetric with a slight right skew.';
+  } else {
+    // two boxes: X (smaller) and Y (larger)
+    const xStats={min:50,q1:61,med:73,q3:84,max:99};
+    const yStats={min:30,q1:62,med:90,q3:118,max:150};
+    const minV=20,maxV=160;
+    drawBoxAxis(boxCtx,padL,padT,chartH,minV,maxV);
+    drawSingleBox(boxCtx,w*0.35,padL,padT,chartH,minV,maxV,xStats,'#3ecfb2',true,'Group X');
+    drawSingleBox(boxCtx,w*0.65,padL,padT,chartH,minV,maxV,yStats,'#e8a230',true,'Group Y');
+    boxInfoEl.innerHTML='<strong style="color:white">Comparison:</strong> Group X is less spread (IQR=23) than Group Y (IQR=56). Q1, Median, Q3 are all lower in X than Y. No outliers in either group. Both are roughly symmetric.';
+  }
+}
+
+function yToPixel(val,padT,chartH,minV,maxV){
+  return padT + chartH - (val-minV)/(maxV-minV)*chartH;
+}
+
+function drawSingleBox(ctx,cx,padL,padT,chartH,minV,maxV,s,color,label=false,lname=''){
+  const bw=55;
+  const q1y=yToPixel(s.q1,padT,chartH,minV,maxV);
+  const q3y=yToPixel(s.q3,padT,chartH,minV,maxV);
+  const medy=yToPixel(s.med,padT,chartH,minV,maxV);
+  const miny=yToPixel(s.min,padT,chartH,minV,maxV);
+  const maxy=yToPixel(s.max,padT,chartH,minV,maxV);
+
+  // box
+  ctx.fillStyle=color+'22'; ctx.strokeStyle=color+'aa'; ctx.lineWidth=2;
+  ctx.fillRect(cx-bw/2,q3y,bw,q1y-q3y);
+  ctx.strokeRect(cx-bw/2,q3y,bw,q1y-q3y);
+  // median
+  ctx.beginPath();ctx.moveTo(cx-bw/2,medy);ctx.lineTo(cx+bw/2,medy);
+  ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();
+  // whiskers
+  ctx.strokeStyle=color+'88';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(cx,q1y);ctx.lineTo(cx,miny);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,q3y);ctx.lineTo(cx,maxy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-15,miny);ctx.lineTo(cx+15,miny);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-15,maxy);ctx.lineTo(cx+15,maxy);ctx.stroke();
+  // label
+  if(label){
+    ctx.fillStyle='rgba(255,255,255,0.7)';ctx.font='12px DM Sans';ctx.textAlign='center';
+    ctx.fillText(lname,cx,padT+chartH+20);
+  }
+  // stats labels
+  ctx.fillStyle=color+'99';ctx.font='9px DM Mono';ctx.textAlign='left';
+  const lx=cx+bw/2+4;
+  [[s.max,'Max'],[s.q3,'Q3'],[s.med,'Md'],[s.q1,'Q1'],[s.min,'Min']].forEach(([v,lbl])=>{
+    const y=yToPixel(v,padT,chartH,minV,maxV);
+    ctx.fillText(`${lbl}=${v}`,lx,y+3);
+  });
+}
+
+function drawBoxAxis(ctx,padL,padT,chartH,minV,maxV){
+  for(let v=minV;v<=maxV;v+=20){
+    const y=yToPixel(v,padT,chartH,minV,maxV);
+    ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(ctx.canvas.width-20,y);
+    ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font='10px DM Mono';ctx.textAlign='right';
+    ctx.fillText(v,padL-4,y+3);
+  }
+}
+
+// ── ERROR BARS ──
+const errorCtx = document.getElementById('errorCanvas').getContext('2d');
+const errorInfoEl = document.getElementById('errorInfo');
+const groups = [
+  {label:'Secondary',mean:4111.8,ci:[3800,4420],sd:[1800,6420],se:[3770,4455]},
+  {label:'High Edu.',mean:5324.4,ci:[4720,5930],sd:[2900,7750],se:[4780,5870]},
+  {label:'Postgrad.',mean:6043.1,ci:[5440,6650],sd:[3300,8790],se:[5380,6710]},
+];
+
+function showError(type, btn) {
+  document.querySelectorAll('#errorbar .chart-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  drawError(type);
+}
+
+function drawError(type) {
+  const c=errorCtx.canvas; resizeCanvas(c);
+  const w=c.width, h=c.height;
+  errorCtx.clearRect(0,0,w,h);
+  const padL=60,padR=20,padT=20,padB=40;
+  const chartW=w-padL-padR, chartH=h-padT-padB;
+  const minV=2500,maxV=8000;
+
+  const typeMap={ci:'ci',sd:'sd',se:'se'};
+  const color='#f472b6';
+
+  // grid
+  for(let v=3000;v<=8000;v+=1000){
+    const y=padT+chartH-(v-minV)/(maxV-minV)*chartH;
+    errorCtx.beginPath();errorCtx.moveTo(padL,y);errorCtx.lineTo(w-padR,y);
+    errorCtx.strokeStyle='rgba(255,255,255,0.05)';errorCtx.lineWidth=1;errorCtx.stroke();
+    errorCtx.fillStyle='rgba(255,255,255,0.35)';errorCtx.font='10px DM Mono';errorCtx.textAlign='right';
+    errorCtx.fillText(v,padL-4,y+3);
+  }
+
+  const step=chartW/groups.length;
+  groups.forEach((g,i)=>{
+    const cx=padL+i*step+step/2;
+    const my=padT+chartH-(g.mean-minV)/(maxV-minV)*chartH;
+    const range=g[typeMap[type]];
+    const lo=padT+chartH-(range[0]-minV)/(maxV-minV)*chartH;
+    const hi=padT+chartH-(range[1]-minV)/(maxV-minV)*chartH;
+
+    // error line
+    errorCtx.beginPath();errorCtx.moveTo(cx,lo);errorCtx.lineTo(cx,hi);
+    errorCtx.strokeStyle=color+'88';errorCtx.lineWidth=2;errorCtx.stroke();
+    // caps
+    errorCtx.beginPath();errorCtx.moveTo(cx-10,lo);errorCtx.lineTo(cx+10,lo);
+    errorCtx.beginPath();errorCtx.moveTo(cx-10,hi);errorCtx.lineTo(cx+10,hi);
+    errorCtx.strokeStyle=color+'aa';errorCtx.stroke();
+    // mean dot
+    errorCtx.beginPath();errorCtx.arc(cx,my,5,0,Math.PI*2);
+    errorCtx.fillStyle=color;errorCtx.fill();
+    // label
+    errorCtx.fillStyle='rgba(255,255,255,0.6)';errorCtx.font='10px DM Mono';errorCtx.textAlign='center';
+    ctx_label_fix: {
+      errorCtx.fillText(g.mean.toFixed(1),cx+22,my+3);
+    }
+    errorCtx.fillStyle='rgba(255,255,255,0.5)';errorCtx.font='11px DM Sans';
+    errorCtx.fillText(g.label,cx,padT+chartH+18);
+  });
+
+  const descs={
+    ci:'95% Confidence Interval for Mean — the bar shows where the true population mean likely lies. Non-overlapping CIs between Secondary and Postgraduate suggest a significant difference.',
+    sd:'±2 Standard Deviations — shows the natural spread of individual salaries in each group. Much wider bars; captures ~95% of individual values.',
+    se:'±2 Standard Errors of Mean — shows how precisely the sample mean estimates the population mean. Narrower than SD bars; used for inferential comparisons.'
+  };
+  errorInfoEl.textContent = descs[type];
+}
+
+// ── SCATTER ──
+const scatterCtx = document.getElementById('scatterCanvas').getContext('2d');
+const scatterInfoEl = document.getElementById('scatterInfo');
+
+const scatterData = {
+  none: {
+    xLabel:'Height (cm)', yLabel:'Salary (EGP)',
+    info:'<strong style="color:white">No Relationship</strong> — Points are scattered randomly. Knowing a person\'s height tells you nothing about their salary. The scatter confirms there is no linear pattern.',
+    gen: () => {const pts=[];for(let i=0;i<50;i++) pts.push({x:145+Math.random()*30,y:9000+Math.random()*2000}); return pts;}
+  },
+  positive: {
+    xLabel:'Bus Age (years)', yLabel:'Maintenance Cost',
+    info:'<strong style="color:white">Positive Relationship</strong> — As bus age increases, maintenance cost increases. Points trend upward from left to right. There is a clear positive linear relationship.',
+    gen: () => {const pts=[];for(let i=0;i<50;i++){const x=Math.random()*10;pts.push({x,y:900+x*23+Math.random()*60-30});} return pts;}
+  },
+  negative: {
+    xLabel:'Meat Price (EGP/kg)', yLabel:'Quantity Purchased (kg)',
+    info:'<strong style="color:white">Negative (Inverse) Relationship</strong> — As meat price increases, the quantity purchased decreases. Points trend downward from left to right.',
+    gen: () => {const pts=[];for(let i=0;i<50;i++){const x=5+Math.random()*15;pts.push({x,y:115-x*1.5+Math.random()*8-4});} return pts;}
+  }
+};
+
+function showScatter(type, btn) {
+  document.querySelectorAll('#scatter .chart-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  drawScatter(type);
+}
+
+function drawScatter(type) {
+  const c=scatterCtx.canvas; resizeCanvas(c);
+  const w=c.width, h=c.height;
+  scatterCtx.clearRect(0,0,w,h);
+  const padL=60,padR=20,padT=20,padB=50;
+  const chartW=w-padL-padR, chartH=h-padT-padB;
+  const d=scatterData[type];
+  const pts=d.gen();
+
+  const xs=pts.map(p=>p.x), ys=pts.map(p=>p.y);
+  const minX=Math.min(...xs)-1, maxX=Math.max(...xs)+1;
+  const minY=Math.min(...ys)-5, maxY=Math.max(...ys)+5;
+
+  // grid
+  for(let i=0;i<=4;i++){
+    const y=padT+(i/4)*chartH;
+    scatterCtx.beginPath();scatterCtx.moveTo(padL,y);scatterCtx.lineTo(w-padR,y);
+    scatterCtx.strokeStyle='rgba(255,255,255,0.05)';scatterCtx.lineWidth=1;scatterCtx.stroke();
+    const v=maxY-(i/4)*(maxY-minY);
+    scatterCtx.fillStyle='rgba(255,255,255,0.35)';scatterCtx.font='10px DM Mono';scatterCtx.textAlign='right';
+    scatterCtx.fillText(v.toFixed(0),padL-4,y+3);
+    const xv=minX+(i/4)*(maxX-minX);
+    const xp=padL+(i/4)*chartW;
+    scatterCtx.textAlign='center'; scatterCtx.fillText(xv.toFixed(0),xp,padT+chartH+16);
+  }
+
+  // dots
+  const color=type==='none'?'#f472b6':type==='positive'?'#3ecfb2':'#e8507a';
+  pts.forEach(p=>{
+    const px=padL+(p.x-minX)/(maxX-minX)*chartW;
+    const py=padT+chartH-(p.y-minY)/(maxY-minY)*chartH;
+    scatterCtx.beginPath();scatterCtx.arc(px,py,4,0,Math.PI*2);
+    scatterCtx.fillStyle=color+'55';scatterCtx.fill();
+    scatterCtx.strokeStyle=color+'cc';scatterCtx.lineWidth=1;scatterCtx.stroke();
+  });
+
+  // trend line for positive/negative
+  if(type!=='none'){
+    const n=pts.length;
+    const mx=xs.reduce((a,b)=>a+b)/n, my=ys.reduce((a,b)=>a+b)/n;
+    const slope=pts.reduce((a,p)=>a+(p.x-mx)*(p.y-my),0)/pts.reduce((a,p)=>a+(p.x-mx)**2,0);
+    const intercept=my-slope*mx;
+    const x0=minX, x1=maxX;
+    const y0=slope*x0+intercept, y1=slope*x1+intercept;
+    const px0=padL, py0=padT+chartH-(y0-minY)/(maxY-minY)*chartH;
+    const px1=padL+chartW, py1=padT+chartH-(y1-minY)/(maxY-minY)*chartH;
+    scatterCtx.beginPath();scatterCtx.moveTo(px0,py0);scatterCtx.lineTo(px1,py1);
+    scatterCtx.strokeStyle='rgba(255,255,255,0.4)';scatterCtx.lineWidth=1.5;
+    scatterCtx.setLineDash([5,3]);scatterCtx.stroke();scatterCtx.setLineDash([]);
+  }
+
+  // axes labels
+  scatterCtx.fillStyle='rgba(255,255,255,0.5)';scatterCtx.font='11px DM Sans';scatterCtx.textAlign='center';
+  scatterCtx.fillText(d.xLabel,padL+chartW/2,h-5);
+  scatterCtx.save();scatterCtx.translate(14,padT+chartH/2);scatterCtx.rotate(-Math.PI/2);
+  scatterCtx.fillText(d.yLabel,0,0);scatterCtx.restore();
+  scatterInfoEl.innerHTML=d.info;
+}
+
+// ── QUIZ ──
+const questions = [
+  { q:'A researcher wants to display the count of nurses by education level (Secondary, High Education, Postgraduate). Which chart is most appropriate?', opts:['Histogram','Box Plot','Bar Chart','Scatter Diagram'], ans:2, explain:'A Bar Chart is used for categorical variables showing the count or percentage of cases in each category. Histograms are for continuous numeric data.' },
+  { q:'Which SPSS menu path creates a Histogram for a quantitative variable?', opts:['Analyze → Explore','Graphs → Bar → Simple','Graphs → Histogram','Graphs → Scatter/Dot → Simple Dot'], ans:2, explain:'Graphs → Histogram opens the Histogram dialog where you select a numeric variable and optionally overlay a normal curve.' },
+  { q:'In a Stem-and-Leaf display with stem=12 and leaves "7 5 7 0 5 5 0 4", how many observations are in this row?', opts:['8','7','12','6'], ans:0, explain:'Count the leaves: 7, 5, 7, 0, 5, 5, 0, 4 — that is 8 leaves = 8 observations. Each leaf represents one case.' },
+  { q:'A box plot shows Q1=46, Median=57, Q3=66. What is the Interquartile Range (IQR)?', opts:['11','20','23','57'], ans:1, explain:'IQR = Q3 − Q1 = 66 − 46 = 20. The IQR represents the spread of the middle 50% of the data.' },
+  { q:'An error bar plot using "Confidence Interval for Mean" shows non-overlapping 95% CI bars for Secondary vs Postgraduate education groups. What does this suggest?', opts:['The means are identical','There is likely a significant difference in means','The data is not normally distributed','The sample sizes are different'], ans:1, explain:'Non-overlapping 95% CI bars suggest a statistically significant difference between the group means — they are unlikely to be equal in the population.' },
+  { q:'A scatter diagram shows points that trend upward from left to right (positive slope). What relationship does this indicate?', opts:['No relationship','Negative relationship','Positive relationship','Curvilinear relationship'], ans:2, explain:'An upward trend (left to right) indicates a positive relationship: as X increases, Y tends to increase. Example: bus age vs. maintenance cost.' },
+  { q:'Which SPSS command produces the stem-and-leaf display, box plot, AND full descriptives table all at once?', opts:['Graphs → Boxplot','Analyze → Descriptive Statistics → Frequencies','Analyze → Descriptive Statistics → Explore','Graphs → Histogram'], ans:2, explain:'Analyze → Descriptive Statistics → Explore produces a comprehensive output: descriptives table, stem-and-leaf, box plot, and normality tests — all in one run.' },
+  { q:'In the apartment area stem-and-leaf (n=45), what are the actual data values in the row: Stem=8, Leaves=8 9?', opts:['0.8 and 0.9','8.8 and 8.9','80 and 90','88 and 89'], ans:3, explain:'In a stem-and-leaf display, the stem represents the tens (or higher) digit and the leaf represents the units digit. Stem=8 and leaves=8,9 → values are 88 and 89 m².' },
+];
+
+let qIdx=0, score=0, answered=false;
+function renderQ() {
+  const q=questions[qIdx];
+  document.getElementById('qTitle').textContent=`Question ${qIdx+1} of ${questions.length}`;
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('qFeedback').classList.remove('show');
+  document.getElementById('qNext').style.display='none';
+  answered=false;
+  const opts=document.getElementById('qOpts');
+  opts.innerHTML='';
+  q.opts.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='quiz-opt'; btn.textContent=opt;
+    btn.onclick=()=>{
+      if(answered)return;
+      answered=true;
+      document.querySelectorAll('.quiz-opt').forEach(b=>b.disabled=true);
+      if(i===q.ans){btn.classList.add('correct');score++;}
+      else{btn.classList.add('wrong');document.querySelectorAll('.quiz-opt')[q.ans].classList.add('correct');}
+      document.getElementById('qScore').textContent=`Score: ${score}/${questions.length}`;
+      const fb=document.getElementById('qFeedback');
+      fb.textContent=q.explain; fb.classList.add('show');
+      const nxt=document.getElementById('qNext');
+      if(qIdx<questions.length-1){nxt.textContent='Next →';nxt.style.display='block';}
+      else{nxt.textContent=`Done! Score: ${score}/${questions.length}`;nxt.style.display='block';nxt.onclick=()=>{qIdx=0;score=0;renderQ();nxt.onclick=nextQuestion;nxt.textContent='Next →';};}
+    };
+    opts.appendChild(btn);
+  });
+}
+function nextQuestion(){qIdx++;renderQ();}
+renderQ();
+
+// ── INIT ALL CHARTS ──
+window.addEventListener('load', ()=>{
+  drawBar();
+  drawHist();
+  drawBox('example');
+  drawError('ci');
+  drawScatter('none');
+});
+window.addEventListener('resize', ()=>{
+  drawBar();
+  drawHist();
+  drawBox(document.querySelector('#boxplot .chart-btn.active')?.textContent.includes('Compare')?'compare':'example');
+  drawError(document.querySelector('#errorbar .chart-btn.active')?.textContent.includes('SD')?'sd':document.querySelector('#errorbar .chart-btn.active')?.textContent.includes('SE')?'se':'ci');
+  drawScatter(document.querySelector('#scatter .chart-btn.active')?.textContent.includes('Positive')?'positive':document.querySelector('#scatter .chart-btn.active')?.textContent.includes('Negative')?'negative':'none');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 2 – Data Processing | DS 501</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #080d1e; --navy2: #0f1630; --navy3: #1a2248;
+    --gold: #e8a230; --gold2: #f5c060;
+    --teal: #3ecfb2; --pink: #e8507a;
+    --white: #f0eee8; --muted: #8a96b8;
+    --card: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
+    --green: #4ecb71; --purple: #a78bfa;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(62,207,178,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(62,207,178,0.03) 1px, transparent 1px);
+    background-size: 60px 60px; pointer-events: none; z-index: 0;
+  }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 3rem;
+    background: rgba(8,13,30,0.9); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--teal); }
+  .nav-links { display: flex; gap: 1.5rem; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--teal); }
+
+  .page-wrap { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; position: relative; z-index: 1; }
+
+  /* HERO */
+  .lecture-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; padding: 3rem 0; }
+  .lecture-badge { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--teal); letter-spacing: 0.12em; background: rgba(62,207,178,0.1); border: 1px solid rgba(62,207,178,0.25); display: inline-block; padding: 0.3rem 1rem; border-radius: 4px; margin-bottom: 1rem; }
+  .lecture-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; line-height: 1.1; }
+  .lecture-title em { font-style: italic; color: var(--teal); }
+  .lecture-desc { color: var(--muted); font-size: 1rem; line-height: 1.8; margin-top: 1.2rem; font-weight: 300; }
+  .toc-item { display: flex; align-items: center; gap: 0.7rem; padding: 0.45rem 0; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--white); font-size: 0.85rem; transition: color 0.2s; }
+  .toc-item:hover { color: var(--teal); }
+  .toc-num { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); width: 24px; }
+  .toc-title-sm { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.8rem; margin-top:1.5rem; }
+  .hero-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; }
+  .mini-stat { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0; border-bottom: 1px solid var(--border); }
+  .mini-stat:last-child { border-bottom: none; }
+  .mini-stat-label { font-size: 0.82rem; color: var(--muted); }
+  .mini-stat-val { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--teal); }
+  .hero-card-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--muted); margin-bottom: 1.2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+
+  /* SECTIONS */
+  .content-section { margin-bottom: 4rem; }
+  .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .section-icon { width: 44px; height: 44px; border-radius: 10px; background: rgba(62,207,178,0.1); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+  .section-label-sm { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--teal); letter-spacing: 0.12em; }
+  .section-h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; }
+
+  .def-box { background: rgba(62,207,178,0.06); border: 1px solid rgba(62,207,178,0.2); border-left: 4px solid var(--teal); border-radius: 8px; padding: 1.5rem 1.8rem; margin-bottom: 1.5rem; }
+  .def-box p { color: var(--white); line-height: 1.8; font-size: 0.95rem; }
+  .def-box strong { color: var(--teal); }
+  .info-box { background: rgba(232,162,48,0.05); border: 1px solid rgba(232,162,48,0.2); border-radius: 8px; padding: 1.2rem 1.5rem; margin-bottom: 1rem; display: flex; gap: 1rem; align-items: flex-start; }
+  .info-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .info-box p { color: var(--muted); font-size: 0.88rem; line-height: 1.7; }
+  .info-box p strong { color: var(--white); }
+
+  /* OPERATION CARDS */
+  .ops-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 1.2rem; margin: 2rem 0; }
+  .op-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; transition: all 0.25s; cursor: pointer; }
+  .op-card:hover { border-color: rgba(62,207,178,0.35); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+  .op-card.expanded { border-color: rgba(62,207,178,0.4); background: rgba(62,207,178,0.04); }
+  .op-header { display: flex; align-items: center; gap: 1rem; }
+  .op-icon { font-size: 1.5rem; }
+  .op-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+  .op-tag { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--teal); background: rgba(62,207,178,0.1); border: 1px solid rgba(62,207,178,0.25); padding: 0.15rem 0.5rem; border-radius: 4px; margin-top: 0.3rem; display: inline-block; }
+  .op-desc { color: var(--muted); font-size: 0.85rem; margin-top: 0.8rem; line-height: 1.6; }
+  .op-expand { display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+  .op-card.expanded .op-expand { display: block; }
+  .op-steps { list-style: none; counter-reset: step-counter; }
+  .op-steps li { counter-increment: step-counter; padding: 0.5rem 0; font-size: 0.84rem; color: var(--muted); line-height: 1.6; display: flex; gap: 0.8rem; align-items: flex-start; }
+  .op-steps li::before { content: counter(step-counter); min-width: 22px; height: 22px; background: rgba(62,207,178,0.15); color: var(--teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 0.7rem; flex-shrink: 0; }
+  .toggle-arrow { margin-left: auto; color: var(--muted); transition: transform 0.2s; font-size: 0.85rem; }
+  .op-card.expanded .toggle-arrow { transform: rotate(180deg); color: var(--teal); }
+
+  /* PIPELINE VISUAL */
+  .pipeline { display: flex; align-items: stretch; gap: 0; margin: 2rem 0; overflow-x: auto; }
+  .pipe-step { flex: 1; min-width: 120px; background: var(--card); border: 1px solid var(--border); padding: 1.2rem 1rem; text-align: center; position: relative; transition: all 0.2s; }
+  .pipe-step:hover { background: rgba(62,207,178,0.06); border-color: rgba(62,207,178,0.25); }
+  .pipe-step:not(:last-child)::after { content: '→'; position: absolute; right: -14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 1.1rem; z-index: 2; background: var(--navy); padding: 0 2px; }
+  .pipe-icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+  .pipe-label { font-size: 0.78rem; color: var(--white); font-weight: 500; }
+  .pipe-sub { font-size: 0.7rem; color: var(--muted); margin-top: 0.3rem; }
+
+  /* SORT DEMO */
+  .sort-demo { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 1.5rem 0; }
+  .sort-demo-title { font-weight: 600; margin-bottom: 1rem; font-size: 0.9rem; }
+  .sort-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; font-family: 'DM Mono', monospace; }
+  .sort-table th { background: rgba(62,207,178,0.1); color: var(--teal); padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid rgba(62,207,178,0.2); }
+  .sort-table td { padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); color: var(--muted); transition: background 0.3s, color 0.3s; }
+  .sort-table td.highlighted { background: rgba(62,207,178,0.08); color: var(--teal); }
+  .sort-controls { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+  .sort-btn { padding: 0.45rem 1rem; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 0.8rem; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .sort-btn:hover { border-color: var(--teal); color: var(--teal); }
+
+  /* RECODE DEMO */
+  .recode-demo { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 1.5rem 0; }
+  .recode-input-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .recode-label { font-size: 0.85rem; color: var(--muted); }
+  .recode-slider { flex: 1; accent-color: var(--teal); min-width: 150px; }
+  .recode-val { font-family: 'DM Mono', monospace; font-size: 0.9rem; color: var(--teal); width: 40px; text-align: center; }
+  .recode-result { background: rgba(232,162,48,0.08); border: 1px solid rgba(232,162,48,0.2); border-radius: 8px; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem; }
+  .recode-arrow { color: var(--gold); font-size: 1.5rem; }
+  .recode-category { font-family: 'DM Mono', monospace; font-size: 0.9rem; }
+
+  /* COMPUTE DEMO */
+  .compute-demo { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 1.5rem 0; }
+  .formula-input { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+  .formula-field { background: var(--navy3); border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem 1rem; font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--white); flex: 1; min-width: 200px; }
+  .formula-btn { background: var(--teal); color: var(--navy); border: none; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; }
+  .compute-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .compute-table th { background: rgba(232,162,48,0.1); color: var(--gold); padding: 0.6rem 0.8rem; text-align: right; border-bottom: 1px solid var(--border); }
+  .compute-table th:first-child { text-align: left; }
+  .compute-table td { padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); color: var(--muted); text-align: right; font-family: 'DM Mono', monospace; }
+  .compute-table td:first-child { text-align: left; color: var(--white); }
+  .compute-table td.new-col { color: var(--teal); }
+
+  /* MISSING VALUES */
+  .missing-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0; }
+  .missing-panel { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+  .missing-panel-title { font-weight: 600; font-size: 0.88rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+  .missing-cell { display: inline-block; width: 36px; height: 36px; border-radius: 4px; line-height: 36px; text-align: center; font-family: 'DM Mono', monospace; font-size: 0.75rem; margin: 3px; }
+  .missing-cell.val { background: rgba(255,255,255,0.06); color: var(--white); }
+  .missing-cell.miss { background: rgba(232,80,122,0.2); color: var(--pink); border: 1px solid rgba(232,80,122,0.4); }
+  .missing-cell.filled { background: rgba(78,203,113,0.2); color: var(--green); border: 1px solid rgba(78,203,113,0.4); }
+
+  /* SPSS TABLE */
+  .spss-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.85rem; }
+  .spss-table th { background: rgba(62,207,178,0.08); color: var(--teal); font-weight: 600; padding: 0.8rem 1rem; text-align: left; border-bottom: 1px solid rgba(62,207,178,0.2); }
+  .spss-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; line-height: 1.5; }
+  .spss-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .spss-table td:first-child { color: var(--white); font-weight: 500; font-family: 'DM Mono', monospace; font-size: 0.8rem; }
+
+  /* QUIZ */
+  .quiz-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 2rem 0; }
+  .quiz-q { color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.5rem; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 0.6rem; }
+  .quiz-opt { padding: 0.8rem 1.2rem; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; font-size: 0.88rem; transition: all 0.2s; text-align: left; background: transparent; color: var(--white); font-family: 'DM Sans', sans-serif; width: 100%; }
+  .quiz-opt:hover { border-color: var(--teal); }
+  .quiz-opt.correct { background: rgba(78,203,113,0.15); border-color: var(--green); color: var(--green); }
+  .quiz-opt.wrong { background: rgba(232,80,122,0.12); border-color: var(--pink); color: var(--pink); }
+  .quiz-feedback { margin-top: 1rem; font-size: 0.88rem; line-height: 1.6; color: var(--muted); display: none; }
+  .quiz-feedback.show { display: block; }
+  .quiz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; }
+  .quiz-counter { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--muted); }
+  .quiz-next { background: var(--teal); color: var(--navy); border: none; padding: 0.6rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: 'DM Sans', sans-serif; display: none; }
+  .quiz-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 0.5rem; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 768px) {
+    .lecture-hero { grid-template-columns: 1fr; }
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .page-wrap { padding: 2rem 1.2rem; }
+    .missing-demo { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">DS 501 · Lecture 02</div>
+  <div class="nav-links">
+    <a href="index.html">← Home</a>
+    <a href="lecture1.html">← Lecture 1</a>
+    <a href="#merge">Merge</a>
+    <a href="#sort">Sort</a>
+    <a href="#recode">Recode</a>
+    <a href="#compute">Compute</a>
+    <a href="#quiz">Quiz</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <div class="lecture-hero">
+    <div>
+      <div class="lecture-badge">LECTURE 02 — DS 501</div>
+      <h1 class="lecture-title">Data Processing<em>in SPSS</em></h1>
+      <p class="lecture-desc">Master the essential data manipulation operations in SPSS: merging files, replacing missing values, sorting cases, recoding variables, selecting subgroups, computing new variables, and working with time series.</p>
+      <div class="toc-title-sm">In this lecture</div>
+      <a href="#overview" class="toc-item"><span class="toc-num">01</span> Overview of Operations</a>
+      <a href="#merge" class="toc-item"><span class="toc-num">02</span> Merge Files</a>
+      <a href="#missing" class="toc-item"><span class="toc-num">03</span> Replace Missing Values</a>
+      <a href="#sort" class="toc-item"><span class="toc-num">04</span> Sort Cases</a>
+      <a href="#recode" class="toc-item"><span class="toc-num">05</span> Recode & Compute</a>
+      <a href="#select" class="toc-item"><span class="toc-num">06</span> Select Cases</a>
+      <a href="#timeseries" class="toc-item"><span class="toc-num">07</span> Time Series Operations</a>
+      <a href="#quiz" class="toc-item"><span class="toc-num">08</span> Test Yourself</a>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-title">Lecture Overview</div>
+      <div class="mini-stat"><span class="mini-stat-label">Course</span><span class="mini-stat-val">DS 501</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Software</span><span class="mini-stat-val">IBM SPSS v25</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Operations</span><span class="mini-stat-val">10 topics</span></div>
+    </div>
+  </div>
+
+  <!-- ── 1. OVERVIEW ── -->
+  <div class="content-section" id="overview">
+    <div class="section-header">
+      <div class="section-icon">🗺️</div>
+      <div>
+        <div class="section-label-sm">SECTION 01</div>
+        <div class="section-h2">Overview of Data Processing</div>
+      </div>
+    </div>
+    <p style="color:var(--muted); line-height:1.8; margin-bottom:1.5rem;">Before running any statistical analysis, raw data must be <strong style="color:var(--white)">processed and prepared</strong>. SPSS provides a powerful set of tools for this. Here's the general workflow:</p>
+
+    <div class="pipeline">
+      <div class="pipe-step"><div class="pipe-icon">📥</div><div class="pipe-label">Import Data</div><div class="pipe-sub">From survey, file, etc.</div></div>
+      <div class="pipe-step"><div class="pipe-icon">🔗</div><div class="pipe-label">Merge Files</div><div class="pipe-sub">Combine datasets</div></div>
+      <div class="pipe-step"><div class="pipe-icon">🩹</div><div class="pipe-label">Fix Missing</div><div class="pipe-sub">Replace missing values</div></div>
+      <div class="pipe-step"><div class="pipe-icon">↕️</div><div class="pipe-label">Sort Cases</div><div class="pipe-sub">Order the data</div></div>
+      <div class="pipe-step"><div class="pipe-icon">🔄</div><div class="pipe-label">Recode</div><div class="pipe-sub">Convert variables</div></div>
+      <div class="pipe-step"><div class="pipe-icon">🧮</div><div class="pipe-label">Compute</div><div class="pipe-sub">New variables</div></div>
+      <div class="pipe-step"><div class="pipe-icon">📊</div><div class="pipe-label">Analyze</div><div class="pipe-sub">Run statistics</div></div>
+    </div>
+
+    <!-- Quick-reference cards -->
+    <div class="ops-grid" id="opsGrid">
+      <div class="op-card" onclick="toggleOp(this)">
+        <div class="op-header"><div class="op-icon">🔗</div><div><div class="op-name">Merge Files</div><div class="op-tag">Data → Merge Files</div></div><div class="toggle-arrow">▼</div></div>
+        <div class="op-desc">Combine two or more SPSS files — either adding more cases (rows) or more variables (columns).</div>
+        <div class="op-expand">
+          <ol class="op-steps">
+            <li>Go to <strong>Data → Merge Files</strong></li>
+            <li>Choose <strong>Add Cases</strong> (same variables, more rows) OR <strong>Add Variables</strong> (same rows, more columns)</li>
+            <li>Select the external file to merge with</li>
+            <li>Match variables as needed → Click OK</li>
+          </ol>
+          <div class="info-box" style="margin-top:1rem;">
+            <div class="info-icon">💡</div>
+            <p><strong>When to use:</strong> You collected data in two batches (same form, different months). Use Add Cases to combine them into one dataset.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="op-card" onclick="toggleOp(this)">
+        <div class="op-header"><div class="op-icon">↔️</div><div><div class="op-name">Transpose</div><div class="op-tag">Data → Transpose</div></div><div class="toggle-arrow">▼</div></div>
+        <div class="op-desc">Flip the dataset: rows become columns and columns become rows. Converts variables to cases and vice versa.</div>
+        <div class="op-expand">
+          <ol class="op-steps">
+            <li>Go to <strong>Data → Transpose</strong></li>
+            <li>Move variables to the <strong>Variable(s)</strong> box</li>
+            <li>Optionally specify a Name Variable (for labeling transposed rows)</li>
+            <li>Click OK — a new dataset is created</li>
+          </ol>
+          <div class="info-box" style="margin-top:1rem;">
+            <div class="info-icon">💡</div>
+            <p><strong>When to use:</strong> Your data was collected in "wide" format (each time point as a column) but an analysis needs "long" format (each time point as a row).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="op-card" onclick="toggleOp(this)">
+        <div class="op-header"><div class="op-icon">🩹</div><div><div class="op-name">Replace Missing Values</div><div class="op-tag">Transform → Replace Missing</div></div><div class="toggle-arrow">▼</div></div>
+        <div class="op-desc">Estimate and fill in missing values using several methods such as Series Mean, Linear Interpolation, etc.</div>
+        <div class="op-expand">
+          <ol class="op-steps">
+            <li>Go to <strong>Transform → Replace Missing Values</strong></li>
+            <li>Select the variable(s) with missing data</li>
+            <li>Choose a <strong>Method</strong>: Series Mean, Mean of nearby points, Median, Linear interpolation, etc.</li>
+            <li>SPSS creates a new variable with the filled values (e.g., <code>age_1</code>)</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="op-card" onclick="toggleOp(this)">
+        <div class="op-header"><div class="op-icon">↕️</div><div><div class="op-name">Sort Cases</div><div class="op-tag">Data → Sort Cases</div></div><div class="toggle-arrow">▼</div></div>
+        <div class="op-desc">Arrange all rows in ascending or descending order based on the values of one or more key variables.</div>
+        <div class="op-expand">
+          <ol class="op-steps">
+            <li>Go to <strong>Data → Sort Cases</strong></li>
+            <li>Move the key variable (e.g., <strong>age</strong>) to the <em>Sort by</em> box</li>
+            <li>Choose <strong>Ascending</strong> (smallest to largest) or <strong>Descending</strong></li>
+            <li>Click OK — the data is now sorted</li>
+          </ol>
+          <div class="info-box" style="margin-top:1rem;">
+            <div class="info-icon">💡</div>
+            <p>You can sort by multiple variables at once. SPSS sorts by the first key, then breaks ties using the second key, and so on.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="op-card" onclick="toggleOp(this)">
+        <div class="op-header"><div class="op-icon">🔄</div><div><div class="op-name">Recode Variables</div><div class="op-tag">Transform → Recode</div></div><div class="toggle-arrow">▼</div></div>
+        <div class="op-desc">Convert a quantitative variable into a qualitative (categorical) one by grouping its values into ranges or categories.</div>
+        <div class="op-expand">
+          <ol class="op-steps">
+            <li>Go to <strong>Transform → Recode into Same Variables</strong> (overwrites) OR <strong>Recode into Different Variables</strong> (creates new)</li>
+            <li>Move the variable to recode (e.g., <strong>age</strong>)</li>
+            <li>Click <strong>Old and New Values</strong></li>
+            <li>Define ranges: e.g., 21–30 → 1, 31–40 → 2, 41+ → 3</li>
+            <li>Click Continue → OK</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="op-card" onclick="toggleOp(this)">
+        <div class="op-header"><div class="op-icon">🎯</div><div><div class="op-name">Select Cases</div><div class="op-tag">Data → Select Cases</div></div><div class="toggle-arrow">▼</div></div>
+        <div class="op-desc">Restrict analysis to a subset of cases based on a condition, a random sample, a time range, or a filter variable.</div>
+        <div class="op-expand">
+          <ol class="op-steps">
+            <li>Go to <strong>Data → Select Cases</strong></li>
+            <li>Choose selection method:<br>
+              — <em>If condition is satisfied</em> (e.g., Gender = 1)<br>
+              — <em>Random sample of cases</em> (e.g., 5%)<br>
+              — <em>Based on time or case range</em> (e.g., cases 100–130)</li>
+            <li>Choose output: filter, copy to new dataset, or delete unselected</li>
+            <li>Click OK</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="op-card" onclick="toggleOp(this)">
+        <div class="op-header"><div class="op-icon">🧮</div><div><div class="op-name">Compute Variable</div><div class="op-tag">Transform → Compute Variable</div></div><div class="toggle-arrow">▼</div></div>
+        <div class="op-desc">Create a new variable by applying a mathematical formula to existing variables. E.g., average of several Likert scale items.</div>
+        <div class="op-expand">
+          <ol class="op-steps">
+            <li>Go to <strong>Transform → Compute Variable</strong></li>
+            <li>Type a name in <strong>Target Variable</strong> (e.g., <code>mean_score</code>)</li>
+            <li>Type the formula in <strong>Numeric Expression</strong> (e.g., <code>(x1 + x2 + x3) / 3</code>)</li>
+            <li>You can use built-in functions: MEAN, SUM, LN, SQRT, etc.</li>
+            <li>Click OK — the new variable column appears in the data</li>
+          </ol>
+          <div class="info-box" style="margin-top:1rem;">
+            <div class="info-icon">💡</div>
+            <p><strong>Syntax shortcut:</strong> For many variables, use the <strong>Syntax Editor</strong> (<em>File → New → Syntax</em>) to write COMPUTE commands in batch, then press Run.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="op-card" onclick="toggleOp(this)">
+        <div class="op-header"><div class="op-icon">📈</div><div><div class="op-name">Create Time Series</div><div class="op-tag">Transform → Create Time Series</div></div><div class="toggle-arrow">▼</div></div>
+        <div class="op-desc">Generate new variables derived from time series: differences, moving averages, cumulative sums, lags, leads, etc.</div>
+        <div class="op-expand">
+          <ol class="op-steps">
+            <li>Go to <strong>Transform → Create Time Series</strong></li>
+            <li>Select the time-series variable(s)</li>
+            <li>Choose a <strong>Function</strong>:<br>
+              — Difference (removes trends)<br>
+              — Seasonal Difference<br>
+              — Centered/Prior Moving Average<br>
+              — Cumulative Sum<br>
+              — Lag (shift back n periods)<br>
+              — Lead (shift forward n periods)</li>
+            <li>Click OK — new variables are added</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="op-card" onclick="toggleOp(this)">
+        <div class="op-header"><div class="op-icon">🔍</div><div><div class="op-name">Find Cases / Variables</div><div class="op-tag">Edit → Go To Case / Variable</div></div><div class="toggle-arrow">▼</div></div>
+        <div class="op-desc">Navigate quickly to a specific case number or variable name in large datasets without scrolling.</div>
+        <div class="op-expand">
+          <ol class="op-steps">
+            <li>Go to <strong>Edit → Go To Case</strong> or <strong>Go To Variable</strong></li>
+            <li>For cases: type the row number (e.g., 100) → click Go</li>
+            <li>For variables: select from the dropdown → click Go</li>
+            <li>The cursor jumps to that position in the Data View</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="op-card" onclick="toggleOp(this)">
+        <div class="op-header"><div class="op-icon">✏️</div><div><div class="op-name">Syntax Editor</div><div class="op-tag">File → New → Syntax</div></div><div class="toggle-arrow">▼</div></div>
+        <div class="op-desc">Write SPSS command scripts to automate multiple operations at once. Essential for complex computations across many variables.</div>
+        <div class="op-expand">
+          <ol class="op-steps">
+            <li>Go to <strong>File → New → Syntax</strong></li>
+            <li>Type your COMPUTE commands (e.g., <code>COMPUTE y1=(x1+x2+x3+x4)/4.</code>)</li>
+            <li>Press <strong>Run → All</strong> (or Ctrl+A then Run)</li>
+            <li>The computed variables appear in your data file</li>
+          </ol>
+          <pre style="background:var(--navy3); border:1px solid var(--border); border-radius:6px; padding:1rem; font-size:0.75rem; color:var(--teal); margin-top:0.8rem; overflow-x:auto;">compute y1=(x11+x12+x13+x14)/4.
+compute y2=(x21+x22+x23)/3.
+compute total=(y1+y2)/2.
+EXECUTE.</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. MERGE ── -->
+  <div class="content-section" id="merge">
+    <div class="section-header">
+      <div class="section-icon">🔗</div>
+      <div><div class="section-label-sm">SECTION 02</div><div class="section-h2">Merge Files — Deep Dive</div></div>
+    </div>
+    <div class="def-box">
+      <p><strong>Merging files</strong> in SPSS means combining two datasets into one. There are two scenarios:<br>
+      <strong>(1) Add Cases</strong> — both files have the same variables, but different observations (rows).<br>
+      <strong>(2) Add Variables</strong> — both files have the same cases, but different variables (columns).</p>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin:1.5rem 0;">
+      <div>
+        <div style="font-weight:600; color:var(--teal); margin-bottom:1rem; font-size:0.9rem;">📋 File A (50 patients, Hospital X)</div>
+        <table class="spss-table" style="font-size:0.78rem;">
+          <tr><th>ID</th><th>Age</th><th>BP</th></tr>
+          <tr><td>1</td><td>25</td><td>120</td></tr>
+          <tr><td>2</td><td>30</td><td>130</td></tr>
+          <tr><td style="color:var(--muted)">...</td><td style="color:var(--muted)">...</td><td style="color:var(--muted)">...</td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-weight:600; color:var(--pink); margin-bottom:1rem; font-size:0.9rem;">📋 File B (60 patients, Hospital Y)</div>
+        <table class="spss-table" style="font-size:0.78rem;">
+          <tr><th>ID</th><th>Age</th><th>BP</th></tr>
+          <tr><td>51</td><td>22</td><td>115</td></tr>
+          <tr><td>52</td><td>45</td><td>140</td></tr>
+          <tr><td style="color:var(--muted)">...</td><td style="color:var(--muted)">...</td><td style="color:var(--muted)">...</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="info-box">
+      <div class="info-icon">✅</div>
+      <p>After <strong>Add Cases</strong>: One merged file with <strong>110 patients</strong> (50 + 60) and the same variables (ID, Age, BP).</p>
+    </div>
+  </div>
+
+  <!-- ── 3. MISSING VALUES ── -->
+  <div class="content-section" id="missing">
+    <div class="section-header">
+      <div class="section-icon">🩹</div>
+      <div><div class="section-label-sm">SECTION 03</div><div class="section-h2">Replacing Missing Values</div></div>
+    </div>
+    <p style="color:var(--muted); margin-bottom:1.5rem; line-height:1.8;">Missing values (shown as a dot "." in SPSS) can cause problems in analysis. SPSS can estimate and fill them using several strategies.</p>
+    <div class="missing-demo">
+      <div class="missing-panel">
+        <div class="missing-panel-title">❌ Before: Raw Data with Missing Values</div>
+        <div id="beforeGrid"></div>
+      </div>
+      <div class="missing-panel">
+        <div class="missing-panel-title">✅ After: Missing Values Replaced</div>
+        <div id="afterGrid"></div>
+      </div>
+    </div>
+    <table class="spss-table">
+      <tr><th>Method</th><th>How It Works</th><th>Best For</th></tr>
+      <tr><td>Series Mean</td><td>Replaces with the overall mean of the variable</td><td>Stable, non-trended data</td></tr>
+      <tr><td>Mean of Nearby Points</td><td>Average of the n closest non-missing values</td><td>Locally stable data</td></tr>
+      <tr><td>Median of Nearby Points</td><td>Median of nearby values (robust to outliers)</td><td>Skewed or outlier-prone data</td></tr>
+      <tr><td>Linear Interpolation</td><td>Draws a straight line between neighboring values</td><td>Linearly trending time series</td></tr>
+      <tr><td>Linear Trend at Point</td><td>Fits a regression trend line and uses it</td><td>Strong linear trends</td></tr>
+    </table>
+  </div>
+
+  <!-- ── 4. SORT ── -->
+  <div class="content-section" id="sort">
+    <div class="section-header">
+      <div class="section-icon">↕️</div>
+      <div><div class="section-label-sm">SECTION 04</div><div class="section-h2">Sort Cases — Interactive Demo</div></div>
+    </div>
+    <p style="color:var(--muted); margin-bottom:1.5rem; line-height:1.8;">Click a button to see how the same dataset looks when sorted by different variables.</p>
+    <div class="sort-demo">
+      <div class="sort-demo-title">Sample Dataset — Job Satisfaction Study</div>
+      <table class="sort-table" id="sortTable">
+        <tr><th>ID</th><th>Age</th><th>Salary</th><th>Experience</th><th>Satisfaction</th></tr>
+      </table>
+      <div class="sort-controls">
+        <button class="sort-btn" onclick="sortBy('id')">Sort by ID</button>
+        <button class="sort-btn" onclick="sortBy('age')">Sort by Age ↑</button>
+        <button class="sort-btn" onclick="sortBy('age_desc')">Sort by Age ↓</button>
+        <button class="sort-btn" onclick="sortBy('salary')">Sort by Salary ↑</button>
+        <button class="sort-btn" onclick="sortBy('exp')">Sort by Experience</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. RECODE & COMPUTE ── -->
+  <div class="content-section" id="recode">
+    <div class="section-header">
+      <div class="section-icon">🔄</div>
+      <div><div class="section-label-sm">SECTION 05</div><div class="section-h2">Recode & Compute</div></div>
+    </div>
+    <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; margin-bottom:1rem;">Recode: Convert Age to Age Group</h3>
+    <p style="color:var(--muted); margin-bottom:1.5rem; line-height:1.8;">Drag the slider to see how a continuous age value gets recoded into a categorical age group.</p>
+    <div class="recode-demo">
+      <div class="recode-input-row">
+        <span class="recode-label">Age value:</span>
+        <input type="range" class="recode-slider" id="ageSlider" min="18" max="70" value="35" oninput="updateRecode()">
+        <span class="recode-val" id="ageVal">35</span>
+      </div>
+      <div class="recode-result">
+        <div>
+          <div style="font-size:0.78rem; color:var(--muted); margin-bottom:0.3rem;">Age (Continuous)</div>
+          <div class="recode-category" style="color:var(--white); font-size:1.2rem;" id="ageNumeric">35</div>
+        </div>
+        <div class="recode-arrow">→</div>
+        <div>
+          <div style="font-size:0.78rem; color:var(--muted); margin-bottom:0.3rem;">Age Group (Categorical)</div>
+          <div class="recode-category" id="ageGroup" style="font-size:1.1rem;"></div>
+        </div>
+        <div class="recode-arrow">→</div>
+        <div>
+          <div style="font-size:0.78rem; color:var(--muted); margin-bottom:0.3rem;">Code in SPSS</div>
+          <div class="recode-category" id="ageCode" style="color:var(--gold);"></div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; margin:2.5rem 0 1rem;">Compute: Build New Variables from Existing Ones</h3>
+    <p style="color:var(--muted); margin-bottom:1.5rem; line-height:1.8;">The Compute function lets you build new variables using math. The interactive table below shows how a mean score is computed from three Likert items.</p>
+    <div class="compute-demo">
+      <div style="font-family:'DM Mono',monospace; font-size:0.82rem; color:var(--teal); background:var(--navy3); border:1px solid var(--border); border-radius:6px; padding:0.8rem 1rem; margin-bottom:1rem;">COMPUTE mean_score = (x1 + x2 + x3) / 3.</div>
+      <table class="compute-table" id="computeTable">
+        <tr><th style="text-align:left">Case</th><th>x1</th><th>x2</th><th>x3</th><th style="color:var(--teal)">mean_score (NEW)</th></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── 6. SELECT CASES ── -->
+  <div class="content-section" id="select">
+    <div class="section-header">
+      <div class="section-icon">🎯</div>
+      <div><div class="section-label-sm">SECTION 06</div><div class="section-h2">Select Cases</div></div>
+    </div>
+    <div class="def-box">
+      <p>Sometimes you only want to run analysis on a <strong>subset</strong> of your data. The Select Cases function lets you filter data without permanently deleting the excluded rows.</p>
+    </div>
+    <table class="spss-table">
+      <tr><th>Selection Type</th><th>Description</th><th>Example</th></tr>
+      <tr><td>If condition is satisfied</td><td>Filter by a logical condition on any variable</td><td>Analyze only Female patients: <code>Gender = 2</code></td></tr>
+      <tr><td>Random sample</td><td>Randomly select a % of all cases</td><td>Select 5% for spot-checking</td></tr>
+      <tr><td>Based on time or case range</td><td>Select consecutive rows from N to M</td><td>Cases 100 to 130 only</td></tr>
+      <tr><td>Use filter variable</td><td>A 0/1 variable indicates which cases to include</td><td>Include case if <code>valid_response = 1</code></td></tr>
+    </table>
+    <div class="info-box">
+      <div class="info-icon">⚠️</div>
+      <p><strong>Important:</strong> Unselected cases are NOT deleted — they are filtered out (a diagonal line appears on their row number). You can restore all cases by selecting "All Cases" again. OR you can permanently delete them or copy selected to a new dataset.</p>
+    </div>
+  </div>
+
+  <!-- ── 7. TIME SERIES ── -->
+  <div class="content-section" id="timeseries">
+    <div class="section-header">
+      <div class="section-icon">📈</div>
+      <div><div class="section-label-sm">SECTION 07</div><div class="section-h2">Time Series Operations</div></div>
+    </div>
+    <p style="color:var(--muted); margin-bottom:1.5rem; line-height:1.8;">The Create Time Series function generates derived variables from an existing time series — essential for time-series modeling in econometrics and forecasting.</p>
+    <canvas id="tsCanvas" width="700" height="200" style="width:100%; max-width:700px; display:block; border:1px solid var(--border); border-radius:10px; background:var(--card); margin-bottom:1.5rem;"></canvas>
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem;">
+      <button class="sort-btn active" onclick="showTS('raw', this)">Raw Series (Y)</button>
+      <button class="sort-btn" onclick="showTS('diff', this)">Difference (ΔY)</button>
+      <button class="sort-btn" onclick="showTS('ma', this)">Moving Average</button>
+      <button class="sort-btn" onclick="showTS('lag', this)">Lag (Y shifted back)</button>
+    </div>
+    <div id="tsDesc" style="background:rgba(62,207,178,0.06); border:1px solid rgba(62,207,178,0.2); border-radius:8px; padding:1rem 1.5rem; font-size:0.88rem; color:var(--muted); line-height:1.7;"></div>
+
+    <table class="spss-table" style="margin-top:1.5rem;">
+      <tr><th>Function</th><th>Formula</th><th>Purpose</th></tr>
+      <tr><td>Difference</td><td>Yₜ - Yₜ₋₁</td><td>Remove trends, make series stationary</td></tr>
+      <tr><td>Seasonal Difference</td><td>Yₜ - Yₜ₋ₛ</td><td>Remove seasonal patterns (s = season length)</td></tr>
+      <tr><td>Moving Average</td><td>(Yₜ₋₁ + Yₜ + Yₜ₊₁) / 3</td><td>Smooth out short-term fluctuations</td></tr>
+      <tr><td>Cumulative Sum</td><td>Σ Yᵢ (from i=1 to t)</td><td>Running total over time</td></tr>
+      <tr><td>Lag (n)</td><td>Yₜ₋ₙ</td><td>Use past values as predictors</td></tr>
+      <tr><td>Lead (n)</td><td>Yₜ₊ₙ</td><td>Use future values (rare, for analysis only)</td></tr>
+    </table>
+  </div>
+
+  <!-- ── QUIZ ── -->
+  <div class="content-section" id="quiz">
+    <div class="section-header">
+      <div class="section-icon">🎯</div>
+      <div><div class="section-label-sm">SECTION 08</div><div class="section-h2">Test Yourself</div></div>
+    </div>
+    <div class="quiz-wrap">
+      <div class="quiz-title" id="qTitle2">Question 1 of 6</div>
+      <div class="quiz-q" id="qText2"></div>
+      <div class="quiz-opts" id="qOpts2"></div>
+      <div class="quiz-feedback" id="qFeedback2"></div>
+      <div class="quiz-nav">
+        <div class="quiz-counter" id="qScore2">Score: 0</div>
+        <button class="quiz-next" id="qNext2" onclick="nextQuestion2()">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center; padding:3rem 0; border-top:1px solid var(--border); display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+    <a href="lecture1.html" style="border:1px solid var(--border); color:var(--white); padding:0.9rem 2rem; border-radius:8px; text-decoration:none; font-weight:500;">← Back to Lecture 1</a>
+    <a href="index.html" style="background:var(--teal); color:var(--navy); padding:0.9rem 2rem; border-radius:8px; text-decoration:none; font-weight:700;">Back to Home ↩</a>
+  </div>
+
+</div>
+
+<script>
+// ── TOGGLE OP CARDS ──
+function toggleOp(card) {
+  card.classList.toggle('expanded');
+}
+
+// ── SORT DEMO ──
+const rawData = [
+  {id:8,age:21,sal:1280,exp:1,sat:3}, {id:25,age:21,sal:1330,exp:5,sat:2},
+  {id:26,age:21,sal:1070,exp:4,sat:1}, {id:1,age:22,sal:1290,exp:2,sat:1},
+  {id:12,age:22,sal:1160,exp:6,sat:1}, {id:15,age:22,sal:1190,exp:5,sat:0},
+  {id:2,age:23,sal:1010,exp:5,sat:2}, {id:9,age:23,sal:1300,exp:5,sat:1},
+  {id:10,age:23,sal:1530,exp:4,sat:3}, {id:14,age:23,sal:2510,exp:3,sat:1},
+];
+let currentSort = 'id';
+function sortBy(key) {
+  currentSort = key;
+  let sorted = [...rawData];
+  if (key === 'id') sorted.sort((a,b) => a.id - b.id);
+  else if (key === 'age') sorted.sort((a,b) => a.age - b.age);
+  else if (key === 'age_desc') sorted.sort((a,b) => b.age - a.age);
+  else if (key === 'salary') sorted.sort((a,b) => a.sal - b.sal);
+  else if (key === 'exp') sorted.sort((a,b) => a.exp - b.exp);
+  renderSort(sorted, key);
+}
+function renderSort(data, key) {
+  const body = document.getElementById('sortTable');
+  const rows = data.map(r => {
+    const highlight = (field) => {
+      const colMap = {id:'id',age:'age',age_desc:'age',salary:'sal',exp:'exp'};
+      return colMap[key] && r[colMap[key]] !== undefined ? 'highlighted' : '';
+    };
+    return `<tr>
+      <td class="${key==='id'?'highlighted':''}">${r.id}</td>
+      <td class="${key==='age'||key==='age_desc'?'highlighted':''}">${r.age}</td>
+      <td class="${key==='salary'?'highlighted':''}">${r.sal.toLocaleString()}</td>
+      <td class="${key==='exp'?'highlighted':''}">${r.exp}</td>
+      <td>${r.sat}</td>
+    </tr>`;
+  }).join('');
+  body.innerHTML = `<tr><th>ID</th><th>Age</th><th>Salary</th><th>Experience</th><th>Satisfaction</th></tr>` + rows;
+}
+sortBy('id');
+
+// ── MISSING VALUES DEMO ──
+const missingVals = [45, null, 52, 38, null, 61, 70, null, 49, 55, null, 63];
+function renderMissing() {
+  const mean = missingVals.filter(v => v !== null).reduce((a,b) => a+b, 0) / missingVals.filter(v => v !== null).length;
+  const before = document.getElementById('beforeGrid');
+  const after = document.getElementById('afterGrid');
+  before.innerHTML = missingVals.map(v => `<span class="missing-cell ${v===null?'miss':'val'}">${v===null?'.':v}</span>`).join('');
+  after.innerHTML = missingVals.map(v => `<span class="missing-cell ${v===null?'filled':'val'}">${v===null?Math.round(mean):v}</span>`).join('');
+}
+renderMissing();
+
+// ── RECODE DEMO ──
+function updateRecode() {
+  const age = parseInt(document.getElementById('ageSlider').value);
+  document.getElementById('ageVal').textContent = age;
+  document.getElementById('ageNumeric').textContent = age;
+  let group, code, color;
+  if (age <= 25) { group = 'Young (18–25)'; code = '1'; color = 'var(--teal)'; }
+  else if (age <= 35) { group = 'Young Adult (26–35)'; code = '2'; color = 'var(--green)'; }
+  else if (age <= 45) { group = 'Middle Aged (36–45)'; code = '3'; color = 'var(--gold)'; }
+  else if (age <= 55) { group = 'Senior (46–55)'; code = '4'; color = 'var(--pink)'; }
+  else { group = 'Elder (56+)'; code = '5'; color = 'var(--purple)'; }
+  document.getElementById('ageGroup').textContent = group;
+  document.getElementById('ageGroup').style.color = color;
+  document.getElementById('ageCode').textContent = code;
+}
+updateRecode();
+
+// ── COMPUTE DEMO ──
+const computeData = [
+  {id:'Case 1', x1:4, x2:3, x3:5}, {id:'Case 2', x1:2, x2:4, x3:3},
+  {id:'Case 3', x1:5, x2:5, x3:4}, {id:'Case 4', x1:1, x2:2, x3:3},
+  {id:'Case 5', x1:4, x2:4, x3:5}, {id:'Case 6', x1:3, x2:3, x3:3},
+];
+const ct = document.getElementById('computeTable');
+ct.innerHTML = `<tr><th style="text-align:left">Case</th><th>x1</th><th>x2</th><th>x3</th><th style="color:var(--teal)">mean_score (NEW)</th></tr>`;
+computeData.forEach(r => {
+  const mean = ((r.x1 + r.x2 + r.x3) / 3).toFixed(2);
+  ct.innerHTML += `<tr><td>${r.id}</td><td>${r.x1}</td><td>${r.x2}</td><td>${r.x3}</td><td class="new-col">${mean}</td></tr>`;
+});
+
+// ── TIME SERIES CANVAS ──
+const tsCanvas = document.getElementById('tsCanvas');
+const tsCtx = tsCanvas.getContext('2d');
+const rawTS = [45,52,48,61,57,70,65,80,73,88,82,95,90,105,100,115,108,120,115,128];
+const tsDescs = {
+  raw: '<strong style="color:white">Raw Series (Y)</strong><br>The original time series data as recorded. Notice the upward trend — the series is NOT stationary.',
+  diff: '<strong style="color:white">Difference (ΔY = Yₜ - Yₜ₋₁)</strong><br>Subtracting the previous value from each observation removes the trend and makes the series more stationary — useful before fitting ARIMA models.',
+  ma: '<strong style="color:white">Moving Average (3-period centered)</strong><br>Smooths out short-term noise. Each point is the average of itself and its two neighbors. Reveals the underlying trend.',
+  lag: '<strong style="color:white">Lag-1 (Yₜ₋₁)</strong><br>Shifts the series one period back. Used to see if past values predict current ones — the basis of autoregressive (AR) models.'
+};
+
+let currentTS = 'raw';
+function getSeriesData(type) {
+  if (type === 'raw') return rawTS;
+  if (type === 'diff') return [null, ...rawTS.slice(1).map((v,i) => v - rawTS[i])];
+  if (type === 'ma') return rawTS.map((v,i,a) => i===0||i===a.length-1?null:(a[i-1]+v+a[i+1])/3);
+  if (type === 'lag') return [null, ...rawTS.slice(0,-1)];
+  return rawTS;
+}
+
+function showTS(type, btn) {
+  currentTS = type;
+  document.querySelectorAll('#timeseries .sort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  drawTS();
+  document.getElementById('tsDesc').innerHTML = tsDescs[type];
+}
+
+function drawTS() {
+  const w = tsCanvas.width, h = tsCanvas.height;
+  tsCtx.clearRect(0,0,w,h);
+  const data = getSeriesData(currentTS);
+  const validData = data.filter(v => v !== null);
+  const minV = Math.min(...validData), maxV = Math.max(...validData);
+  const range = maxV - minV || 1;
+  const padL = 40, padR = 20, padT = 20, padB = 30;
+  const chartW = w - padL - padR, chartH = h - padT - padB;
+  const n = data.length;
+  const xStep = chartW / (n - 1);
+
+  // Grid lines
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + (i / 4) * chartH;
+    tsCtx.beginPath(); tsCtx.moveTo(padL, y); tsCtx.lineTo(w - padR, y);
+    tsCtx.strokeStyle = 'rgba(255,255,255,0.05)'; tsCtx.lineWidth = 1; tsCtx.stroke();
+    const val = (maxV - (i/4)*range).toFixed(0);
+    tsCtx.fillStyle = 'rgba(255,255,255,0.3)'; tsCtx.font = '9px DM Mono'; tsCtx.textAlign = 'right';
+    tsCtx.fillText(val, padL - 4, y + 3);
+  }
+
+  // Area fill
+  const colorMap = {raw:'rgba(232,162,48,', diff:'rgba(62,207,178,', ma:'rgba(232,80,122,', lag:'rgba(167,139,250,'};
+  const c = colorMap[currentTS];
+  tsCtx.beginPath();
+  let firstX = -1;
+  data.forEach((v,i) => {
+    if (v === null) return;
+    const x = padL + i * xStep;
+    const y = padT + ((maxV - v) / range) * chartH;
+    if (firstX < 0) { tsCtx.moveTo(x, padT + chartH); tsCtx.lineTo(x, y); firstX = x; }
+    else tsCtx.lineTo(x, y);
+  });
+  // close to bottom
+  const lastI = data.reduceRight((acc, v, i) => (acc === -1 && v !== null) ? i : acc, -1);
+  tsCtx.lineTo(padL + lastI * xStep, padT + chartH);
+  tsCtx.closePath();
+  tsCtx.fillStyle = c + '0.12)'; tsCtx.fill();
+
+  // Line
+  tsCtx.beginPath(); let moved = false;
+  data.forEach((v,i) => {
+    if (v === null) { moved = false; return; }
+    const x = padL + i * xStep;
+    const y = padT + ((maxV - v) / range) * chartH;
+    if (!moved) { tsCtx.moveTo(x, y); moved = true; } else tsCtx.lineTo(x, y);
+  });
+  tsCtx.strokeStyle = c + '0.9)'; tsCtx.lineWidth = 2; tsCtx.stroke();
+
+  // Dots
+  data.forEach((v,i) => {
+    if (v === null) return;
+    const x = padL + i * xStep;
+    const y = padT + ((maxV - v) / range) * chartH;
+    tsCtx.beginPath(); tsCtx.arc(x, y, 3, 0, Math.PI * 2);
+    tsCtx.fillStyle = c + '1)'; tsCtx.fill();
+  });
+
+  // X axis labels
+  tsCtx.fillStyle = 'rgba(255,255,255,0.3)'; tsCtx.font = '9px DM Mono'; tsCtx.textAlign = 'center';
+  for (let i = 0; i < n; i += 4) {
+    tsCtx.fillText('t' + (i+1), padL + i * xStep, h - 5);
+  }
+}
+showTS('raw', document.querySelector('#timeseries .sort-btn'));
+
+// ── QUIZ 2 ──
+const questions2 = [
+  { q: 'You have two SPSS files: File A has 100 patients with Age, BP, and Cholesterol. File B has the SAME 100 patients but also includes their Medication and Dose. How should you merge them?', opts: ['Add Cases', 'Add Variables', 'Transpose', 'Recode'], ans: 1, explain: '"Add Variables" adds new columns (variables) to the same cases. Since File B has the same patients but extra variables, we need to add those variable columns.' },
+  { q: 'A researcher wants to recode the "Salary" variable so that salaries < 2000 = "Low", 2000–4000 = "Medium", > 4000 = "High". Which SPSS menu should they use?', opts: ['Data → Sort Cases', 'Analyze → Descriptives', 'Transform → Recode into Different Variables', 'Data → Select Cases'], ans: 2, explain: 'Recode into Different Variables converts a quantitative variable into categories — which is exactly what we need here. "Into Different Variables" preserves the original.' },
+  { q: 'A student wants to analyze only the Female patients in their dataset (Gender = 2), without deleting the Male records. What should they use?', opts: ['Delete all Male rows', 'Data → Select Cases → If condition: Gender = 2', 'Transform → Recode Gender', 'Data → Sort Cases by Gender'], ans: 1, explain: 'Select Cases → "If condition is satisfied" (Gender = 2) temporarily filters to show only female patients, while keeping male records intact.' },
+  { q: 'You want to create a new variable "mean_cloud" which is the average of variables x11, x12, x13, x14, x15 (5 items). Which is the correct SPSS syntax?', opts: ['COMPUTE mean_cloud = x11 + x15.', 'RECODE mean_cloud = MEAN(x11,x15).', 'COMPUTE mean_cloud = (x11+x12+x13+x14+x15)/5.', 'SELECT mean_cloud = AVG(x11 TO x15).'], ans: 2, explain: 'COMPUTE creates a new variable using a math expression. The formula (x11+x12+x13+x14+x15)/5 sums all 5 items and divides by 5 to get the mean.' },
+  { q: 'To remove the TREND from a time series before analysis, which Create Time Series function should you use?', opts: ['Moving Average', 'Cumulative Sum', 'Difference (Yₜ - Yₜ₋₁)', 'Lead'], ans: 2, explain: 'The Difference function (Yₜ - Yₜ₋₁) subtracts consecutive values, removing linear trends and making the series stationary — required for many time-series models.' },
+  { q: 'SPSS shows a "." (dot) for some values in your dataset. What does this mean?', opts: ['The value is zero', 'The value is missing', 'The variable is categorical', 'SPSS could not calculate it yet'], ans: 1, explain: 'In SPSS, a dot (.) in a data cell represents a MISSING VALUE — data that was not collected, not entered, or marked as missing. It must be handled before analysis.' },
+];
+let qIdx2 = 0, score2 = 0, answered2 = false;
+function renderQ2() {
+  const q = questions2[qIdx2];
+  document.getElementById('qTitle2').textContent = `Question ${qIdx2+1} of ${questions2.length}`;
+  document.getElementById('qText2').textContent = q.q;
+  document.getElementById('qFeedback2').classList.remove('show');
+  document.getElementById('qNext2').style.display = 'none';
+  answered2 = false;
+  const opts = document.getElementById('qOpts2');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt'; btn.textContent = opt;
+    btn.onclick = () => {
+      if (answered2) return;
+      answered2 = true;
+      document.querySelectorAll('#qOpts2 .quiz-opt').forEach(b => b.disabled = true);
+      if (i === q.ans) { btn.classList.add('correct'); score2++; }
+      else { btn.classList.add('wrong'); document.querySelectorAll('#qOpts2 .quiz-opt')[q.ans].classList.add('correct'); }
+      document.getElementById('qScore2').textContent = `Score: ${score2}/${questions2.length}`;
+      const fb = document.getElementById('qFeedback2');
+      fb.textContent = q.explain; fb.classList.add('show');
+      if (qIdx2 < questions2.length - 1) document.getElementById('qNext2').style.display = 'block';
+      else {
+        document.getElementById('qNext2').textContent = `Done! Score: ${score2}/${questions2.length}`;
+        document.getElementById('qNext2').style.display = 'block';
+        document.getElementById('qNext2').onclick = () => { qIdx2=0; score2=0; renderQ2(); document.getElementById('qNext2').onclick=nextQuestion2; document.getElementById('qNext2').textContent='Next →'; };
+      }
+    };
+    opts.appendChild(btn);
+  });
+}
+function nextQuestion2() { qIdx2++; renderQ2(); }
+renderQ2();
+</script>
+</body>
+</html>

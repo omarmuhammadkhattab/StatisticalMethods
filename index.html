@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DS 501 – Statistical Methods</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #080d1e;
+    --navy2: #0f1630;
+    --navy3: #1a2248;
+    --gold: #e8a230;
+    --gold2: #f5c060;
+    --teal: #3ecfb2;
+    --pink: #e8507a;
+    --white: #f0eee8;
+    --muted: #8a96b8;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND GRID ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(232,162,48,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,162,48,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 3rem;
+    background: rgba(8,13,30,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+  }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none;
+    font-size: 0.88rem; font-weight: 500;
+    letter-spacing: 0.04em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 8rem 2rem 4rem;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(232,162,48,0.12);
+    border: 1px solid rgba(232,162,48,0.3);
+    border-radius: 99px;
+    padding: 0.4rem 1.2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.8s ease both;
+  }
+  .hero-badge::before { content: '◈'; }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold);
+    display: block;
+  }
+  .hero-sub {
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 540px;
+    line-height: 1.7;
+    font-weight: 300;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+  .hero-meta {
+    display: flex; gap: 2rem; margin-top: 2.5rem;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+  .hero-meta-item { text-align: center; }
+  .hero-meta-item .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem; font-weight: 700;
+    color: var(--gold);
+  }
+  .hero-meta-item .label {
+    font-size: 0.78rem; color: var(--muted);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-top: 0.2rem;
+  }
+  .hero-divider { width: 1px; background: var(--border); height: 60px; align-self: center; }
+
+  .hero-cta {
+    margin-top: 3rem;
+    display: flex; gap: 1rem;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--navy);
+    padding: 0.85rem 2.2rem;
+    border-radius: 6px;
+    font-weight: 600; font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none; cursor: pointer;
+  }
+  .btn-primary:hover { background: var(--gold2); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(232,162,48,0.3); }
+  .btn-ghost {
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 0.85rem 2.2rem;
+    border-radius: 6px;
+    font-weight: 500; font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ── ANIMATED ORB ── */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    animation: pulse 8s ease-in-out infinite;
+  }
+  .orb-1 { width: 500px; height: 500px; background: rgba(232,162,48,0.12); top: 10%; left: -10%; }
+  .orb-2 { width: 400px; height: 400px; background: rgba(62,207,178,0.08); bottom: 10%; right: -10%; animation-delay: 3s; }
+  .orb-3 { width: 300px; height: 300px; background: rgba(232,80,122,0.06); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 6s; }
+
+  /* ── CURVE CANVAS ── */
+  .hero-canvas-wrap {
+    margin-top: 4rem;
+    animation: fadeUp 0.8s 0.5s ease both;
+  }
+  .hero-canvas-wrap canvas {
+    opacity: 0.6;
+    display: block;
+    margin: 0 auto;
+  }
+
+  /* ── SECTION ── */
+  section { position: relative; z-index: 1; padding: 5rem 3rem; max-width: 1200px; margin: 0 auto; }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.15em;
+    color: var(--gold); text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 700; line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+  .section-body { color: var(--muted); max-width: 600px; line-height: 1.8; font-weight: 300; }
+
+  /* ── LECTURE CARDS ── */
+  .lectures-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .lecture-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .lecture-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--teal));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.3s;
+  }
+  .lecture-card:hover { transform: translateY(-6px); border-color: rgba(232,162,48,0.25); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+  .lecture-card:hover::before { transform: scaleX(1); }
+
+  .card-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; color: var(--gold);
+    letter-spacing: 0.1em; margin-bottom: 1.2rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .card-num::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .card-icon {
+    width: 48px; height: 48px;
+    background: rgba(232,162,48,0.1);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 1.2rem;
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 700;
+    margin-bottom: 0.8rem;
+  }
+  .card-desc { color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+  .card-topics {
+    margin-top: 1.5rem;
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+  }
+  .topic-tag {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.75rem; color: var(--muted);
+  }
+  .card-footer {
+    margin-top: 1.8rem;
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 1.2rem; border-top: 1px solid var(--border);
+  }
+  .card-status { font-size: 0.78rem; color: var(--teal); display: flex; align-items: center; gap: 0.4rem; }
+  .card-status::before { content: '●'; font-size: 0.6rem; }
+  .card-arrow { color: var(--gold); font-size: 1.2rem; transition: transform 0.2s; }
+  .lecture-card:hover .card-arrow { transform: translateX(4px); }
+
+  /* ── STATS ROW ── */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    margin-top: 5rem;
+  }
+  .stat-box {
+    background: var(--navy2);
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem; font-weight: 700;
+    color: var(--gold);
+  }
+  .stat-label { font-size: 0.82rem; color: var(--muted); margin-top: 0.4rem; }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    border-top: 1px solid var(--border);
+    text-align: center; padding: 3rem;
+    color: var(--muted); font-size: 0.85rem;
+  }
+  footer .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── KEYFRAMES ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1) translate(0, 0); }
+    33% { transform: scale(1.1) translate(3%, -2%); }
+    66% { transform: scale(0.95) translate(-2%, 3%); }
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 3rem 1.5rem; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .hero-meta { gap: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">DS 501 · Statistical Methods</div>
+  <div class="nav-links">
+    <a href="#lectures">Lectures</a>
+    <a href="#about">About</a>
+    <a href="lecture1.html">Lecture 1</a>
+    <a href="lecture2.html">Lecture 2</a>
+    <a href="lecture3.html">Lecture 3&4</a>
+    <a href="lecture5.html">Lecture 5</a>
+    <a href="lecture6.html">Lecture 6</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="hero-badge">FACULTY OF GRADUATE STUDIES — CAIRO UNIVERSITY</div>
+
+  <h1>Statistical<em>Methods</em></h1>
+  <p class="hero-sub">An interactive learning companion for DS 501 — covering data types, distributions, SPSS workflows, and the foundations of statistical thinking.</p>
+
+  <div class="hero-meta">
+    <div class="hero-meta-item">
+      <div class="num">6</div>
+      <div class="label">Lectures</div>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-meta-item">
+      <div class="num">20+</div>
+      <div class="label">Concepts</div>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-meta-item">
+      <div class="num">SPSS</div>
+      <div class="label">Software</div>
+    </div>
+  </div>
+
+  <div class="hero-cta">
+    <a href="#lectures" class="btn-primary">Start Learning</a>
+    <a href="lecture1.html" class="btn-ghost">Lecture 1 →</a>
+  </div>
+
+  <!-- Mini animated bell curve -->
+  <div class="hero-canvas-wrap">
+    <canvas id="heroCanvas" width="600" height="100"></canvas>
+  </div>
+</div>
+
+<!-- STATS -->
+<section>
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Levels of Measurement</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">10</div>
+      <div class="stat-label">Research Stages</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">6+</div>
+      <div class="stat-label">Data Distributions</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">10</div>
+      <div class="stat-label">SPSS Operations</div>
+    </div>
+  </div>
+</section>
+
+<!-- LECTURES -->
+<section id="lectures">
+  <div class="section-label">Course Content</div>
+  <h2 class="section-title">Interactive Lectures</h2>
+  <p class="section-body">Each lecture is broken into clear explanations, visual diagrams, and interactive elements to help you truly understand the material — not just memorize it.</p>
+
+  <div class="lectures-grid">
+
+    <a href="lecture1.html" class="lecture-card">
+      <div class="card-num">LECTURE 01</div>
+      <div class="card-icon">📊</div>
+      <div class="card-title">Types of Data & Introduction to SPSS</div>
+      <div class="card-desc">Understand what statistics is, how different data types are classified, distributions like Normal and Poisson, levels of measurement, and the 10 stages of scientific research.</div>
+      <div class="card-topics">
+        <span class="topic-tag">Qualitative</span>
+        <span class="topic-tag">Quantitative</span>
+        <span class="topic-tag">Normal Dist.</span>
+        <span class="topic-tag">Measurement Levels</span>
+        <span class="topic-tag">SPSS Basics</span>
+        <span class="topic-tag">Variables</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-status">Available</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="lecture2.html" class="lecture-card">
+      <div class="card-num">LECTURE 02</div>
+      <div class="card-icon">⚙️</div>
+      <div class="card-title">Data Processing in SPSS</div>
+      <div class="card-desc">Master essential data manipulation techniques: merging files, replacing missing values, sorting, recoding variables, selecting cases, computing new variables, and working with time series.</div>
+      <div class="card-topics">
+        <span class="topic-tag">Merge Files</span>
+        <span class="topic-tag">Transpose</span>
+        <span class="topic-tag">Missing Values</span>
+        <span class="topic-tag">Sort Cases</span>
+        <span class="topic-tag">Recode</span>
+        <span class="topic-tag">Compute</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-status">Available</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="lecture3.html" class="lecture-card">
+      <div class="card-num">LECTURES 03 & 04</div>
+      <div class="card-icon">📐</div>
+      <div class="card-title">Descriptive Statistics</div>
+      <div class="card-desc">Summarise any dataset using measures of central tendency, variability, the normal curve rule, standard scores, percentiles, skewness, and kurtosis — with worked examples and interactive calculators.</div>
+      <div class="card-topics">
+        <span class="topic-tag">Mean / Median / Mode</span>
+        <span class="topic-tag">Variance & SD</span>
+        <span class="topic-tag">Z-Score</span>
+        <span class="topic-tag">Percentiles</span>
+        <span class="topic-tag">Skewness</span>
+        <span class="topic-tag">Kurtosis</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-status">Available</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="lecture5.html" class="lecture-card">
+      <div class="card-num">LECTURE 05</div>
+      <div class="card-icon">📊</div>
+      <div class="card-title">Displaying & Exploring Data</div>
+      <div class="card-desc">Master graphical tools for exploratory data analysis in SPSS — bar charts, pie charts, histograms, dot plots, stem-and-leaf displays, box plots, error bars, and scatter diagrams.</div>
+      <div class="card-topics">
+        <span class="topic-tag">Bar & Pie Charts</span>
+        <span class="topic-tag">Histogram</span>
+        <span class="topic-tag">Stem-and-Leaf</span>
+        <span class="topic-tag">Box Plot</span>
+        <span class="topic-tag">Error Bars</span>
+        <span class="topic-tag">Scatter Diagram</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-status">Available</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="lecture6.html" class="lecture-card">
+      <div class="card-num">LECTURE 06</div>
+      <div class="card-icon">🎲</div>
+      <div class="card-title">Probability</div>
+      <div class="card-desc">Explore the foundations of probability — sample spaces, events, set operations, the addition rule, conditional probability, independence, and joint probability tables with worked examples.</div>
+      <div class="card-topics">
+        <span class="topic-tag">Sample Space</span>
+        <span class="topic-tag">Events & Sets</span>
+        <span class="topic-tag">Addition Rule</span>
+        <span class="topic-tag">Conditional P</span>
+        <span class="topic-tag">Independence</span>
+        <span class="topic-tag">Joint Table</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-status">Available</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+
+<footer>
+  <div class="footer-logo">DS 501</div>
+  <p>Statistical Methods · Cairo University</p>
+</footer>
+
+<script>
+  // ── ANIMATED BELL CURVE ──
+  const canvas = document.getElementById('heroCanvas');
+  const ctx = canvas.getContext('2d');
+
+  function gaussian(x, mu, sigma) {
+    return Math.exp(-0.5 * ((x - mu) / sigma) ** 2);
+  }
+
+  let phase = 0;
+  function drawCurve() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const w = canvas.width, h = canvas.height;
+    const mu = w / 2, sigma = w / 8;
+
+    // Animated fill
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    for (let x = 0; x <= w; x++) {
+      const y = h - gaussian(x, mu + Math.sin(phase) * 10, sigma) * (h - 8);
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(w, h); ctx.closePath();
+
+    const grad = ctx.createLinearGradient(0, 0, w, 0);
+    grad.addColorStop(0, 'rgba(62,207,178,0.1)');
+    grad.addColorStop(0.5, 'rgba(232,162,48,0.25)');
+    grad.addColorStop(1, 'rgba(232,80,122,0.1)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Curve stroke
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    for (let x = 0; x <= w; x++) {
+      const y = h - gaussian(x, mu + Math.sin(phase) * 10, sigma) * (h - 8);
+      ctx.lineTo(x, y);
+    }
+    const grad2 = ctx.createLinearGradient(0, 0, w, 0);
+    grad2.addColorStop(0, 'rgba(62,207,178,0.6)');
+    grad2.addColorStop(0.5, 'rgba(232,162,48,0.9)');
+    grad2.addColorStop(1, 'rgba(232,80,122,0.6)');
+    ctx.strokeStyle = grad2;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    phase += 0.008;
+    requestAnimationFrame(drawCurve);
+  }
+  drawCurve();
+
+  // ── SCROLL REVEAL ──
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.animation = 'fadeUp 0.7s ease both';
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.lecture-card, .stat-box, .section-title, .section-body').forEach(el => {
+    el.style.opacity = '0';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 6 – Probability | DS 501</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #080d1e; --navy2: #0f1630; --navy3: #1a2248;
+    --gold: #e8a230; --gold2: #f5c060;
+    --teal: #3ecfb2; --pink: #e8507a;
+    --white: #f0eee8; --muted: #8a96b8;
+    --card: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
+    --accent: #3ecfb2;
+    --accent2: rgba(62,207,178,0.15);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(62,207,178,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(62,207,178,0.03) 1px, transparent 1px);
+    background-size: 60px 60px; pointer-events: none; z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 3rem;
+    background: rgba(8,13,30,0.92); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--accent); }
+  .nav-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-links a.active { color: var(--accent); }
+
+  /* LAYOUT */
+  .page-wrap { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; position: relative; z-index: 1; }
+
+  /* HERO */
+  .lecture-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; padding: 3rem 0; }
+  .lecture-badge { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--accent); letter-spacing: 0.12em; background: rgba(62,207,178,0.1); border: 1px solid rgba(62,207,178,0.25); display: inline-block; padding: 0.3rem 1rem; border-radius: 4px; margin-bottom: 1rem; }
+  .lecture-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; line-height: 1.1; }
+  .lecture-title em { font-style: italic; color: var(--accent); }
+  .lecture-desc { color: var(--muted); font-size: 1rem; line-height: 1.8; margin-top: 1.2rem; font-weight: 300; }
+  .toc-title-sm { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.8rem; margin-top: 1.5rem; }
+  .toc-item { display: flex; align-items: center; gap: 0.7rem; padding: 0.45rem 0; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--white); font-size: 0.85rem; transition: color 0.2s; }
+  .toc-item:hover { color: var(--accent); }
+  .toc-num { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); width: 24px; }
+  .hero-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; }
+  .hero-card-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--muted); margin-bottom: 1.2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .mini-stat { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0; border-bottom: 1px solid var(--border); }
+  .mini-stat:last-child { border-bottom: none; }
+  .mini-stat-label { font-size: 0.82rem; color: var(--muted); }
+  .mini-stat-val { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--accent); }
+
+  /* SECTIONS */
+  .content-section { margin-bottom: 4rem; }
+  .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .section-icon { width: 44px; height: 44px; border-radius: 10px; background: rgba(62,207,178,0.1); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+  .section-label-sm { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--accent); letter-spacing: 0.12em; }
+  .section-h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; }
+
+  /* BOXES */
+  .def-box { background: rgba(62,207,178,0.06); border: 1px solid rgba(62,207,178,0.2); border-left: 4px solid var(--accent); border-radius: 8px; padding: 1.5rem 1.8rem; margin-bottom: 1.5rem; }
+  .def-box p { color: var(--white); line-height: 1.8; font-size: 0.95rem; }
+  .def-box strong { color: var(--accent); }
+  .info-box { background: rgba(232,162,48,0.05); border: 1px solid rgba(232,162,48,0.2); border-radius: 8px; padding: 1.2rem 1.5rem; margin-bottom: 1rem; display: flex; gap: 1rem; align-items: flex-start; }
+  .info-box.teal { background: rgba(62,207,178,0.05); border-color: rgba(62,207,178,0.2); }
+  .info-box.pink { background: rgba(232,80,122,0.05); border-color: rgba(232,80,122,0.2); }
+  .info-box.gold { background: rgba(232,162,48,0.05); border-color: rgba(232,162,48,0.2); }
+  .info-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .info-box p { color: var(--muted); font-size: 0.88rem; line-height: 1.7; }
+  .info-box p strong { color: var(--white); }
+
+  /* FORMULA BOX */
+  .formula-box {
+    background: rgba(8,13,30,0.6);
+    border: 1px solid rgba(62,207,178,0.3);
+    border-radius: 10px;
+    padding: 1.5rem 2rem;
+    margin: 1.5rem 0;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+  }
+  .formula-box .formula { font-size: 1.3rem; color: var(--accent); margin-bottom: 0.5rem; }
+  .formula-box .formula-desc { font-size: 0.82rem; color: var(--muted); }
+
+  /* GRID CARDS */
+  .concepts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .concept-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.4rem; transition: border-color 0.2s; }
+  .concept-card:hover { border-color: rgba(62,207,178,0.3); }
+  .concept-card-icon { font-size: 1.6rem; margin-bottom: 0.8rem; }
+  .concept-card-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--accent); }
+  .concept-card-body { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+  /* EXAMPLE BOX */
+  .example-box {
+    background: rgba(232,162,48,0.04);
+    border: 1px solid rgba(232,162,48,0.25);
+    border-radius: 10px;
+    padding: 1.5rem 2rem;
+    margin: 1.5rem 0;
+  }
+  .example-title { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; }
+  .example-box p { color: var(--muted); font-size: 0.9rem; line-height: 1.8; }
+  .example-box p strong { color: var(--white); }
+  .example-box .solution { margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--border); color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.88rem; }
+
+  /* VENN SVG wrappers */
+  .venn-wrap { display: flex; justify-content: center; align-items: center; margin: 2rem 0; gap: 3rem; flex-wrap: wrap; }
+  .venn-item { text-align: center; }
+  .venn-label { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); margin-top: 0.6rem; }
+
+  /* TABLE */
+  .prob-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 1.5rem 0; }
+  .prob-table th { background: rgba(62,207,178,0.1); color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; padding: 0.8rem 1rem; border: 1px solid var(--border); text-align: center; }
+  .prob-table td { padding: 0.7rem 1rem; border: 1px solid var(--border); color: var(--muted); text-align: center; }
+  .prob-table tr:hover td { background: rgba(62,207,178,0.03); }
+  .prob-table .total-row td { color: var(--accent); font-family: 'DM Mono', monospace; font-weight: 600; background: rgba(62,207,178,0.05); }
+  .prob-table .total-col { color: var(--gold); font-weight: 600; }
+
+  /* RULES LIST */
+  .rules-list { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; margin: 1.5rem 0; }
+  .rules-list li { display: flex; gap: 1rem; align-items: flex-start; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; }
+  .rule-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--accent); background: rgba(62,207,178,0.1); border-radius: 4px; padding: 0.2rem 0.5rem; flex-shrink: 0; }
+  .rule-text { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+  .rule-text strong { color: var(--white); }
+
+  /* INTERACTIVE QUIZ */
+  .quiz-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 2rem 0; }
+  .quiz-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; }
+  .quiz-question { margin-bottom: 1.5rem; }
+  .quiz-q { font-size: 0.9rem; color: var(--white); margin-bottom: 0.8rem; line-height: 1.6; }
+  .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+  .quiz-option { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 6px; padding: 0.65rem 1rem; font-size: 0.85rem; color: var(--muted); cursor: pointer; transition: all 0.2s; text-align: left; }
+  .quiz-option:hover { border-color: rgba(62,207,178,0.4); color: var(--white); }
+  .quiz-option.correct { background: rgba(62,207,178,0.1); border-color: var(--accent); color: var(--accent); }
+  .quiz-option.wrong { background: rgba(232,80,122,0.1); border-color: var(--pink); color: var(--pink); }
+  .quiz-feedback { margin-top: 0.6rem; font-size: 0.82rem; min-height: 1.2em; color: var(--muted); }
+
+  /* PROB CALCULATOR */
+  .calc-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 2rem 0; }
+  .calc-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1.2rem; }
+  .calc-inputs { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.2rem; }
+  .calc-field label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 0.4rem; font-family: 'DM Mono', monospace; }
+  .calc-field input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem 0.9rem; color: var(--white); font-family: 'DM Mono', monospace; font-size: 0.88rem; outline: none; transition: border-color 0.2s; }
+  .calc-field input:focus { border-color: var(--accent); }
+  .calc-btn { background: var(--accent); color: var(--navy); font-weight: 700; font-size: 0.88rem; border: none; border-radius: 6px; padding: 0.7rem 1.8rem; cursor: pointer; transition: opacity 0.2s; }
+  .calc-btn:hover { opacity: 0.85; }
+  .calc-result { margin-top: 1.2rem; background: rgba(62,207,178,0.06); border: 1px solid rgba(62,207,178,0.2); border-radius: 8px; padding: 1rem 1.4rem; font-family: 'DM Mono', monospace; font-size: 0.88rem; color: var(--accent); display: none; }
+
+  /* FOOTER NAV */
+  .lecture-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 5rem; padding-top: 2rem; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 1rem; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .content-section { animation: fadeUp 0.5s ease both; }
+
+  @media (max-width: 900px) {
+    .lecture-hero { grid-template-columns: 1fr; gap: 2rem; }
+  }
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .page-wrap { padding: 2rem 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">DS 501 · Lecture 6</div>
+  <div class="nav-links">
+    <a href="index.html">← Home</a>
+    <a href="lecture5.html">← Lecture 5</a>
+    <a href="#probability" class="active">Probability</a>
+    <a href="#basic-definitions">Definitions</a>
+    <a href="#rules">Rules</a>
+    <a href="#conditional">Conditional</a>
+    <a href="#independence">Independence</a>
+    <a href="#joint-table">Joint Table</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <div class="lecture-hero">
+    <div>
+      <div class="lecture-badge">LECTURE 06 · DS 501</div>
+      <h1 class="lecture-title">The Foundations of<em>Probability</em></h1>
+      <p class="lecture-desc">A rigorous yet intuitive exploration of probability theory — from sample spaces and event operations to conditional probability, independence, and joint probability tables.</p>
+
+      <p class="toc-title-sm">In this lecture</p>
+      <a href="#probability" class="toc-item"><span class="toc-num">01</span> What is Probability?</a>
+      <a href="#basic-definitions" class="toc-item"><span class="toc-num">02</span> Basic Definitions & Set Theory</a>
+      <a href="#rules" class="toc-item"><span class="toc-num">03</span> Basic Rules for Probability</a>
+      <a href="#conditional" class="toc-item"><span class="toc-num">04</span> Conditional Probability</a>
+      <a href="#independence" class="toc-item"><span class="toc-num">05</span> Independence of Events</a>
+      <a href="#joint-table" class="toc-item"><span class="toc-num">06</span> Joint Probability Table</a>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-title">Learning Objectives</div>
+      <div class="mini-stat"><span class="mini-stat-label">Define probability, sample space, event</span><span class="mini-stat-val">§1</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Subjective vs. objective probability</span><span class="mini-stat-val">§1</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Complement, intersection, union</span><span class="mini-stat-val">§2</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Compute event probabilities</span><span class="mini-stat-val">§3</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Conditional probability</span><span class="mini-stat-val">§4</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Permutations & combinations</span><span class="mini-stat-val">§5</span></div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────── SECTION 1 ─────────────────────────────── -->
+  <div class="content-section" id="probability">
+    <div class="section-header">
+      <div class="section-icon">🎲</div>
+      <div>
+        <div class="section-label-sm">SECTION 01</div>
+        <h2 class="section-h2">What is Probability?</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>Probability is a <strong>quantitative measure of uncertainty</strong> — a number between 0 and 1 (or 0% and 100%) that describes the likelihood of an uncertain event occurring. The closer to 1, the more likely the event; the closer to 0, the less likely.</p>
+    </div>
+
+    <div class="concepts-grid">
+      <div class="concept-card">
+        <div class="concept-card-icon">🎯</div>
+        <div class="concept-card-title">Objective (Classical)</div>
+        <div class="concept-card-body">Based on equally-likely outcomes or long-run relative frequency. The same for all observers. Examples: tossing a coin, rolling a die, drawing a card.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-card-icon">🧠</div>
+        <div class="concept-card-title">Subjective</div>
+        <div class="concept-card-body">Based on personal beliefs, experience, and judgment. Differs between individuals. Example: a student saying "I will attend tomorrow's lecture with 60% probability."</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-card-icon">📈</div>
+        <div class="concept-card-title">Empirical</div>
+        <div class="concept-card-body">Calculated by repeating an experiment many times under identical conditions. Probability = (times event occurs) ÷ (total trials).</div>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula">P(A) = m / n</div>
+      <div class="formula-desc">m = number of outcomes favourable to A &nbsp;|&nbsp; n = total number of equally-likely outcomes</div>
+    </div>
+
+    <div class="example-box">
+      <div class="example-title">Example 1 — Drawing a Ball</div>
+      <p>A box contains <strong>10 balls</strong> of the same size: 6 red and 4 white. What is the probability of drawing a red ball?</p>
+      <div class="solution">P(red) = 6 / 10 = 0.60</div>
+    </div>
+
+    <div class="example-box">
+      <div class="example-title">Example 2 — Rolling a Die</div>
+      <p>A balanced die is thrown. Find the probability that an <strong>odd number</strong> appears.</p>
+      <p>Sample space S = {1, 2, 3, 4, 5, 6} &nbsp;|&nbsp; Event A = {1, 3, 5}</p>
+      <div class="solution">P(A) = m / n = 3 / 6 = 0.5</div>
+    </div>
+
+    <div class="example-box">
+      <div class="example-title">Example 3 — Empirical Probability</div>
+      <p>A random sample of <strong>200 students</strong> who sat an exam found that <strong>10</strong> received an "Excellent" grade. Let A = the event that a student receives Excellent.</p>
+      <div class="solution">P(A) = 10 / 200 = 0.05</div>
+    </div>
+
+    <div class="example-box">
+      <div class="example-title">Example 4 — Birth Data</div>
+      <p>In a certain year in Al-Madinah, there were <strong>10,000 births</strong> of which <strong>5,050</strong> were male. Let B = the event that a newborn is male.</p>
+      <div class="solution">P(B) = 5050 / 10000 = 0.505</div>
+    </div>
+
+    <!-- Interactive probability calculator -->
+    <div class="calc-wrap">
+      <div class="calc-title">🧮 Classical Probability Calculator</div>
+      <p style="color:var(--muted);font-size:0.88rem;margin-bottom:1.2rem;">Enter the number of favourable outcomes (m) and total possible outcomes (n) to compute P(A).</p>
+      <div class="calc-inputs">
+        <div class="calc-field">
+          <label>Favourable outcomes (m)</label>
+          <input type="number" id="calc-m" min="0" placeholder="e.g. 3">
+        </div>
+        <div class="calc-field">
+          <label>Total outcomes (n)</label>
+          <input type="number" id="calc-n" min="1" placeholder="e.g. 6">
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcProb()">Calculate P(A)</button>
+      <div class="calc-result" id="calc-result"></div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────── SECTION 2 ─────────────────────────────── -->
+  <div class="content-section" id="basic-definitions">
+    <div class="section-header">
+      <div class="section-icon">🗂️</div>
+      <div>
+        <div class="section-label-sm">SECTION 02</div>
+        <h2 class="section-h2">Basic Definitions & Set Theory</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>An <strong>experiment</strong> is any process that leads to one of several possible outcomes. A <strong>sample space (S)</strong> is the set of all possible outcomes. An <strong>event</strong> is any collection of outcomes sharing a common characteristic.</p>
+    </div>
+
+    <div class="concepts-grid">
+      <div class="concept-card">
+        <div class="concept-card-icon">∅</div>
+        <div class="concept-card-title">Empty Set</div>
+        <div class="concept-card-body">A set with no elements. Represents an impossible event. P(∅) = 0.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-card-icon">S</div>
+        <div class="concept-card-title">Universal Set</div>
+        <div class="concept-card-body">Contains all possible outcomes (the sample space). P(S) = 1.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-card-icon">Ā</div>
+        <div class="concept-card-title">Complement</div>
+        <div class="concept-card-body">All elements of S that are <em>not</em> in A. P(Ā) = 1 − P(A).</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-card-icon">∩</div>
+        <div class="concept-card-title">Intersection (AND)</div>
+        <div class="concept-card-body">A ∩ B — elements in <em>both</em> A and B. "A and B both occur."</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-card-icon">∪</div>
+        <div class="concept-card-title">Union (OR)</div>
+        <div class="concept-card-body">A ∪ B — elements in A or B or both. "At least one of A or B occurs."</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-card-icon">⊥</div>
+        <div class="concept-card-title">Mutually Exclusive</div>
+        <div class="concept-card-body">Sets with nothing in common: A ∩ B = ∅. Cannot occur simultaneously.</div>
+      </div>
+    </div>
+
+    <!-- Venn Diagrams -->
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin:2rem 0 1rem;">Venn Diagrams</h3>
+    <div class="venn-wrap">
+
+      <!-- Complement -->
+      <div class="venn-item">
+        <svg width="200" height="140" viewBox="0 0 200 140">
+          <rect x="5" y="5" width="190" height="130" rx="8" fill="rgba(232,80,122,0.15)" stroke="rgba(232,80,122,0.4)" stroke-width="1.5"/>
+          <ellipse cx="100" cy="72" rx="55" ry="45" fill="rgba(62,207,178,0.25)" stroke="rgba(62,207,178,0.6)" stroke-width="1.5"/>
+          <text x="45" y="35" font-size="13" fill="#e8507a" font-family="serif" font-style="italic">Ā</text>
+          <text x="93" y="77" font-size="14" fill="#3ecfb2" font-family="serif" font-style="italic">A</text>
+          <text x="170" y="18" font-size="12" fill="#8a96b8" font-family="monospace">S</text>
+        </svg>
+        <div class="venn-label">Complement of A</div>
+      </div>
+
+      <!-- Intersection -->
+      <div class="venn-item">
+        <svg width="200" height="140" viewBox="0 0 200 140">
+          <rect x="5" y="5" width="190" height="130" rx="8" fill="rgba(62,207,178,0.05)" stroke="rgba(62,207,178,0.2)" stroke-width="1.5"/>
+          <ellipse cx="80" cy="72" rx="55" ry="45" fill="rgba(232,162,48,0.2)" stroke="rgba(232,162,48,0.5)" stroke-width="1.5"/>
+          <ellipse cx="122" cy="72" rx="55" ry="45" fill="rgba(62,207,178,0.2)" stroke="rgba(62,207,178,0.5)" stroke-width="1.5"/>
+          <!-- intersection highlight -->
+          <path d="M101,30 A55,45 0 0 1 101,114 A55,45 0 0 1 101,30" fill="rgba(255,255,255,0.12)"/>
+          <text x="55" y="77" font-size="14" fill="#e8a230" font-family="serif" font-style="italic">A</text>
+          <text x="130" y="77" font-size="14" fill="#3ecfb2" font-family="serif" font-style="italic">B</text>
+          <text x="95" y="77" font-size="10" fill="white" font-family="monospace">A∩B</text>
+          <text x="170" y="18" font-size="12" fill="#8a96b8" font-family="monospace">S</text>
+        </svg>
+        <div class="venn-label">Intersection A ∩ B</div>
+      </div>
+
+      <!-- Union -->
+      <div class="venn-item">
+        <svg width="200" height="140" viewBox="0 0 200 140">
+          <rect x="5" y="5" width="190" height="130" rx="8" fill="rgba(62,207,178,0.05)" stroke="rgba(62,207,178,0.2)" stroke-width="1.5"/>
+          <ellipse cx="80" cy="72" rx="55" ry="45" fill="rgba(232,162,48,0.3)" stroke="rgba(232,162,48,0.5)" stroke-width="1.5"/>
+          <ellipse cx="122" cy="72" rx="55" ry="45" fill="rgba(62,207,178,0.25)" stroke="rgba(62,207,178,0.5)" stroke-width="1.5"/>
+          <text x="50" y="77" font-size="14" fill="#e8a230" font-family="serif" font-style="italic">A</text>
+          <text x="136" y="77" font-size="14" fill="#3ecfb2" font-family="serif" font-style="italic">B</text>
+          <text x="170" y="18" font-size="12" fill="#8a96b8" font-family="monospace">S</text>
+        </svg>
+        <div class="venn-label">Union A ∪ B</div>
+      </div>
+
+      <!-- Mutually Exclusive -->
+      <div class="venn-item">
+        <svg width="200" height="140" viewBox="0 0 200 140">
+          <rect x="5" y="5" width="190" height="130" rx="8" fill="rgba(232,162,48,0.04)" stroke="rgba(232,162,48,0.2)" stroke-width="1.5"/>
+          <ellipse cx="62" cy="72" rx="45" ry="40" fill="rgba(232,80,122,0.25)" stroke="rgba(232,80,122,0.5)" stroke-width="1.5"/>
+          <ellipse cx="140" cy="72" rx="45" ry="40" fill="rgba(62,207,178,0.25)" stroke="rgba(62,207,178,0.5)" stroke-width="1.5"/>
+          <text x="53" y="77" font-size="14" fill="#e8507a" font-family="serif" font-style="italic">A</text>
+          <text x="131" y="77" font-size="14" fill="#3ecfb2" font-family="serif" font-style="italic">B</text>
+          <text x="170" y="18" font-size="12" fill="#8a96b8" font-family="monospace">S</text>
+        </svg>
+        <div class="venn-label">Mutually Exclusive</div>
+      </div>
+    </div>
+
+    <div class="example-box">
+      <div class="example-title">Example 5 — Card Drawing</div>
+      <p>Draw one card from a standard 52-card deck (n = 52). Let A = drawing a 7.</p>
+      <p>There are <strong>4 sevens</strong> in the deck (one per suit), so m = 4.</p>
+      <div class="solution">P(A) = 4/52 = 1/13 ≈ 0.077</div>
+    </div>
+
+    <div class="example-box">
+      <div class="example-title">Card Space — Hearts & Aces</div>
+      <p>From a 52-card deck: <strong>P(Heart)</strong> = 13/52 = 1/4 &nbsp;|&nbsp; <strong>P(Ace)</strong> = 4/52 = 1/13</p>
+      <p style="margin-top:0.5rem;"><strong>P(Heart ∩ Ace)</strong> = 1/52 (only the Ace of Hearts)</p>
+      <p style="margin-top:0.5rem;"><strong>P(Heart ∪ Ace)</strong> = 13/52 + 4/52 − 1/52 = 16/52 = 4/13</p>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────── SECTION 3 ─────────────────────────────── -->
+  <div class="content-section" id="rules">
+    <div class="section-header">
+      <div class="section-icon">📐</div>
+      <div>
+        <div class="section-label-sm">SECTION 03</div>
+        <h2 class="section-h2">Basic Rules for Probability</h2>
+      </div>
+    </div>
+
+    <ul class="rules-list">
+      <li>
+        <span class="rule-num">R1</span>
+        <span class="rule-text"><strong>Range:</strong> For any event A, &nbsp; 0 ≤ P(A) ≤ 1</span>
+      </li>
+      <li>
+        <span class="rule-num">R2</span>
+        <span class="rule-text"><strong>Complement Rule:</strong> &nbsp; P(Ā) = 1 − P(A)</span>
+      </li>
+      <li>
+        <span class="rule-num">R3</span>
+        <span class="rule-text"><strong>Intersection:</strong> &nbsp; P(A ∩ B) = n(A ∩ B) / n(S) &nbsp;|&nbsp; If mutually exclusive: P(A ∩ B) = 0</span>
+      </li>
+      <li>
+        <span class="rule-num">R4</span>
+        <span class="rule-text"><strong>Addition Rule (Union):</strong> &nbsp; P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</span>
+      </li>
+      <li>
+        <span class="rule-num">R5</span>
+        <span class="rule-text"><strong>Mutually Exclusive Union:</strong> &nbsp; If P(A ∩ B) = 0, then P(A ∪ B) = P(A) + P(B)</span>
+      </li>
+    </ul>
+
+    <div class="formula-box">
+      <div class="formula">P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</div>
+      <div class="formula-desc">The Addition Rule — avoids double-counting the intersection</div>
+    </div>
+
+    <!-- Quiz -->
+    <div class="quiz-wrap">
+      <div class="quiz-title">✅ Quick Check — Probability Rules</div>
+
+      <div class="quiz-question" id="q1">
+        <div class="quiz-q">If P(A) = 0.35, what is P(Ā)?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="checkAnswer(this,'q1',false)">0.35</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q1',true)">0.65</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q1',false)">1.35</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q1',false)">Cannot determine</button>
+        </div>
+        <div class="quiz-feedback" id="fb-q1"></div>
+      </div>
+
+      <div class="quiz-question" id="q2" style="margin-top:1.5rem;">
+        <div class="quiz-q">P(A) = 0.4, P(B) = 0.3, P(A ∩ B) = 0.1. What is P(A ∪ B)?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="checkAnswer(this,'q2',false)">0.7</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q2',false)">0.8</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q2',true)">0.6</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q2',false)">0.12</button>
+        </div>
+        <div class="quiz-feedback" id="fb-q2"></div>
+      </div>
+
+      <div class="quiz-question" id="q3" style="margin-top:1.5rem;">
+        <div class="quiz-q">Events A and B are mutually exclusive. P(A) = 0.25, P(B) = 0.40. What is P(A ∪ B)?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="checkAnswer(this,'q3',false)">0.10</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q3',true)">0.65</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q3',false)">0.55</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q3',false)">1.00</button>
+        </div>
+        <div class="quiz-feedback" id="fb-q3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────── SECTION 4 ─────────────────────────────── -->
+  <div class="content-section" id="conditional">
+    <div class="section-header">
+      <div class="section-icon">🔗</div>
+      <div>
+        <div class="section-label-sm">SECTION 04</div>
+        <h2 class="section-h2">Conditional Probability</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>The <strong>conditional probability</strong> of event A given that event B has occurred is written P(A|B). It asks: "If we already know B happened, how likely is A?"</p>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula">P(A|B) = P(A ∩ B) / P(B) &nbsp;, where P(B) ≠ 0</div>
+      <div class="formula-desc">This also means: P(A ∩ B) = P(A|B) · P(B) = P(B|A) · P(A)</div>
+    </div>
+
+    <!-- Contingency Table Example -->
+    <div class="example-box">
+      <div class="example-title">Example — IT Project Contracts (Contingency Table)</div>
+      <p>100 IT projects were assigned to AT&amp;T or IBM, split between Telecom and Computer categories.</p>
+    </div>
+
+    <table class="prob-table">
+      <thead>
+        <tr><th></th><th>AT&amp;T</th><th>IBM</th><th class="total-col">Total</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Telecommunication</td><td>.40</td><td>.10</td><td class="total-col">.50</td></tr>
+        <tr><td>Computers</td><td>.20</td><td>.30</td><td class="total-col">.50</td></tr>
+        <tr class="total-row"><td>Total</td><td>.60</td><td>.40</td><td>1.00</td></tr>
+      </tbody>
+    </table>
+
+    <div class="info-box teal">
+      <div class="info-icon">💡</div>
+      <p><strong>P(IBM | Telecom) = P(IBM ∩ Telecom) / P(Telecom) = 0.10 / 0.50 = 0.20</strong><br>
+      Given that a project is in Telecommunications, there is a 20% chance IBM handles it.</p>
+    </div>
+
+    <!-- Conditional probability calculator -->
+    <div class="calc-wrap">
+      <div class="calc-title">🔗 Conditional Probability Calculator</div>
+      <p style="color:var(--muted);font-size:0.88rem;margin-bottom:1.2rem;">Enter P(A ∩ B) and P(B) to compute P(A|B).</p>
+      <div class="calc-inputs">
+        <div class="calc-field">
+          <label>P(A ∩ B)</label>
+          <input type="number" id="cond-ab" min="0" max="1" step="0.01" placeholder="e.g. 0.10">
+        </div>
+        <div class="calc-field">
+          <label>P(B)</label>
+          <input type="number" id="cond-b" min="0.001" max="1" step="0.01" placeholder="e.g. 0.50">
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcCond()">Calculate P(A|B)</button>
+      <div class="calc-result" id="cond-result"></div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────── SECTION 5 ─────────────────────────────── -->
+  <div class="content-section" id="independence">
+    <div class="section-header">
+      <div class="section-icon">⚖️</div>
+      <div>
+        <div class="section-label-sm">SECTION 05</div>
+        <h2 class="section-h2">Independence of Events</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>Two events A and B are <strong>statistically independent</strong> if knowing that one has occurred does not change the probability of the other. Knowing B gives no information about A.</p>
+    </div>
+
+    <div class="info-box teal">
+      <div class="info-icon">📌</div>
+      <p><strong>Three equivalent conditions for independence:</strong><br>
+      &nbsp;&nbsp;&nbsp;① P(A|B) = P(A)&nbsp;&nbsp;&nbsp;② P(B|A) = P(B)&nbsp;&nbsp;&nbsp;③ P(A ∩ B) = P(A) · P(B)</p>
+    </div>
+
+    <div class="example-box">
+      <div class="example-title">Example — Ace and Heart (Cards)</div>
+      <p>From a 52-card deck: P(Ace) = 4/52 = 1/13 &nbsp;|&nbsp; P(Heart) = 13/52 = 1/4</p>
+      <p style="margin-top:0.5rem;">P(Ace|Heart) = P(Ace ∩ Heart) / P(Heart) = (1/52) / (13/52) = 1/13 = P(Ace) ✓</p>
+      <p style="margin-top:0.5rem;">Since P(Ace|Heart) = P(Ace), the events <strong>Ace</strong> and <strong>Heart</strong> are independent.</p>
+      <div class="solution">P(Ace ∩ Heart) = P(Ace) × P(Heart) = (4/52) × (13/52) = 1/52 ✓</div>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin:2rem 0 1rem;">Product Rules for Multiple Independent Events</h3>
+
+    <div class="info-box gold">
+      <div class="info-icon">✖️</div>
+      <p><strong>Intersection of n independent events:</strong><br>
+      P(A₁ ∩ A₂ ∩ … ∩ Aₙ) = P(A₁) · P(A₂) · … · P(Aₙ)</p>
+    </div>
+    <div class="info-box teal" style="margin-top:0.8rem;">
+      <div class="info-icon">➕</div>
+      <p><strong>Union of n independent events:</strong><br>
+      P(A₁ ∪ A₂ ∪ … ∪ Aₙ) = 1 − P(Ā₁) · P(Ā₂) · … · P(Āₙ)</p>
+    </div>
+
+    <div class="example-box">
+      <div class="example-title">Example — TV and Billboard Advertising</div>
+      <p>Events Television (T) and Billboard (B) are independent. P(T) = 0.04, P(B) = 0.06.</p>
+      <p style="margin-top:0.6rem;"><strong>a)</strong> P(T ∩ B) = P(T) × P(B) = 0.04 × 0.06 = <strong>0.0024</strong></p>
+      <p style="margin-top:0.4rem;"><strong>b)</strong> P(T ∪ B) = 0.04 + 0.06 − 0.0024 = <strong>0.0976</strong></p>
+    </div>
+
+    <div class="example-box">
+      <div class="example-title">Example — At Least One Success in 10 Trials</div>
+      <p>Ten independent trials, each with failure probability 0.90. What is the probability that at least one succeeds?</p>
+      <div class="solution">P(at least one) = 1 − (0.90)¹⁰ = 1 − 0.3487 = 0.6513</div>
+    </div>
+
+    <!-- Independence checker -->
+    <div class="calc-wrap">
+      <div class="calc-title">⚖️ Independence Checker</div>
+      <p style="color:var(--muted);font-size:0.88rem;margin-bottom:1.2rem;">Enter P(A), P(B), and P(A ∩ B) to check whether A and B are statistically independent.</p>
+      <div class="calc-inputs">
+        <div class="calc-field"><label>P(A)</label><input type="number" id="ind-a" min="0" max="1" step="0.01" placeholder="e.g. 0.25"></div>
+        <div class="calc-field"><label>P(B)</label><input type="number" id="ind-b" min="0" max="1" step="0.01" placeholder="e.g. 0.40"></div>
+        <div class="calc-field"><label>P(A ∩ B)</label><input type="number" id="ind-ab" min="0" max="1" step="0.01" placeholder="e.g. 0.10"></div>
+      </div>
+      <button class="calc-btn" onclick="checkIndependence()">Check Independence</button>
+      <div class="calc-result" id="ind-result"></div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────── SECTION 6 ─────────────────────────────── -->
+  <div class="content-section" id="joint-table">
+    <div class="section-header">
+      <div class="section-icon">📊</div>
+      <div>
+        <div class="section-label-sm">SECTION 06</div>
+        <h2 class="section-h2">The Joint Probability Table</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>A <strong>joint probability table</strong> is similar to a contingency table but contains probabilities instead of frequencies. The <strong>row totals</strong> and <strong>column totals</strong> are called <em>marginal probabilities</em>.</p>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin:1.5rem 0 1rem;">Example — Dollar vs. Economic Growth</h3>
+    <p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem;">Economic growth level (High / Medium / Low) and whether the dollar appreciates or depreciates.</p>
+
+    <table class="prob-table">
+      <thead>
+        <tr><th></th><th>High</th><th>Medium</th><th>Low</th><th class="total-col">Total</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>$ Appreciates</td><td>0.21</td><td>0.20</td><td>0.04</td><td class="total-col">0.45</td></tr>
+        <tr><td>$ Depreciates</td><td>0.09</td><td>0.30</td><td>0.16</td><td class="total-col">0.55</td></tr>
+        <tr class="total-row"><td>Total</td><td>0.30</td><td>0.50</td><td>0.20</td><td>1.00</td></tr>
+      </tbody>
+    </table>
+
+    <div class="info-box teal" style="margin-top:1.5rem;">
+      <div class="info-icon">📌</div>
+      <p>
+        <strong>Marginal probabilities</strong> are simply the row and column totals.<br>
+        For example, P(High growth) = <strong>0.30</strong> and P($ Appreciates) = <strong>0.45</strong>.<br><br>
+        <strong>Joint probability:</strong> P($ Appreciates ∩ High) = <strong>0.21</strong><br>
+        <strong>Conditional:</strong> P($ Appreciates | High) = 0.21 / 0.30 = <strong>0.70</strong>
+      </p>
+    </div>
+
+    <!-- Final quiz -->
+    <div class="quiz-wrap">
+      <div class="quiz-title">✅ Joint Table Quiz</div>
+      <div class="quiz-question" id="q4">
+        <div class="quiz-q">Using the joint table above: what is P($ Depreciates | Medium growth)?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="checkAnswer(this,'q4',false)">0.30</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q4',true)">0.60</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q4',false)">0.55</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q4',false)">0.16</button>
+        </div>
+        <div class="quiz-feedback" id="fb-q4"></div>
+      </div>
+
+      <div class="quiz-question" id="q5" style="margin-top:1.5rem;">
+        <div class="quiz-q">What is the marginal probability P(Low growth)?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="checkAnswer(this,'q5',false)">0.04</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q5',false)">0.16</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q5',true)">0.20</button>
+          <button class="quiz-option" onclick="checkAnswer(this,'q5',false)">0.24</button>
+        </div>
+        <div class="quiz-feedback" id="fb-q5"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER NAV -->
+  <div class="lecture-footer">
+    <a href="lecture5.html" style="border:1px solid var(--border);color:var(--white);padding:0.9rem 2rem;border-radius:8px;text-decoration:none;font-weight:500;">← Back to Lecture 5</a>
+    <a href="index.html" style="background:var(--accent);color:var(--navy);padding:0.9rem 2rem;border-radius:8px;text-decoration:none;font-weight:700;">Back to Home ↩</a>
+  </div>
+
+</div><!-- end page-wrap -->
+
+<script>
+// ── Classical Probability Calculator ──
+function calcProb() {
+  const m = parseFloat(document.getElementById('calc-m').value);
+  const n = parseFloat(document.getElementById('calc-n').value);
+  const res = document.getElementById('calc-result');
+  if (isNaN(m) || isNaN(n) || n <= 0 || m < 0) {
+    res.textContent = '⚠ Please enter valid positive numbers (n > 0, m ≥ 0).';
+    res.style.display = 'block'; return;
+  }
+  if (m > n) { res.textContent = '⚠ m cannot exceed n.'; res.style.display = 'block'; return; }
+  const p = m / n;
+  res.textContent = `P(A) = ${m} / ${n} = ${p.toFixed(4)} (${(p*100).toFixed(2)}%)`;
+  res.style.display = 'block';
+}
+
+// ── Conditional Probability Calculator ──
+function calcCond() {
+  const ab = parseFloat(document.getElementById('cond-ab').value);
+  const b  = parseFloat(document.getElementById('cond-b').value);
+  const res = document.getElementById('cond-result');
+  if (isNaN(ab) || isNaN(b) || b <= 0) {
+    res.textContent = '⚠ Please enter valid values (P(B) > 0).'; res.style.display = 'block'; return;
+  }
+  const p = ab / b;
+  res.textContent = `P(A|B) = ${ab} / ${b} = ${p.toFixed(4)} (${(p*100).toFixed(2)}%)`;
+  res.style.display = 'block';
+}
+
+// ── Independence Checker ──
+function checkIndependence() {
+  const pa = parseFloat(document.getElementById('ind-a').value);
+  const pb = parseFloat(document.getElementById('ind-b').value);
+  const pab = parseFloat(document.getElementById('ind-ab').value);
+  const res = document.getElementById('ind-result');
+  if ([pa,pb,pab].some(isNaN)) { res.textContent = '⚠ Please fill all three fields.'; res.style.display='block'; return; }
+  const product = pa * pb;
+  const diff = Math.abs(product - pab);
+  if (diff < 0.0001) {
+    res.textContent = `✅ INDEPENDENT — P(A)×P(B) = ${product.toFixed(4)} ≈ P(A∩B) = ${pab}`;
+  } else {
+    res.textContent = `❌ NOT INDEPENDENT — P(A)×P(B) = ${product.toFixed(4)} ≠ P(A∩B) = ${pab}  (difference: ${diff.toFixed(4)})`;
+  }
+  res.style.display = 'block';
+}
+
+// ── Quiz ──
+const answers = {
+  q1: 'P(Ā) = 1 − 0.35 = 0.65 ✓',
+  q2: 'P(A∪B) = 0.4 + 0.3 − 0.1 = 0.6 ✓',
+  q3: 'Mutually exclusive: P(A∪B) = 0.25 + 0.40 = 0.65 ✓',
+  q4: 'P(Deprec|Medium) = 0.30 / 0.50 = 0.60 ✓',
+  q5: 'Marginal P(Low) = 0.04 + 0.16 = 0.20 ✓'
+};
+
+function checkAnswer(btn, qId, correct) {
+  const allBtns = document.querySelectorAll(`#${qId} .quiz-option`);
+  allBtns.forEach(b => { b.disabled = true; });
+  const fb = document.getElementById(`fb-${qId}`);
+  if (correct) {
+    btn.classList.add('correct');
+    fb.textContent = '✓ Correct! ' + answers[qId];
+    fb.style.color = 'var(--accent)';
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent = '✗ Not quite. ' + answers[qId];
+    fb.style.color = 'var(--pink)';
+  }
+}
+</script>
+</body>
+</html>
