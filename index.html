@@ -313,7 +313,23 @@
     .nav-links { display: none; }
     section { padding: 3rem 1.5rem; }
     .stats-row { grid-template-columns: repeat(2, 1fr); }
-    .hero-meta { gap: 1.2rem; }
+    .hero-meta { gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+    .hero-meta-item .num { font-size: 1.6rem; }
+    .hero-divider { display: none; }
+    .hero h1 { font-size: clamp(2.4rem, 11vw, 4rem); }
+    .hero-cta { flex-direction: column; align-items: center; gap: 0.8rem; }
+    .btn-primary, .btn-ghost { width: 100%; max-width: 260px; text-align: center; }
+    .hero-canvas-wrap canvas { width: 100% !important; height: auto !important; }
+    .hero-sub { font-size: 0.95rem; padding: 0 0.5rem; }
+    .lectures-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 480px) {
+    .hero { padding: 7rem 1.2rem 3rem; }
+    .hero h1 { font-size: clamp(2rem, 10vw, 3rem); }
+    .hero-badge { font-size: 0.68rem; letter-spacing: 0.06em; padding: 0.35rem 0.9rem; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    section { padding: 2.5rem 1rem; }
   }
 
   /* ═══════════════════════════════════════
@@ -480,6 +496,7 @@
     <a href="lecture3.html">Lecture 3&4</a>
     <a href="lecture5.html">Lecture 5</a>
     <a href="lecture6.html">Lecture 6</a>
+    <a href="lecture7.html">Lecture 7</a>
   </div>
 
   <button class="hamburger" id="hamburgerBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
@@ -493,6 +510,7 @@
     <a href="lecture3.html">Lecture 3&4</a>
     <a href="lecture5.html">Lecture 5</a>
     <a href="lecture6.html">Lecture 6</a>
+    <a href="lecture7.html">Lecture 7</a>
 </div>
 
 <!-- HERO -->
@@ -508,7 +526,7 @@
 
   <div class="hero-meta">
     <div class="hero-meta-item">
-      <div class="num">6</div>
+      <div class="num">7</div>
       <div class="label">Lectures</div>
     </div>
     <div class="hero-divider"></div>
@@ -647,11 +665,30 @@
       <div class="card-desc">Explore the foundations of probability — sample spaces, events, set operations, the addition rule, conditional probability, independence, and joint probability tables with worked examples.</div>
       <div class="card-topics">
         <span class="topic-tag">Sample Space</span>
-        <span class="topic-tag">Events & Sets</span>
+        <span class="topic-tag">Events &amp; Sets</span>
         <span class="topic-tag">Addition Rule</span>
         <span class="topic-tag">Conditional P</span>
         <span class="topic-tag">Independence</span>
         <span class="topic-tag">Joint Table</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-status">Available</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="lecture7.html" class="lecture-card">
+      <div class="card-num">LECTURE 07</div>
+      <div class="card-icon">🎰</div>
+      <div class="card-title">Discrete Random Variables</div>
+      <div class="card-desc">Master probability distributions for discrete outcomes — from random variable definitions and expected values to the Bernoulli, Binomial, Poisson, and Geometric distributions with interactive calculators.</div>
+      <div class="card-topics">
+        <span class="topic-tag">Expected Value</span>
+        <span class="topic-tag">Variance</span>
+        <span class="topic-tag">Bernoulli</span>
+        <span class="topic-tag">Binomial</span>
+        <span class="topic-tag">Poisson</span>
+        <span class="topic-tag">Geometric</span>
       </div>
       <div class="card-footer">
         <span class="card-status">Available</span>
