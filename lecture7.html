@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 7 – Discrete Random Variables | DS 501</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #080d1e; --navy2: #0f1630; --navy3: #1a2248;
+    --gold: #e8a230; --gold2: #f5c060;
+    --teal: #3ecfb2; --pink: #e8507a;
+    --white: #f0eee8; --muted: #8a96b8;
+    --card: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
+    --accent: #b87aff;
+    --accent2: rgba(184,122,255,0.15);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(184,122,255,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(184,122,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px; pointer-events: none; z-index: 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 3rem;
+    background: rgba(8,13,30,0.92); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--accent); }
+  .nav-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+
+  /* ── HAMBURGER ── */
+  .hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; cursor: pointer; padding: 6px; border: none; background: transparent; }
+  .hamburger span { display: block; width: 22px; height: 2px; background: var(--accent); border-radius: 2px; transition: transform 0.3s, opacity 0.3s; }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .mobile-nav-overlay { display: none; position: fixed; inset: 0; background: rgba(8,13,30,0.98); z-index: 300; flex-direction: column; align-items: center; justify-content: center; gap: 1.8rem; backdrop-filter: blur(20px); }
+  .mobile-nav-overlay.open { display: flex; }
+  .mobile-nav-overlay a { color: var(--white); text-decoration: none; font-size: 1.05rem; font-weight: 500; padding: 0.5rem 1.5rem; border-radius: 8px; transition: background 0.2s, color 0.2s; border: 1px solid transparent; }
+  .mobile-nav-overlay a:hover { color: var(--accent); border-color: rgba(184,122,255,0.3); background: rgba(184,122,255,0.06); }
+  .mnav-close { position: absolute; top: 1rem; right: 1.2rem; background: none; border: none; color: var(--muted); font-size: 1.6rem; cursor: pointer; line-height: 1; padding: 0.3rem; }
+
+  /* ── LAYOUT ── */
+  .page-wrap { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; position: relative; z-index: 1; }
+
+  /* ── HERO ── */
+  .lecture-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; padding: 3rem 0; }
+  .lecture-badge { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--accent); letter-spacing: 0.12em; background: rgba(184,122,255,0.1); border: 1px solid rgba(184,122,255,0.25); display: inline-block; padding: 0.3rem 1rem; border-radius: 4px; margin-bottom: 1rem; }
+  .lecture-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; line-height: 1.1; }
+  .lecture-title em { font-style: italic; color: var(--accent); }
+  .lecture-desc { color: var(--muted); font-size: 1rem; line-height: 1.8; margin-top: 1.2rem; font-weight: 300; }
+  .toc-title-sm { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.8rem; margin-top: 1.5rem; }
+  .toc-item { display: flex; align-items: center; gap: 0.7rem; padding: 0.45rem 0; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--white); font-size: 0.85rem; transition: color 0.2s; }
+  .toc-item:hover { color: var(--accent); }
+  .toc-num { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); width: 24px; }
+  .hero-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; }
+  .hero-card-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--muted); margin-bottom: 1.2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .mini-stat { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0; border-bottom: 1px solid var(--border); }
+  .mini-stat:last-child { border-bottom: none; }
+  .mini-stat-label { font-size: 0.82rem; color: var(--muted); }
+  .mini-stat-val { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--accent); }
+
+  /* ── SECTION ── */
+  .content-section { margin-bottom: 4rem; }
+  .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .section-icon { width: 44px; height: 44px; border-radius: 10px; background: rgba(184,122,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+  .section-label-sm { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--accent); letter-spacing: 0.12em; }
+  .section-h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; }
+
+  /* ── BOXES ── */
+  .def-box { background: rgba(184,122,255,0.06); border: 1px solid rgba(184,122,255,0.2); border-left: 4px solid var(--accent); border-radius: 8px; padding: 1.5rem 1.8rem; margin-bottom: 1.5rem; }
+  .def-box p { color: var(--white); line-height: 1.8; font-size: 0.95rem; }
+  .def-box strong { color: var(--accent); }
+  .info-box { background: rgba(232,162,48,0.05); border: 1px solid rgba(232,162,48,0.2); border-radius: 8px; padding: 1.2rem 1.5rem; margin-bottom: 1rem; display: flex; gap: 1rem; align-items: flex-start; }
+  .info-box.purple { background: rgba(184,122,255,0.05); border-color: rgba(184,122,255,0.2); }
+  .info-box.teal { background: rgba(62,207,178,0.05); border-color: rgba(62,207,178,0.2); }
+  .info-box.pink { background: rgba(232,80,122,0.05); border-color: rgba(232,80,122,0.2); }
+  .info-box.gold { background: rgba(232,162,48,0.05); border-color: rgba(232,162,48,0.2); }
+  .info-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .info-box p { color: var(--muted); font-size: 0.88rem; line-height: 1.7; }
+  .info-box p strong { color: var(--white); }
+
+  /* ── FORMULA BOX ── */
+  .formula-box { background: rgba(8,13,30,0.6); border: 1px solid rgba(184,122,255,0.3); border-radius: 10px; padding: 1.5rem 2rem; margin: 1.5rem 0; text-align: center; font-family: 'DM Mono', monospace; }
+  .formula-box .formula { font-size: 1.2rem; color: var(--accent); margin-bottom: 0.5rem; line-height: 1.6; }
+  .formula-box .formula-desc { font-size: 0.82rem; color: var(--muted); }
+
+  /* ── TABLE ── */
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 1.5rem 0; border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  thead tr { background: rgba(184,122,255,0.1); }
+  thead th { padding: 0.8rem 1rem; text-align: left; font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--accent); letter-spacing: 0.08em; border-bottom: 1px solid var(--border); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  tbody tr:hover { background: rgba(255,255,255,0.03); }
+  tbody td { padding: 0.7rem 1rem; color: var(--muted); }
+  tbody td:first-child { color: var(--white); font-family: 'DM Mono', monospace; }
+  .td-highlight { color: var(--accent) !important; font-weight: 600; }
+
+  /* ── GRID CARDS ── */
+  .concepts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .concept-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.4rem; transition: border-color 0.2s; }
+  .concept-card:hover { border-color: rgba(184,122,255,0.3); }
+  .concept-card-icon { font-size: 1.6rem; margin-bottom: 0.8rem; }
+  .concept-card-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--accent); }
+  .concept-card-body { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+
+  /* ── DISTRIBUTIONS COMPARE ── */
+  .dist-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0; }
+  .dist-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+  .dist-card-title { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 1rem; }
+  .dist-card ul { list-style: none; }
+  .dist-card ul li { padding: 0.35rem 0; font-size: 0.85rem; color: var(--muted); border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 0.6rem; }
+  .dist-card ul li:last-child { border-bottom: none; }
+  .dist-card ul li::before { content: '◆'; font-size: 0.5rem; color: var(--accent); margin-top: 0.35rem; flex-shrink: 0; }
+
+  /* ── INTERACTIVE CALC ── */
+  .calc-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 1.5rem 0; }
+  .calc-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--white); }
+  .calc-row { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; align-items: flex-end; }
+  .calc-field { display: flex; flex-direction: column; gap: 0.4rem; min-width: 120px; flex: 1; }
+  .calc-field label { font-size: 0.78rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
+  .calc-field input, .calc-field select {
+    background: rgba(184,122,255,0.06); border: 1px solid rgba(184,122,255,0.2);
+    border-radius: 6px; padding: 0.55rem 0.9rem; color: var(--white);
+    font-family: 'DM Mono', monospace; font-size: 0.9rem; outline: none;
+    transition: border-color 0.2s;
+  }
+  .calc-field input:focus, .calc-field select:focus { border-color: var(--accent); }
+  .calc-btn {
+    background: var(--accent); color: var(--navy); padding: 0.6rem 1.6rem;
+    border: none; border-radius: 6px; font-weight: 700; font-size: 0.88rem;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .calc-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .calc-result { background: rgba(8,13,30,0.5); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem 1.5rem; margin-top: 1rem; min-height: 56px; }
+  .calc-result-val { font-family: 'DM Mono', monospace; font-size: 1.1rem; color: var(--accent); }
+  .calc-result-label { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+
+  /* ── CHART AREA ── */
+  .chart-wrap { background: rgba(8,13,30,0.4); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
+  .chart-title { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--muted); letter-spacing: 0.08em; margin-bottom: 1rem; }
+  canvas { display: block; max-width: 100%; height: auto; }
+
+  /* ── QUIZ ── */
+  .quiz-wrap { background: rgba(184,122,255,0.04); border: 1px solid rgba(184,122,255,0.15); border-radius: 12px; padding: 1.8rem 2rem; margin: 2rem 0; }
+  .quiz-q { font-weight: 600; font-size: 0.95rem; margin-bottom: 1.2rem; line-height: 1.5; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 0.6rem; }
+  .quiz-opt {
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.75rem 1.2rem; font-size: 0.88rem;
+    cursor: pointer; text-align: left; color: var(--white);
+    transition: all 0.2s; width: 100%;
+  }
+  .quiz-opt:hover { border-color: rgba(184,122,255,0.4); background: rgba(184,122,255,0.06); }
+  .quiz-opt.correct { background: rgba(62,207,178,0.12); border-color: var(--teal); color: var(--teal); }
+  .quiz-opt.wrong   { background: rgba(232,80,122,0.10); border-color: var(--pink); color: var(--pink); }
+  .quiz-feedback { margin-top: 1rem; font-size: 0.87rem; color: var(--muted); padding: 0.8rem 1.2rem; background: rgba(8,13,30,0.4); border-radius: 6px; display: none; }
+  .quiz-feedback.show { display: block; }
+
+  /* ── FOOTER ── */
+  footer { position: relative; z-index: 1; border-top: 1px solid var(--border); text-align: center; padding: 3rem; color: var(--muted); font-size: 0.85rem; margin-top: 4rem; }
+  footer .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--accent); margin-bottom: 0.5rem; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 0.9rem 1.2rem; }
+    .nav-links { display: none !important; }
+    .hamburger { display: flex; }
+    .page-wrap { padding: 2rem 1rem; }
+    .lecture-hero { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 0 1.5rem; }
+    .lecture-title { font-size: clamp(1.7rem, 7vw, 2.4rem); }
+    .dist-compare { grid-template-columns: 1fr; }
+    .concepts-grid { grid-template-columns: 1fr; }
+    .calc-row { flex-direction: column; }
+    .section-h2 { font-size: 1.3rem; }
+    .section-icon { width: 36px; height: 36px; font-size: 1rem; }
+    .formula-box .formula { font-size: 0.95rem; }
+    table { font-size: 0.8rem; }
+  }
+  @media (max-width: 480px) {
+    .page-wrap { padding: 1.5rem 0.8rem; }
+    .quiz-opt { font-size: 0.82rem; padding: 0.65rem 0.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">DS 501 · Lecture 7</div>
+  <div class="nav-links">
+    <a href="index.html">← Home</a>
+    <a href="lecture6.html">← Lecture 6</a>
+    <a href="#rv">Random Variables</a>
+    <a href="#expected">Expected Value</a>
+    <a href="#bernoulli">Bernoulli</a>
+    <a href="#binomial">Binomial</a>
+    <a href="#poisson">Poisson</a>
+  </div>
+  <button class="hamburger" id="hamburgerBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="mobile-nav-overlay" id="mobileNavOverlay">
+  <button class="mnav-close">✕</button>
+  <a href="index.html">← Home</a>
+  <a href="lecture6.html">← Lecture 6</a>
+  <a href="#rv">Random Variables</a>
+  <a href="#expected">Expected Value</a>
+  <a href="#bernoulli">Bernoulli</a>
+  <a href="#binomial">Binomial</a>
+  <a href="#poisson">Poisson</a>
+</div>
+
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <div class="lecture-hero">
+    <div>
+      <div class="lecture-badge">LECTURE 07 · DS 501</div>
+      <h1 class="lecture-title">Discrete <em>Random Variables</em></h1>
+      <p class="lecture-desc">Learn to quantify uncertainty — model random experiments using probability distributions, compute expected values and variance, and master the Bernoulli, Binomial, and Poisson families.</p>
+
+      <div class="toc-title-sm">Topics Covered</div>
+      <a href="#rv" class="toc-item"><span class="toc-num">7.1</span>Random Variables &amp; Probability Distributions</a>
+      <a href="#expected" class="toc-item"><span class="toc-num">7.2</span>Expected Values &amp; Variance</a>
+      <a href="#bernoulli" class="toc-item"><span class="toc-num">7.3</span>Bernoulli Random Variable</a>
+      <a href="#binomial" class="toc-item"><span class="toc-num">7.4</span>The Binomial Distribution</a>
+      <a href="#poisson" class="toc-item"><span class="toc-num">7.5</span>The Poisson Distribution</a>
+      <a href="#geometric" class="toc-item"><span class="toc-num">7.6</span>Geometric Distribution</a>
+    </div>
+
+    <div class="hero-card">
+      <div class="hero-card-title">Chapter at a Glance</div>
+      <div class="mini-stat"><span class="mini-stat-label">Type</span><span class="mini-stat-val">Discrete Distributions</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Key Symbol</span><span class="mini-stat-val">X ~ B(n, p)</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Binomial Mean</span><span class="mini-stat-val">μ = np</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Poisson Mean</span><span class="mini-stat-val">μ = λ</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Bernoulli Var</span><span class="mini-stat-val">V(X) = p(1−p)</span></div>
+      <div class="mini-stat"><span class="mini-stat-label">Euler's e</span><span class="mini-stat-val">≈ 2.71828</span></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       7.1 RANDOM VARIABLES
+  ══════════════════════════════════ -->
+  <div class="content-section" id="rv">
+    <div class="section-header">
+      <div class="section-icon">🎲</div>
+      <div>
+        <div class="section-label-sm">SECTION 7.1</div>
+        <h2 class="section-h2">Random Variables</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>A <strong>random variable, X</strong>, is a function that assigns a single, but variable, numeric value to each element of a sample space. It turns the outcomes of a random experiment into numbers we can work with mathematically.</p>
+    </div>
+
+    <p style="color:var(--muted); font-size:0.92rem; line-height:1.8; margin-bottom:1.5rem;">
+      Consider four sequential births. Each child is either a Boy (B) or Girl (G), giving 2⁴ = 16 equally likely outcomes. The random variable X = "number of girls" maps each outcome to a count from 0 to 4.
+    </p>
+
+    <div class="dist-compare">
+      <div class="dist-card">
+        <div class="dist-card-title">DISCRETE RANDOM VARIABLE</div>
+        <ul>
+          <li>Countable number of possible values</li>
+          <li>Discrete gaps between successive values</li>
+          <li>Measurable probability at each individual value</li>
+          <li>Examples: # of defects, # of heads in 5 flips, # of calls per hour</li>
+        </ul>
+      </div>
+      <div class="dist-card">
+        <div class="dist-card-title">CONTINUOUS RANDOM VARIABLE</div>
+        <ul>
+          <li>Uncountably infinite number of values</li>
+          <li>Moves continuously from value to value</li>
+          <li>No measurable probability at a single exact point</li>
+          <li>Examples: height, weight, time, temperature</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; margin:2rem 0 1rem;">Probability Distribution — 4 Births Example</h3>
+    <p style="color:var(--muted); font-size:0.88rem; line-height:1.7; margin-bottom:1rem;">
+      Each of 16 outcomes has probability 1/16. Counting the girls in each outcome gives:
+    </p>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>x (# Girls)</th><th>Count of Outcomes</th><th>P(X = x)</th><th>F(x) = P(X ≤ x)</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>1 (BBBB)</td><td>1/16 = 0.0625</td><td class="td-highlight">0.0625</td></tr>
+          <tr><td>1</td><td>4</td><td>4/16 = 0.2500</td><td class="td-highlight">0.3125</td></tr>
+          <tr><td>2</td><td>6</td><td>6/16 = 0.3750</td><td class="td-highlight">0.6875</td></tr>
+          <tr><td>3</td><td>4</td><td>4/16 = 0.2500</td><td class="td-highlight">0.9375</td></tr>
+          <tr><td>4</td><td>1 (GGGG)</td><td>1/16 = 0.0625</td><td class="td-highlight">1.0000</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">PROBABILITY DISTRIBUTION — NUMBER OF GIRLS IN 4 BIRTHS</div>
+      <canvas id="birthsChart" height="200"></canvas>
+    </div>
+
+    <div class="info-box teal">
+      <span class="info-icon">📋</span>
+      <p><strong>Rules of Discrete Probability Distributions:</strong> (1) P(x) ≥ 0 for all values of x. (2) ΣP(x) = 1 over all values. These two conditions must always hold.</p>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; margin:2rem 0 1rem;">Cumulative Distribution Function (CDF)</h3>
+    <div class="def-box">
+      <p>The <strong>cumulative distribution function</strong> F(x) = P(X ≤ x) = Σ P(i) for all i ≤ x. It gives the probability that X takes a value at most equal to x.</p>
+    </div>
+    <div class="info-box gold">
+      <span class="info-icon">💡</span>
+      <p><strong>Useful identities:</strong> P(X > a) = 1 − F(a) &nbsp;|&nbsp; P(a ≤ X ≤ b) = F(b) − F(a−1) &nbsp;|&nbsp; P(X = x) = F(x) − F(x−1)</p>
+    </div>
+
+    <!-- Quiz 1 -->
+    <div class="quiz-wrap">
+      <div class="quiz-q">In the 4-births example, what is P(X ≥ 3) — the probability of at least 3 girls?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">A) 0.0625</button>
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">B) 0.2500</button>
+        <button class="quiz-opt" data-correct="true"  onclick="quiz(this)">C) 0.3125</button>
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">D) 0.6875</button>
+      </div>
+      <div class="quiz-feedback">P(X ≥ 3) = P(3) + P(4) = 4/16 + 1/16 = 5/16 = 0.3125. Alternatively: 1 − F(2) = 1 − 0.6875 = 0.3125.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       7.2 EXPECTED VALUE & VARIANCE
+  ══════════════════════════════════ -->
+  <div class="content-section" id="expected">
+    <div class="section-header">
+      <div class="section-icon">📐</div>
+      <div>
+        <div class="section-label-sm">SECTION 7.2</div>
+        <h2 class="section-h2">Expected Value &amp; Variance</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>The <strong>expected value (mean)</strong> of a discrete random variable X is the probability-weighted average of all its possible values:<br><br>
+      μ = E(X) = Σ x · P(x)  &nbsp; (sum over all values)</p>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula">μ = E(X) = Σ x · P(x)</div>
+      <div class="formula">σ² = V(X) = E[(X − μ)²] = E(X²) − [E(X)]²</div>
+      <div class="formula">σ = SD(X) = √V(X)</div>
+      <div class="formula-desc">Mean (μ), Variance (σ²), Standard Deviation (σ)</div>
+    </div>
+
+    <div class="info-box purple">
+      <span class="info-icon">🎯</span>
+      <p><strong>Shortcut for Variance:</strong> σ² = Σ x² P(x) − μ² &nbsp; — often easier to compute than summing (x − μ)² directly.</p>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; margin:2rem 0 1rem;">Example — Number of Switches</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>x</th><th>P(x)</th><th>xP(x)</th><th>(x−μ)</th><th>(x−μ)²P(x)</th><th>x²P(x)</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>0.1</td><td>0.0</td><td>−2.3</td><td>0.529</td><td>0.0</td></tr>
+          <tr><td>1</td><td>0.2</td><td>0.2</td><td>−1.3</td><td>0.338</td><td>0.2</td></tr>
+          <tr><td>2</td><td>0.3</td><td>0.6</td><td>−0.3</td><td>0.027</td><td>1.2</td></tr>
+          <tr><td>3</td><td>0.2</td><td>0.6</td><td>+0.7</td><td>0.098</td><td>1.8</td></tr>
+          <tr><td>4</td><td>0.1</td><td>0.4</td><td>+1.7</td><td>0.289</td><td>1.6</td></tr>
+          <tr><td>5</td><td>0.1</td><td>0.5</td><td>+2.7</td><td>0.729</td><td>2.5</td></tr>
+          <tr><td><strong>Total</strong></td><td><strong>1.0</strong></td><td class="td-highlight"><strong>μ = 2.3</strong></td><td></td><td class="td-highlight"><strong>σ² = 2.010</strong></td><td class="td-highlight"><strong>7.3 − 2.3² = 2.01</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; margin:2rem 0 1rem;">Properties of Linear Functions</h3>
+    <div class="formula-box">
+      <div class="formula">E(aX + b) = a·E(X) + b</div>
+      <div class="formula">V(aX + b) = a²·V(X) = a²σ²</div>
+      <div class="formula">For independent X, Y: &nbsp; E(X+Y) = E(X)+E(Y) &nbsp;|&nbsp; V(X+Y) = V(X)+V(Y)</div>
+      <div class="formula-desc">Key rules for transforming and combining random variables</div>
+    </div>
+
+    <!-- Interactive E[X] Calculator -->
+    <div class="calc-wrap">
+      <div class="calc-title">🧮 Expected Value Calculator</div>
+      <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1.2rem;">Enter a probability distribution (up to 6 values). Format: value:probability, one per line. Probabilities must sum to 1.</p>
+      <textarea id="evInput" style="width:100%; background:rgba(184,122,255,0.06); border:1px solid rgba(184,122,255,0.2); border-radius:6px; padding:0.8rem 1rem; color:var(--white); font-family:'DM Mono',monospace; font-size:0.85rem; height:130px; outline:none; resize:vertical;" placeholder="0:0.1&#10;1:0.2&#10;2:0.3&#10;3:0.2&#10;4:0.1&#10;5:0.1"></textarea>
+      <div class="calc-row" style="margin-top:0.8rem;">
+        <button class="calc-btn" onclick="calcEV()">Calculate μ, σ², σ</button>
+      </div>
+      <div class="calc-result" id="evResult">
+        <div class="calc-result-label">Enter values above and click Calculate</div>
+      </div>
+    </div>
+
+    <!-- Quiz 2 -->
+    <div class="quiz-wrap">
+      <div class="quiz-q">A company's monthly profit is h(X) = 2X − 8000, where X is units sold. If E(X) = 6700, what is the expected profit E[h(X)]?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">A) $5,000</button>
+        <button class="quiz-opt" data-correct="true"  onclick="quiz(this)">B) $5,400</button>
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">C) $6,700</button>
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">D) $13,400</button>
+      </div>
+      <div class="quiz-feedback">Using E(aX+b) = a·E(X)+b: E(2X−8000) = 2×6700 − 8000 = 13400 − 8000 = $5,400.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       7.3 BERNOULLI
+  ══════════════════════════════════ -->
+  <div class="content-section" id="bernoulli">
+    <div class="section-header">
+      <div class="section-icon">🪙</div>
+      <div>
+        <div class="section-label-sm">SECTION 7.3</div>
+        <h2 class="section-h2">Bernoulli Random Variable</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>A <strong>Bernoulli trial</strong> is a single experiment with exactly two possible outcomes — <strong>success</strong> (X = 1, probability p) or <strong>failure</strong> (X = 0, probability q = 1 − p). The random variable X counting successes in one Bernoulli trial is a <strong>Bernoulli random variable</strong>.</p>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula">P(X = 1) = p &nbsp;&nbsp;|&nbsp;&nbsp; P(X = 0) = 1 − p = q</div>
+      <div class="formula">E(X) = p &nbsp;&nbsp;|&nbsp;&nbsp; V(X) = p(1 − p) = pq</div>
+      <div class="formula-desc">Bernoulli PMF — mean and variance proofs come directly from the definition</div>
+    </div>
+
+    <div class="concepts-grid">
+      <div class="concept-card">
+        <div class="concept-card-icon">⚕️</div>
+        <div class="concept-card-title">Medicine</div>
+        <div class="concept-card-body">Model single-patient events: disease onset (success) or no disease (failure). Used in clinical trial analysis.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-card-icon">🏦</div>
+        <div class="concept-card-title">Finance</div>
+        <div class="concept-card-body">Logistic regression uses Bernoulli distributions to model binary outcomes like bank default or no default.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-card-icon">🔧</div>
+        <div class="concept-card-title">Quality Control</div>
+        <div class="concept-card-body">Each inspected item is either defective (success) or conforming (failure). The foundation for sampling schemes.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-card-icon">🧬</div>
+        <div class="concept-card-title">Building Block</div>
+        <div class="concept-card-body">Bernoulli is the foundation for Binomial (n Bernoulli trials), Geometric, and Negative Binomial distributions.</div>
+      </div>
+    </div>
+
+    <div class="info-box gold">
+      <span class="info-icon">📌</span>
+      <p>When n = 1, the Binomial distribution reduces to the Bernoulli distribution. So Bernoulli(p) = Binomial(1, p).</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       7.4 BINOMIAL
+  ══════════════════════════════════ -->
+  <div class="content-section" id="binomial">
+    <div class="section-header">
+      <div class="section-icon">📊</div>
+      <div>
+        <div class="section-label-sm">SECTION 7.4</div>
+        <h2 class="section-h2">The Binomial Distribution</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>X ~ <strong>Binomial(n, p)</strong>: count of successes in <strong>n</strong> independent, identical Bernoulli trials each with success probability <strong>p</strong>. Conditions: fixed n, independent trials, constant p, only two outcomes per trial.</p>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula">P(X = x) = ⁿCₓ · pˣ · q⁽ⁿ⁻ˣ⁾ = n! / [x!(n−x)!] · pˣ · (1−p)⁽ⁿ⁻ˣ⁾</div>
+      <div class="formula">μ = E(X) = np &nbsp;&nbsp;|&nbsp;&nbsp; σ² = V(X) = npq &nbsp;&nbsp;|&nbsp;&nbsp; σ = √(npq)</div>
+      <div class="formula-desc">where x = 0, 1, 2, …, n &nbsp;|&nbsp; q = 1 − p</div>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; margin:2rem 0 1rem;">Example — 5 Coin Tosses</h3>
+    <p style="color:var(--muted); font-size:0.88rem; line-height:1.7; margin-bottom:1rem;">
+      X = number of heads in 5 fair coin tosses. n = 5, p = 0.5, q = 0.5.
+    </p>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>x (heads)</th><th>ⁿCₓ</th><th>pˣ · qⁿ⁻ˣ</th><th>P(X = x)</th><th>F(x)</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>1</td><td>(0.5)⁵ = 1/32</td><td>0.0313</td><td>0.0313</td></tr>
+          <tr><td>1</td><td>5</td><td>5/32</td><td>0.1563</td><td>0.1875</td></tr>
+          <tr><td>2</td><td>10</td><td>10/32</td><td class="td-highlight">0.3125</td><td>0.5000</td></tr>
+          <tr><td>3</td><td>10</td><td>10/32</td><td class="td-highlight">0.3125</td><td>0.8125</td></tr>
+          <tr><td>4</td><td>5</td><td>5/32</td><td>0.1563</td><td>0.9688</td></tr>
+          <tr><td>5</td><td>1</td><td>1/32</td><td>0.0313</td><td>1.0000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="color:var(--muted); font-size:0.85rem; margin-top:0.6rem;">μ = np = 5×0.5 = 2.5 &nbsp;|&nbsp; σ² = npq = 5×0.5×0.5 = 1.25 &nbsp;|&nbsp; σ = √1.25 ≈ 1.118</p>
+
+    <div class="chart-wrap" style="margin-top:1.5rem;">
+      <div class="chart-title">BINOMIAL DISTRIBUTION — INTERACTIVE EXPLORER</div>
+      <div class="calc-row" style="margin-bottom:1rem;">
+        <div class="calc-field">
+          <label>n (trials)</label>
+          <input type="number" id="binN" value="10" min="1" max="30" oninput="drawBinomial()">
+        </div>
+        <div class="calc-field">
+          <label>p (success prob.)</label>
+          <input type="number" id="binP" value="0.4" min="0.01" max="0.99" step="0.01" oninput="drawBinomial()">
+        </div>
+      </div>
+      <canvas id="binomialChart" height="220"></canvas>
+      <div id="binomStats" style="font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--muted); margin-top:0.8rem;"></div>
+    </div>
+
+    <div class="info-box teal">
+      <span class="info-icon">📌</span>
+      <p><strong>Real Example:</strong> 60% of Brooke shares are owned by LeBow. From n=15 sampled shares, P(X ≤ 3) = F(3) = 0.002 from the cumulative binomial table with p = 0.60.</p>
+    </div>
+
+    <!-- Binomial Quiz -->
+    <div class="quiz-wrap">
+      <div class="quiz-q">A factory produces items where 10% are defective. In a batch of n=20 items, what is the expected number of defective items, and what is the standard deviation?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">A) μ = 2, σ = 2</button>
+        <button class="quiz-opt" data-correct="true"  onclick="quiz(this)">B) μ = 2, σ ≈ 1.34</button>
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">C) μ = 0.1, σ = 0.09</button>
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">D) μ = 20, σ ≈ 1.34</button>
+      </div>
+      <div class="quiz-feedback">μ = np = 20×0.1 = 2. σ² = npq = 20×0.1×0.9 = 1.8, so σ = √1.8 ≈ 1.342.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       7.5 POISSON
+  ══════════════════════════════════ -->
+  <div class="content-section" id="poisson">
+    <div class="section-header">
+      <div class="section-icon">⚡</div>
+      <div>
+        <div class="section-label-sm">SECTION 7.5</div>
+        <h2 class="section-h2">The Poisson Distribution</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>X ~ <strong>Poisson(λ)</strong>: counts the number of events occurring in a fixed interval of time, area, or volume, where events occur independently at a constant average rate λ. Also approximates Binomial when <strong>p ≤ 0.05</strong> and <strong>n ≥ 20</strong>, using λ = np.</p>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula">P(X = x) = (e⁻λ · λˣ) / x! &nbsp;&nbsp; for x = 0, 1, 2, 3, …</div>
+      <div class="formula">E(X) = V(X) = λ &nbsp;&nbsp;|&nbsp;&nbsp; σ = √λ</div>
+      <div class="formula-desc">e ≈ 2.71828 (Euler's number) &nbsp;|&nbsp; λ is both the mean and variance — a unique feature!</div>
+    </div>
+
+    <div class="concepts-grid">
+      <div class="concept-card">
+        <div class="concept-card-icon">📞</div>
+        <div class="concept-card-title">Call Centers</div>
+        <div class="concept-card-body">Model the number of calls received per hour to know how many agents to staff. If λ = 10 calls/hour, P(X = 0) ≈ 0.000045.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-card-icon">🍽️</div>
+        <div class="concept-card-title">Restaurants</div>
+        <div class="concept-card-body">Model customer arrivals per day to optimize staffing, seating capacity, and food preparation schedules.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-card-icon">🔬</div>
+        <div class="concept-card-title">Rare Events</div>
+        <div class="concept-card-body">Model rare manufacturing defects, radioactive decay events, or mutations — when p is very small and n very large.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-card-icon">🚗</div>
+        <div class="concept-card-title">Traffic Flow</div>
+        <div class="concept-card-body">Count vehicle arrivals at an intersection per minute to design traffic signals and road capacity.</div>
+      </div>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; margin:2rem 0 1rem;">Example — Telephone Choices</h3>
+    <div class="info-box purple">
+      <span class="info-icon">📱</span>
+      <p>1000 telephone models available. 200 managers each pick independently and uniformly. λ = np = 200 × (1/1000) = <strong>0.2</strong>.<br><br>
+      P(0) = e⁻⁰·² × 0.2⁰ / 0! ≈ <strong>0.8187</strong> &nbsp;|&nbsp;
+      P(1) ≈ <strong>0.1637</strong> &nbsp;|&nbsp;
+      P(2) ≈ <strong>0.0164</strong> &nbsp;|&nbsp;
+      P(3) ≈ <strong>0.0011</strong></p>
+    </div>
+
+    <!-- Poisson interactive chart -->
+    <div class="chart-wrap">
+      <div class="chart-title">POISSON DISTRIBUTION — INTERACTIVE EXPLORER</div>
+      <div class="calc-row" style="margin-bottom:1rem;">
+        <div class="calc-field">
+          <label>λ (average rate)</label>
+          <input type="number" id="poissonLambda" value="3" min="0.1" max="20" step="0.1" oninput="drawPoisson()">
+        </div>
+      </div>
+      <canvas id="poissonChart" height="220"></canvas>
+      <div id="poissonStats" style="font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--muted); margin-top:0.8rem;"></div>
+    </div>
+
+    <!-- Poisson Calculator -->
+    <div class="calc-wrap">
+      <div class="calc-title">🧮 Poisson Probability Calculator</div>
+      <div class="calc-row">
+        <div class="calc-field">
+          <label>λ (mean rate)</label>
+          <input type="number" id="pcLambda" value="3" min="0.1" step="0.1">
+        </div>
+        <div class="calc-field">
+          <label>x (number of events)</label>
+          <input type="number" id="pcX" value="2" min="0" step="1">
+        </div>
+        <button class="calc-btn" onclick="calcPoisson()">Calculate</button>
+      </div>
+      <div class="calc-result" id="poissonResult">
+        <div class="calc-result-label">Enter λ and x above and click Calculate</div>
+      </div>
+    </div>
+
+    <!-- Poisson Quiz -->
+    <div class="quiz-wrap">
+      <div class="quiz-q">A hospital receives on average λ = 4 emergency cases per hour. What is the probability of receiving exactly 0 cases in a given hour?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">A) 0.2000</button>
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">B) 0.1353</button>
+        <button class="quiz-opt" data-correct="true"  onclick="quiz(this)">C) 0.0183</button>
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">D) 0.0733</button>
+      </div>
+      <div class="quiz-feedback">P(X=0) = e⁻⁴ × 4⁰ / 0! = e⁻⁴ × 1 / 1 = e⁻⁴ ≈ 0.0183.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       7.6 GEOMETRIC
+  ══════════════════════════════════ -->
+  <div class="content-section" id="geometric">
+    <div class="section-header">
+      <div class="section-icon">🔁</div>
+      <div>
+        <div class="section-label-sm">SECTION 7.6</div>
+        <h2 class="section-h2">Geometric Distribution</h2>
+      </div>
+    </div>
+
+    <div class="def-box">
+      <p>The <strong>Geometric distribution</strong> models the number of Bernoulli trials needed to achieve the <em>first</em> success. It is <strong>memoryless</strong> — previous failures do not change the probability of future success. Conditions: independent trials, constant probability p, two outcomes.</p>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula">P(X = n) = (1 − p)⁽ⁿ⁻¹⁾ · p = qⁿ⁻¹ · p</div>
+      <div class="formula">E(X) = 1/p &nbsp;&nbsp;|&nbsp;&nbsp; V(X) = q/p² = (1−p)/p²</div>
+      <div class="formula-desc">n = 1, 2, 3, … (the trial on which first success occurs)</div>
+    </div>
+
+    <div class="info-box gold">
+      <span class="info-icon">🎲</span>
+      <p><strong>Example:</strong> What is the probability of rolling a 3 for the first time on the 5th roll of a fair die?<br>
+      P(X = 5) = (5/6)⁴ × (1/6) = 625/7776 ≈ <strong>0.0804</strong><br>
+      Expected roll: E(X) = 1/p = 1/(1/6) = <strong>6 rolls</strong> on average.</p>
+    </div>
+
+    <div class="dist-compare">
+      <div class="dist-card">
+        <div class="dist-card-title">GEOMETRIC vs. BINOMIAL</div>
+        <ul>
+          <li>Geometric: trials until 1st success (n is random)</li>
+          <li>Binomial: count successes in fixed n trials (x is random)</li>
+          <li>Both use independent Bernoulli trials with constant p</li>
+          <li>Geometric is memoryless; Binomial is not</li>
+        </ul>
+      </div>
+      <div class="dist-card">
+        <div class="dist-card-title">GEOMETRIC vs. POISSON</div>
+        <ul>
+          <li>Geometric: discrete trials until first success</li>
+          <li>Poisson: events in a continuous time/space interval</li>
+          <li>Geometric has clear trial structure; Poisson uses rate λ</li>
+          <li>Different applications, both model waiting / counting</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Geometric Quiz -->
+    <div class="quiz-wrap">
+      <div class="quiz-q">A student passes a driving test with probability p = 0.3 each attempt. What is the expected number of attempts needed to pass?</div>
+      <div class="quiz-opts">
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">A) 0.3 attempts</button>
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">B) 3 attempts</button>
+        <button class="quiz-opt" data-correct="true"  onclick="quiz(this)">C) ≈ 3.33 attempts</button>
+        <button class="quiz-opt" data-correct="false" onclick="quiz(this)">D) 10 attempts</button>
+      </div>
+      <div class="quiz-feedback">E(X) = 1/p = 1/0.3 ≈ 3.33 attempts on average until first success.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       DISTRIBUTION COMPARISON TABLE
+  ══════════════════════════════════ -->
+  <div class="content-section">
+    <div class="section-header">
+      <div class="section-icon">📋</div>
+      <div>
+        <div class="section-label-sm">SUMMARY</div>
+        <h2 class="section-h2">Distribution Comparison</h2>
+      </div>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Distribution</th>
+            <th>Notation</th>
+            <th>What X counts</th>
+            <th>PMF</th>
+            <th>Mean</th>
+            <th>Variance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Bernoulli</td>
+            <td>Bern(p)</td>
+            <td>1 trial: success (1) or failure (0)</td>
+            <td>pˣ(1−p)¹⁻ˣ</td>
+            <td class="td-highlight">p</td>
+            <td class="td-highlight">p(1−p)</td>
+          </tr>
+          <tr>
+            <td>Binomial</td>
+            <td>B(n, p)</td>
+            <td>Successes in n Bernoulli trials</td>
+            <td>ⁿCₓ pˣ qⁿ⁻ˣ</td>
+            <td class="td-highlight">np</td>
+            <td class="td-highlight">npq</td>
+          </tr>
+          <tr>
+            <td>Poisson</td>
+            <td>Pois(λ)</td>
+            <td>Events in fixed time/space interval</td>
+            <td>e⁻λ λˣ / x!</td>
+            <td class="td-highlight">λ</td>
+            <td class="td-highlight">λ</td>
+          </tr>
+          <tr>
+            <td>Geometric</td>
+            <td>Geom(p)</td>
+            <td>Trials until first success</td>
+            <td>qⁿ⁻¹ · p</td>
+            <td class="td-highlight">1/p</td>
+            <td class="td-highlight">q/p²</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<footer>
+  <div class="footer-logo">DS 501</div>
+  <p>Lecture 7 · Discrete Random Variables · Prof. Salah Mahdy</p>
+  <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:1rem; margin-top:1.5rem;">
+    <a href="lecture6.html" style="border:1px solid var(--border);color:var(--white);padding:0.75rem 1.8rem;border-radius:8px;text-decoration:none;font-weight:500;font-size:0.9rem;">← Back to Lecture 6</a>
+    <a href="index.html" style="background:var(--accent);color:var(--navy);padding:0.75rem 1.8rem;border-radius:8px;text-decoration:none;font-weight:700;font-size:0.9rem;">Back to Home ↩</a>
+  </div>
+</footer>
+
+<script>
+/* ── QUIZ ── */
+function quiz(btn) {
+  const wrap = btn.closest('.quiz-wrap');
+  if (wrap.querySelector('.correct')) return;
+  const opts = wrap.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.disabled = true);
+  btn.classList.add(btn.dataset.correct === 'true' ? 'correct' : 'wrong');
+  if (btn.dataset.correct !== 'true') {
+    opts.forEach(o => { if (o.dataset.correct === 'true') o.classList.add('correct'); });
+  }
+  const fb = wrap.querySelector('.quiz-feedback');
+  fb.classList.add('show');
+}
+
+/* ── DRAW CHART HELPER ── */
+function barChart(canvasId, labels, values, color, highlightIdx) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 600;
+  canvas.width = W; canvas.height = parseInt(canvas.getAttribute('height')) || 220;
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const pad = { top: 20, right: 20, bottom: 40, left: 50 };
+  const maxVal = Math.max(...values) * 1.15 || 0.01;
+  const barW = Math.max(8, (w - pad.left - pad.right) / values.length - 6);
+  const totalW = w - pad.left - pad.right;
+  const step = totalW / values.length;
+
+  // Gridlines
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (h - pad.top - pad.bottom) * (1 - i / 4);
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w - pad.right, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.font = '10px DM Mono, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText((maxVal * i / 4).toFixed(3), pad.left - 4, y + 3);
+  }
+
+  // Bars
+  values.forEach((v, i) => {
+    const x = pad.left + i * step + (step - barW) / 2;
+    const bh = (v / maxVal) * (h - pad.top - pad.bottom);
+    const y = h - pad.bottom - bh;
+
+    const grad = ctx.createLinearGradient(x, y, x, h - pad.bottom);
+    const c = (i === highlightIdx) ? '#e8a230' : color;
+    grad.addColorStop(0, c + 'cc');
+    grad.addColorStop(1, c + '44');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x, y, barW, bh, [4, 4, 0, 0]) : ctx.rect(x, y, barW, bh);
+    ctx.fill();
+
+    // Label
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = '10px DM Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(labels[i], x + barW / 2, h - pad.bottom + 14);
+
+    // Value label
+    if (v > 0.005) {
+      ctx.fillStyle = (i === highlightIdx) ? '#e8a230' : 'rgba(255,255,255,0.5)';
+      ctx.fillText(v.toFixed(3), x + barW / 2, y - 4);
+    }
+  });
+}
+
+/* ── BIRTHS CHART ── */
+function drawBirths() {
+  barChart('birthsChart', ['0','1','2','3','4'], [1/16,4/16,6/16,4/16,1/16], '#b87aff', 2);
+}
+
+/* ── BINOMIAL CHART ── */
+function factorial(n) { if (n <= 1) return 1; let r = 1; for (let i = 2; i <= n; i++) r *= i; return r; }
+function binomPMF(n, p, x) {
+  const c = factorial(n) / (factorial(x) * factorial(n - x));
+  return c * Math.pow(p, x) * Math.pow(1 - p, n - x);
+}
+
+function drawBinomial() {
+  const n = parseInt(document.getElementById('binN').value) || 10;
+  const p = parseFloat(document.getElementById('binP').value) || 0.4;
+  const q = 1 - p;
+  const labels = [], vals = [];
+  for (let x = 0; x <= n; x++) { labels.push(x); vals.push(binomPMF(n, p, x)); }
+  const mode = Math.floor((n + 1) * p);
+  barChart('binomialChart', labels, vals, '#3ecfb2', mode);
+  const mu = (n * p).toFixed(3), sigma = Math.sqrt(n * p * q).toFixed(3);
+  document.getElementById('binomStats').textContent = `μ = ${mu}  |  σ² = ${(n*p*q).toFixed(3)}  |  σ = ${sigma}`;
+}
+
+/* ── POISSON CHART ── */
+function poissonPMF(lambda, x) {
+  let val = Math.exp(-lambda);
+  for (let i = 1; i <= x; i++) val *= lambda / i;
+  return val;
+}
+
+function drawPoisson() {
+  const lambda = parseFloat(document.getElementById('poissonLambda').value) || 3;
+  const maxX = Math.min(30, Math.ceil(lambda + 4 * Math.sqrt(lambda) + 2));
+  const labels = [], vals = [];
+  for (let x = 0; x <= maxX; x++) { labels.push(x); vals.push(poissonPMF(lambda, x)); }
+  const mode = Math.max(0, Math.ceil(lambda) - 1);
+  barChart('poissonChart', labels, vals, '#e8507a', mode);
+  document.getElementById('poissonStats').textContent = `E(X) = V(X) = λ = ${lambda}  |  σ = ${Math.sqrt(lambda).toFixed(3)}`;
+}
+
+/* ── EXPECTED VALUE CALCULATOR ── */
+function calcEV() {
+  const lines = document.getElementById('evInput').value.trim().split('\n');
+  let mu = 0, ex2 = 0, totalP = 0;
+  const pairs = [];
+  try {
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      const [xs, ps] = line.split(':');
+      const x = parseFloat(xs), p = parseFloat(ps);
+      if (isNaN(x) || isNaN(p)) throw new Error();
+      pairs.push({x, p});
+      totalP += p; mu += x * p; ex2 += x * x * p;
+    }
+    const variance = ex2 - mu * mu;
+    const sd = Math.sqrt(Math.max(0, variance));
+    document.getElementById('evResult').innerHTML =
+      `<div class="calc-result-val">μ = ${mu.toFixed(4)}</div>
+       <div class="calc-result-val" style="margin-top:0.3rem;">σ² = ${variance.toFixed(4)} &nbsp;|&nbsp; σ = ${sd.toFixed(4)}</div>
+       <div class="calc-result-label" style="margin-top:0.5rem;">Σ P(x) = ${totalP.toFixed(4)} ${Math.abs(totalP - 1) < 0.001 ? '✓ valid' : '⚠ should equal 1'}</div>`;
+  } catch(e) {
+    document.getElementById('evResult').innerHTML = `<div class="calc-result-label" style="color:var(--pink)">Invalid format. Use: value:probability per line.</div>`;
+  }
+}
+
+/* ── POISSON CALCULATOR ── */
+function calcPoisson() {
+  const lambda = parseFloat(document.getElementById('pcLambda').value);
+  const x = parseInt(document.getElementById('pcX').value);
+  if (isNaN(lambda) || isNaN(x) || lambda <= 0 || x < 0) {
+    document.getElementById('poissonResult').innerHTML = `<div class="calc-result-label" style="color:var(--pink)">Please enter valid λ > 0 and x ≥ 0.</div>`;
+    return;
+  }
+  const p = poissonPMF(lambda, x);
+  let cdf = 0;
+  for (let i = 0; i <= x; i++) cdf += poissonPMF(lambda, i);
+  document.getElementById('poissonResult').innerHTML =
+    `<div class="calc-result-val">P(X = ${x}) = ${p.toFixed(6)}</div>
+     <div class="calc-result-val" style="margin-top:0.3rem;">P(X ≤ ${x}) = F(${x}) = ${cdf.toFixed(6)}</div>
+     <div class="calc-result-label" style="margin-top:0.5rem;">λ = ${lambda} | e⁻λ = ${Math.exp(-lambda).toFixed(6)}</div>`;
+}
+
+/* ── INIT ── */
+window.addEventListener('load', () => {
+  drawBirths();
+  drawBinomial();
+  drawPoisson();
+});
+window.addEventListener('resize', () => {
+  drawBirths();
+  drawBinomial();
+  drawPoisson();
+});
+
+/* ── HAMBURGER ── */
+(function(){
+  const btn = document.getElementById('hamburgerBtn');
+  const overlay = document.getElementById('mobileNavOverlay');
+  if(!btn || !overlay) return;
+  function openMenu()  { overlay.classList.add('open'); btn.classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeMenu() { overlay.classList.remove('open'); btn.classList.remove('open'); document.body.style.overflow=''; }
+  btn.addEventListener('click', openMenu);
+  overlay.querySelector('.mnav-close').addEventListener('click', closeMenu);
+  overlay.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+})();
+</script>
+
+</body>
+</html>
