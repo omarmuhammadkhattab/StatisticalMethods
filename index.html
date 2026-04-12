@@ -171,11 +171,21 @@
   .hero-canvas-wrap {
     margin-top: 4rem;
     animation: fadeUp 0.8s 0.5s ease both;
+    width: 100%;
+    max-width: 600px;
+    overflow: hidden;
   }
   .hero-canvas-wrap canvas {
     opacity: 0.6;
     display: block;
-    margin: 0 auto;
+    width: 100% !important;
+    height: auto;
+  }
+
+  /* shrink the text-based stat so it doesn't dwarf numbers on mobile */
+  .hero-meta-item .num.text-stat {
+    font-size: 1.6rem;
+    letter-spacing: 0.04em;
   }
 
   /* ── SECTION ── */
@@ -536,7 +546,7 @@
     </div>
     <div class="hero-divider"></div>
     <div class="hero-meta-item">
-      <div class="num">SPSS</div>
+      <div class="num text-stat">SPSS</div>
       <div class="label">Software</div>
     </div>
   </div>
@@ -548,7 +558,7 @@
 
   <!-- Mini animated bell curve -->
   <div class="hero-canvas-wrap">
-    <canvas id="heroCanvas" width="600" height="100"></canvas>
+    <canvas id="heroCanvas"></canvas>
   </div>
 </div>
 
@@ -714,10 +724,18 @@
     return Math.exp(-0.5 * ((x - mu) / sigma) ** 2);
   }
 
+  function resizeCanvas() {
+    const wrap = canvas.parentElement;
+    const w = Math.min(wrap.clientWidth || 600, 600);
+    canvas.width = w;
+    canvas.height = Math.round(w * 100 / 600); // keep aspect ratio
+  }
+
   let phase = 0;
+  let animId;
   function drawCurve() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
     const mu = w / 2, sigma = w / 8;
 
     // Animated fill
@@ -752,9 +770,17 @@
     ctx.stroke();
 
     phase += 0.008;
-    requestAnimationFrame(drawCurve);
+    animId = requestAnimationFrame(drawCurve);
   }
+
+  resizeCanvas();
   drawCurve();
+
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(animId);
+    resizeCanvas();
+    drawCurve();
+  });
 
   // ── SCROLL REVEAL ──
   const observer = new IntersectionObserver(entries => {
