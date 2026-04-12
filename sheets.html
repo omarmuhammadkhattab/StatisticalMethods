@@ -128,10 +128,10 @@
     background: transparent; color: var(--muted);
   }
   .tf-btn:hover:not(.disabled) { border-color: rgba(232,162,48,0.3); color: var(--white); }
-  .tf-btn.selected-true { border-color: rgba(62,207,178,0.5); color: var(--teal); background: rgba(62,207,178,0.08); }
-  .tf-btn.selected-false { border-color: rgba(232,80,122,0.5); color: var(--pink); background: rgba(232,80,122,0.08); }
-  .tf-btn.correct-reveal { border-color: rgba(78,203,113,0.6) !important; color: var(--green) !important; background: rgba(78,203,113,0.08) !important; }
-  .tf-btn.wrong-reveal { border-color: rgba(232,80,122,0.4) !important; color: var(--pink) !important; }
+  .tf-btn.selected-true  { border-color: rgba(232,162,48,0.5); color: var(--gold);  background: rgba(232,162,48,0.08); }
+  .tf-btn.selected-false { border-color: rgba(232,162,48,0.5); color: var(--gold);  background: rgba(232,162,48,0.08); }
+  .tf-btn.correct-reveal { border-color: rgba(78,203,113,0.8) !important; color: var(--green) !important; background: rgba(78,203,113,0.12) !important; box-shadow: 0 0 12px rgba(78,203,113,0.25); }
+  .tf-btn.wrong-reveal   { border-color: rgba(232,80,122,0.8) !important; color: var(--pink)  !important; background: rgba(232,80,122,0.12) !important; box-shadow: 0 0 12px rgba(232,80,122,0.3); }
   .tf-btn.disabled { cursor: default; pointer-events: none; }
 
   /* REVEAL BUTTON */
@@ -810,7 +810,12 @@ function revealTF(uid, ans, exp) {
   bF.classList.add('disabled');
 
   const correctBtn = ans === 'T' ? bT : bF;
+  const wrongBtn   = ans === 'T' ? bF : bT;
   correctBtn.classList.add('correct-reveal');
+  // If the user actually selected the wrong button, light it red
+  if (wrongBtn.classList.contains('selected-true') || wrongBtn.classList.contains('selected-false')) {
+    wrongBtn.classList.add('wrong-reveal');
+  }
 
   const ansDiv = document.getElementById(`ans-${uid}`);
   const verdictCls = ans === 'T' ? 'true-v' : 'false-v';
