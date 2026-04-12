@@ -319,9 +319,9 @@
   }
 
   @media (max-width: 768px) {
-    nav { padding: 1rem 1.5rem; }
+    nav { padding: 1rem 1.2rem; }
     .nav-links { display: none; }
-    section { padding: 3rem 1.5rem; }
+    section { padding: 3rem 1rem; }
     .stats-row { grid-template-columns: repeat(2, 1fr); }
     .hero-meta { gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
     .hero-meta-item .num { font-size: 1.6rem; }
@@ -332,14 +332,16 @@
     .hero-canvas-wrap canvas { width: 100% !important; height: auto !important; }
     .hero-sub { font-size: 0.95rem; padding: 0 0.5rem; }
     .lectures-grid { grid-template-columns: 1fr; }
+    .hero { padding: 6rem 1.2rem 3rem; }
   }
 
   @media (max-width: 480px) {
-    .hero { padding: 7rem 1.2rem 3rem; }
+    .hero { padding: 5.5rem 1rem 2.5rem; }
     .hero h1 { font-size: clamp(2rem, 10vw, 3rem); }
     .hero-badge { font-size: 0.68rem; letter-spacing: 0.06em; padding: 0.35rem 0.9rem; }
     .stats-row { grid-template-columns: 1fr 1fr; }
-    section { padding: 2.5rem 1rem; }
+    section { padding: 2rem 1rem; }
+    .hero-sub { font-size: 0.9rem; }
   }
 
   /* ═══════════════════════════════════════
@@ -434,8 +436,6 @@
     .nav-links  { display: none !important; }
     nav { padding: 0.9rem 1.2rem; }
 
-    .page-wrap { padding: 2rem 1rem; }
-
     .lecture-hero {
       grid-template-columns: 1fr !important;
       gap: 2rem !important;
@@ -507,6 +507,7 @@
     <a href="lecture5.html">Lecture 5</a>
     <a href="lecture6.html">Lecture 6</a>
     <a href="lecture7.html">Lecture 7</a>
+    <a href="sheets.html" style="color:var(--gold);font-weight:600;">Sheets</a>
   </div>
 
   <button class="hamburger" id="hamburgerBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
@@ -521,6 +522,7 @@
     <a href="lecture5.html">Lecture 5</a>
     <a href="lecture6.html">Lecture 6</a>
     <a href="lecture7.html">Lecture 7</a>
+    <a href="sheets.html" style="color:var(--gold);font-weight:600;">Practice Sheets</a>
 </div>
 
 <!-- HERO -->
@@ -536,7 +538,7 @@
 
   <div class="hero-meta">
     <div class="hero-meta-item">
-      <div class="num">7</div>
+      <div class="num">8</div>
       <div class="label">Lectures</div>
     </div>
     <div class="hero-divider"></div>
@@ -703,6 +705,23 @@
       <div class="card-footer">
         <span class="card-status">Available</span>
         <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="sheets.html" class="lecture-card" style="border-color: rgba(62,207,178,0.18);">
+      <div class="card-num" style="color:var(--teal);">PRACTICE SHEETS</div>
+      <div class="card-icon" style="background:rgba(62,207,178,0.1);">📝</div>
+      <div class="card-title">Practice Sheets</div>
+      <div class="card-desc">Reinforce your understanding with curated practice questions — true/false, multiple choice, and worked problems — drawn from all lecture topics. Reveal answers with full explanations.</div>
+      <div class="card-topics">
+        <span class="topic-tag">True / False</span>
+        <span class="topic-tag">Multiple Choice</span>
+        <span class="topic-tag">Worked Problems</span>
+        <span class="topic-tag">All Lectures</span>
+      </div>
+      <div class="card-footer">
+        <span class="card-status" style="color:var(--teal);">Available</span>
+        <span class="card-arrow" style="color:var(--teal);">→</span>
       </div>
     </a>
 
