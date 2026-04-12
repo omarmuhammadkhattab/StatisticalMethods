@@ -73,6 +73,8 @@
     align-items: center; justify-content: center;
     text-align: center;
     padding: 8rem 2rem 4rem;
+    overflow-x: hidden;
+    width: 100%;
   }
   .hero-badge {
     display: inline-flex; align-items: center; gap: 0.5rem;
@@ -86,6 +88,10 @@
     letter-spacing: 0.1em;
     margin-bottom: 2rem;
     animation: fadeUp 0.8s ease both;
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.4;
   }
   .hero-badge::before { content: '◈'; }
 
@@ -333,12 +339,13 @@
     .hero-sub { font-size: 0.95rem; padding: 0 0.5rem; }
     .lectures-grid { grid-template-columns: 1fr; }
     .hero { padding: 6rem 1.2rem 3rem; }
+    .hero-badge { font-size: 0.68rem; letter-spacing: 0.06em; padding: 0.4rem 1rem; }
   }
 
   @media (max-width: 480px) {
     .hero { padding: 5.5rem 1rem 2.5rem; }
     .hero h1 { font-size: clamp(2rem, 10vw, 3rem); }
-    .hero-badge { font-size: 0.68rem; letter-spacing: 0.06em; padding: 0.35rem 0.9rem; }
+    .hero-badge { font-size: 0.62rem; letter-spacing: 0.04em; padding: 0.35rem 0.8rem; }
     .stats-row { grid-template-columns: 1fr 1fr; }
     section { padding: 2rem 1rem; }
     .hero-sub { font-size: 0.9rem; }
