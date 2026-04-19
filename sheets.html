@@ -81,9 +81,11 @@
 
   /* PROGRESS BAR */
   .progress-wrap { margin-bottom: 2rem; }
-  .progress-label { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.08em; margin-bottom: 0.5rem; }
-  .progress-bar { height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--gold)); border-radius: 99px; transition: width 0.4s; }
+  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+  .progress-label { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.08em; }
+  .progress-pct { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--teal); font-weight: 500; }
+  .progress-bar { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--gold)); border-radius: 99px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
 
   /* CONTEXT BOX (for dataset questions) */
   .context-box {
@@ -92,18 +94,20 @@
   }
   .context-box h4 { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--teal); letter-spacing: 0.1em; margin-bottom: 0.6rem; text-transform: uppercase; }
   .context-box p { color: var(--muted); font-size: 0.88rem; line-height: 1.8; }
-  .context-box .data-vals { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--white); line-height: 1.8; margin-top: 0.4rem; }
+  .context-box .data-vals { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--white); line-height: 1.8; margin-top: 0.4rem; white-space: pre-wrap; word-break: break-word; overflow-x: auto; max-width: 100%; }
+  .context-box .data-table { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--white); line-height: 1.8; margin-top: 0.4rem; white-space: pre; overflow-x: auto; display: block; max-width: 100%; }
 
   /* QUESTION CARD */
   .q-card {
     background: var(--card); border: 1px solid var(--border);
     border-radius: 12px; padding: 1.8rem; margin-bottom: 1.2rem;
-    transition: border-color 0.2s;
+    transition: border-color 0.3s, box-shadow 0.3s;
   }
-  .q-card.revealed { border-color: rgba(78,203,113,0.25); }
+  .q-card:hover { border-color: rgba(255,255,255,0.12); }
+  .q-card.revealed { border-color: rgba(78,203,113,0.25); box-shadow: 0 4px 24px rgba(78,203,113,0.06); }
   .q-meta { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; }
   .q-meta::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .q-text { font-size: 0.95rem; line-height: 1.7; color: var(--white); margin-bottom: 1.2rem; }
+  .q-text { font-size: 0.95rem; line-height: 1.7; color: var(--white); margin-bottom: 1.2rem; white-space: pre-wrap; }
   .q-text strong { color: var(--gold); }
 
   /* MCQ OPTIONS */
@@ -112,44 +116,48 @@
     padding: 0.65rem 1rem; border-radius: 6px;
     border: 1px solid var(--border); font-size: 0.88rem; color: var(--muted);
     cursor: pointer; transition: all 0.15s; text-align: left;
-    background: transparent;
+    background: transparent; font-family: 'DM Sans', sans-serif;
   }
-  .mcq-opt:hover:not(.disabled) { border-color: rgba(232,162,48,0.3); color: var(--white); background: rgba(232,162,48,0.04); }
-  .mcq-opt.selected { border-color: rgba(232,162,48,0.5); color: var(--white); background: rgba(232,162,48,0.08); }
-  .mcq-opt.correct { border-color: rgba(78,203,113,0.6); color: var(--green); background: rgba(78,203,113,0.08); }
-  .mcq-opt.wrong { border-color: rgba(232,80,122,0.4); color: var(--pink); background: rgba(232,80,122,0.06); }
+  .mcq-opt:hover:not(.disabled) { border-color: rgba(232,162,48,0.35); color: var(--white); background: rgba(232,162,48,0.05); transform: translateX(2px); }
+  .mcq-opt.selected { border-color: rgba(232,162,48,0.6); color: var(--white); background: rgba(232,162,48,0.1); }
+  .mcq-opt.correct { border-color: rgba(78,203,113,0.7); color: var(--green); background: rgba(78,203,113,0.1); }
+  .mcq-opt.wrong { border-color: rgba(232,80,122,0.4); color: var(--pink); background: rgba(232,80,122,0.07); }
   .mcq-opt.disabled { cursor: default; pointer-events: none; }
 
   /* TF BUTTONS */
   .tf-btns { display: flex; gap: 0.8rem; margin-bottom: 1.2rem; }
   .tf-btn {
-    padding: 0.6rem 2rem; border-radius: 6px; font-size: 0.88rem; font-weight: 600;
+    padding: 0.65rem 2.2rem; border-radius: 6px; font-size: 0.88rem; font-weight: 600;
     cursor: pointer; transition: all 0.2s; border: 1px solid var(--border);
-    background: transparent; color: var(--muted);
+    background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif;
   }
-  .tf-btn:hover:not(.disabled) { border-color: rgba(232,162,48,0.3); color: var(--white); }
-  .tf-btn.selected-true  { border-color: rgba(232,162,48,0.5); color: var(--gold);  background: rgba(232,162,48,0.08); }
-  .tf-btn.selected-false { border-color: rgba(232,162,48,0.5); color: var(--gold);  background: rgba(232,162,48,0.08); }
-  .tf-btn.correct-reveal { border-color: rgba(78,203,113,0.8) !important; color: var(--green) !important; background: rgba(78,203,113,0.12) !important; box-shadow: 0 0 12px rgba(78,203,113,0.25); }
-  .tf-btn.wrong-reveal   { border-color: rgba(232,80,122,0.8) !important; color: var(--pink)  !important; background: rgba(232,80,122,0.12) !important; box-shadow: 0 0 12px rgba(232,80,122,0.3); }
+  .tf-btn:hover:not(.disabled) { border-color: rgba(232,162,48,0.4); color: var(--white); background: rgba(232,162,48,0.06); }
+  .tf-btn.selected-true  { border-color: rgba(232,162,48,0.6); color: var(--gold);  background: rgba(232,162,48,0.1); }
+  .tf-btn.selected-false { border-color: rgba(232,162,48,0.6); color: var(--gold);  background: rgba(232,162,48,0.1); }
+  .tf-btn.correct-reveal { border-color: rgba(78,203,113,0.8) !important; color: var(--green) !important; background: rgba(78,203,113,0.12) !important; box-shadow: 0 0 14px rgba(78,203,113,0.2); }
+  .tf-btn.wrong-reveal   { border-color: rgba(232,80,122,0.8) !important; color: var(--pink)  !important; background: rgba(232,80,122,0.12) !important; box-shadow: 0 0 14px rgba(232,80,122,0.25); }
   .tf-btn.disabled { cursor: default; pointer-events: none; }
 
   /* REVEAL BUTTON */
   .reveal-btn {
-    padding: 0.55rem 1.4rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600;
-    cursor: pointer; border: 1px solid rgba(232,162,48,0.35);
-    background: rgba(232,162,48,0.08); color: var(--gold);
+    padding: 0.6rem 1.5rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; border: 1px solid rgba(232,162,48,0.4);
+    background: rgba(232,162,48,0.09); color: var(--gold);
     transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+    position: relative; overflow: hidden;
   }
-  .reveal-btn:hover { background: rgba(232,162,48,0.15); border-color: rgba(232,162,48,0.5); }
-  .reveal-btn:disabled { opacity: 0.4; cursor: default; }
+  .reveal-btn::after { content: ''; position: absolute; inset: 0; background: rgba(232,162,48,0.1); opacity: 0; transition: opacity 0.2s; }
+  .reveal-btn:hover::after { opacity: 1; }
+  .reveal-btn:hover { border-color: rgba(232,162,48,0.6); box-shadow: 0 0 16px rgba(232,162,48,0.15); }
+  .reveal-btn:disabled { opacity: 0.35; cursor: default; box-shadow: none; }
+  .reveal-btn:disabled::after { display: none; }
 
   /* ANSWER REVEAL */
   .answer-box {
     display: none; margin-top: 1.2rem;
     background: rgba(78,203,113,0.06); border: 1px solid rgba(78,203,113,0.2);
     border-radius: 8px; padding: 1.2rem 1.5rem;
-    animation: fadeUp 0.3s ease;
+    animation: fadeUp 0.35s ease;
   }
   .answer-box.show { display: block; }
   .answer-verdict {
@@ -161,34 +169,104 @@
   .answer-verdict.choice-v { color: var(--gold); }
   .answer-explanation { color: var(--muted); font-size: 0.88rem; line-height: 1.75; }
   .answer-explanation strong { color: var(--white); }
-  .answer-explanation .math { font-family: 'DM Mono', monospace; color: var(--gold); font-size: 0.85rem; display: block; margin: 0.4rem 0; padding: 0.3rem 0.6rem; background: rgba(232,162,48,0.06); border-radius: 4px; }
+  .answer-explanation .math { font-family: 'DM Mono', monospace; color: var(--gold); font-size: 0.85rem; display: block; margin: 0.4rem 0; padding: 0.35rem 0.75rem; background: rgba(232,162,48,0.07); border-radius: 4px; border-left: 2px solid rgba(232,162,48,0.4); }
 
   /* WORKED PROBLEM */
   .problem-solution {
     display: none; margin-top: 1.2rem;
     background: rgba(62,207,178,0.04); border: 1px solid rgba(62,207,178,0.2);
     border-radius: 8px; padding: 1.4rem 1.5rem;
-    animation: fadeUp 0.3s ease;
+    animation: fadeUp 0.35s ease;
   }
   .problem-solution.show { display: block; }
   .sol-label { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--teal); letter-spacing: 0.1em; margin-bottom: 0.8rem; text-transform: uppercase; }
-  .sol-step { color: var(--muted); font-size: 0.88rem; line-height: 1.8; margin-bottom: 0.5rem; }
+  .sol-step { color: var(--muted); font-size: 0.88rem; line-height: 1.8; margin-bottom: 0.7rem; }
   .sol-step strong { color: var(--white); }
-  .sol-step .math { font-family: 'DM Mono', monospace; color: var(--teal); font-size: 0.85rem; display: block; margin: 0.4rem 0; padding: 0.4rem 0.8rem; background: rgba(62,207,178,0.05); border-radius: 4px; border-left: 3px solid var(--teal); }
+  .sol-step .math { font-family: 'DM Mono', monospace; color: var(--teal); font-size: 0.85rem; display: block; margin: 0.4rem 0; padding: 0.4rem 0.8rem; background: rgba(62,207,178,0.05); border-radius: 4px; border-left: 3px solid var(--teal); white-space: pre-wrap; }
 
-  /* REVEAL-ALL */
-  .sheet-actions { display: flex; gap: 0.8rem; margin-bottom: 2rem; align-items: center; flex-wrap: wrap; }
-  .btn-reveal-all {
-    padding: 0.6rem 1.5rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600;
-    cursor: pointer; border: 1px solid var(--border);
-    background: var(--card); color: var(--muted);
-    transition: all 0.2s;
+  /* SHEET ACTIONS */
+  .sheet-actions { display: flex; gap: 0.7rem; margin-bottom: 1.2rem; align-items: center; flex-wrap: wrap; }
+  .btn-reveal-all, .btn-reset {
+    padding: 0.55rem 1.3rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
   }
-  .btn-reveal-all:hover { border-color: rgba(232,162,48,0.3); color: var(--gold); }
-  .score-badge { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--muted); }
+  .btn-reveal-all {
+    border: 1px solid var(--border); background: var(--card); color: var(--muted);
+  }
+  .btn-reveal-all:hover { border-color: rgba(232,162,48,0.35); color: var(--gold); background: rgba(232,162,48,0.06); }
+  .btn-reset {
+    border: 1px solid rgba(232,80,122,0.2); background: rgba(232,80,122,0.05); color: rgba(232,80,122,0.7);
+  }
+  .btn-reset:hover { border-color: rgba(232,80,122,0.45); color: var(--pink); background: rgba(232,80,122,0.1); }
+  .score-badge { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--muted); margin-left: auto; }
   .score-badge span { color: var(--gold); }
 
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  /* COMPLETE BADGE */
+  .complete-banner {
+    display: none; margin-top: 1.5rem; padding: 1rem 1.5rem;
+    background: rgba(78,203,113,0.08); border: 1px solid rgba(78,203,113,0.3);
+    border-radius: 10px; text-align: center;
+    font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--green);
+    letter-spacing: 0.06em; animation: fadeUp 0.4s ease;
+  }
+  .complete-banner.show { display: block; }
+
+  /* PART DIVIDER */
+  .part-divider {
+    margin: 2rem 0 1.2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+  }
+  .part-divider p { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--gold); letter-spacing: 0.1em; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes wiggle { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-4px)} 40%{transform:translateX(4px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
+  .wiggle { animation: wiggle 0.4s ease; }
+
+  /* SHEET NAV */
+  .sheet-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); gap: 1rem;
+  }
+  .nav-sheet-btn {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.7rem 1.4rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+    border: 1px solid var(--border); background: var(--card); color: var(--muted);
+    text-decoration: none;
+  }
+  .nav-sheet-btn:hover { border-color: rgba(232,162,48,0.5); color: var(--gold); background: rgba(232,162,48,0.08); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(232,162,48,0.12); }
+  .nav-sheet-btn.primary { border-color: rgba(232,162,48,0.4); color: var(--gold); background: rgba(232,162,48,0.09); }
+  .nav-sheet-btn.primary:hover { background: rgba(232,162,48,0.15); }
+  .nav-sheet-btn:disabled, .nav-sheet-btn.hidden { opacity: 0; pointer-events: none; }
+  .nav-sheet-center { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); letter-spacing: 0.05em; }
+
+  /* BACK TO TOP */
+  .back-top {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 500;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(232,162,48,0.15); border: 1px solid rgba(232,162,48,0.4);
+    color: var(--gold); font-size: 1.2rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s; opacity: 0; pointer-events: none;
+    backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .back-top.visible { opacity: 1; pointer-events: all; }
+  .back-top:hover { background: rgba(232,162,48,0.25); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(232,162,48,0.2); }
+
+  /* Improved q-text */
+  .q-text { font-size: 0.97rem; line-height: 1.75; color: var(--white); margin-bottom: 1.2rem; white-space: pre-wrap; font-weight: 400; }
+  .q-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.8rem; margin-bottom: 1.4rem; transition: border-color 0.3s, box-shadow 0.3s; box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
+  .q-card:hover { border-color: rgba(255,255,255,0.14); box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+  .q-card.revealed { border-color: rgba(78,203,113,0.25); box-shadow: 0 4px 24px rgba(78,203,113,0.08); }
+
+  /* Sheet info pill */
+  .sheet-info-pill {
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    margin-bottom: 1.5rem; padding: 0.8rem 1.2rem;
+    background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+    border-radius: 8px; font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted);
+  }
+  .sheet-info-pill .pill-item { display: flex; align-items: center; gap: 0.4rem; }
+  .sheet-info-pill .pill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
   footer { position: relative; z-index: 1; border-top: 1px solid var(--border); text-align: center; padding: 2.5rem; color: var(--muted); font-size: 0.85rem; }
   footer .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--gold); margin-bottom: 0.4rem; }
 
@@ -201,8 +279,48 @@
     .sheet-tab { font-size: 0.72rem; padding: 0.45rem 0.9rem; }
     .q-card { padding: 1.2rem; }
     .tf-btns { gap: 0.5rem; }
-    .tf-btn { padding: 0.5rem 1.2rem; }
+    .tf-btn { padding: 0.55rem 1.3rem; }
+    .mcq-opt:hover:not(.disabled) { transform: none; }
+    .nav-sheet-btn { padding: 0.6rem 1rem; font-size: 0.78rem; }
+    .back-top { bottom: 1.2rem; right: 1.2rem; width: 40px; height: 40px; }
   }
+
+  /* Z-TABLE MODAL */
+  .ztable-btn {
+    padding: 0.55rem 1.1rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600;
+    cursor: pointer; border: 1px solid rgba(62,207,178,0.35); background: rgba(62,207,178,0.08); color: var(--teal);
+    font-family: "DM Sans", sans-serif; transition: all 0.2s; letter-spacing: 0.02em;
+  }
+  .ztable-btn:hover { background: rgba(62,207,178,0.15); border-color: rgba(62,207,178,0.6); box-shadow: 0 0 14px rgba(62,207,178,0.15); }
+  .ztable-overlay {
+    display: none; position: fixed; inset: 0; z-index: 900;
+    background: rgba(8,13,30,0.92); backdrop-filter: blur(12px);
+    align-items: center; justify-content: center; padding: 1rem;
+  }
+  .ztable-overlay.open { display: flex; }
+  .ztable-modal {
+    background: var(--navy2); border: 1px solid rgba(62,207,178,0.25);
+    border-radius: 16px; padding: 1.5rem; max-width: 820px; width: 100%;
+    max-height: 88vh; overflow-y: auto; position: relative;
+    box-shadow: 0 8px 60px rgba(0,0,0,0.6);
+  }
+  .ztable-modal h3 { font-family: "Playfair Display", serif; font-size: 1.2rem; color: var(--gold); margin-bottom: 0.3rem; }
+  .ztable-modal .ztable-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 1rem; line-height: 1.6; }
+  .ztable-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--muted); font-size: 1.4rem; cursor: pointer; transition: color 0.2s; }
+  .ztable-close:hover { color: var(--white); }
+  .ztable-calc { display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.2rem; padding: 1rem; background: rgba(62,207,178,0.04); border: 1px solid rgba(62,207,178,0.15); border-radius: 8px; }
+  .ztable-calc label { font-family: "DM Mono", monospace; font-size: 0.78rem; color: var(--muted); }
+  .ztable-calc input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--white); padding: 0.4rem 0.7rem; border-radius: 5px; font-family: "DM Mono", monospace; font-size: 0.88rem; width: 90px; }
+  .ztable-calc input:focus { outline: none; border-color: rgba(62,207,178,0.5); }
+  .ztable-result { font-family: "DM Mono", monospace; font-size: 0.9rem; color: var(--teal); font-weight: 600; min-width: 160px; }
+  .ztable-wrap { overflow-x: auto; }
+  table.zt { border-collapse: collapse; font-family: "DM Mono", monospace; font-size: 0.72rem; width: 100%; }
+  table.zt th { background: rgba(62,207,178,0.1); color: var(--teal); padding: 0.35rem 0.5rem; text-align: center; position: sticky; top: 0; border: 1px solid rgba(255,255,255,0.05); }
+  table.zt td { padding: 0.3rem 0.5rem; text-align: center; border: 1px solid rgba(255,255,255,0.04); color: var(--muted); transition: all 0.15s; cursor: default; }
+  table.zt tr:hover td { background: rgba(62,207,178,0.06); color: var(--white); }
+  table.zt td.zt-row-h { color: var(--teal); font-weight: 600; background: rgba(62,207,178,0.05); }
+  table.zt td.zt-hi { background: rgba(232,162,48,0.2) !important; color: var(--gold) !important; font-weight: 700; border-color: rgba(232,162,48,0.4) !important; }
+  .ztable-legend { font-size: 0.75rem; color: var(--muted); margin-top: 0.8rem; line-height: 1.7; }
 </style>
 </head>
 <body>
@@ -249,6 +367,28 @@
   <div class="footer-logo">DS 501</div>
   <p>Statistical Methods · Cairo University</p>
 </footer>
+
+
+<div class="ztable-overlay" id="ztableOverlay">
+  <div class="ztable-modal">
+    <button class="ztable-close" onclick="document.getElementById('ztableOverlay').classList.remove('open')">✕</button>
+    <h3>Standard Normal Distribution Table</h3>
+    <p class="ztable-sub">Values show <strong>P(Z &lt; z)</strong> — the cumulative probability to the <em>left</em> of z.<br>Example: P(Z &lt; 1.25) = 0.8944 → read row 1.2, column 0.05.</p>
+    <div class="ztable-calc">
+      <label>Enter z-score:</label>
+      <input type="number" id="zcalcInput" step="0.01" min="-3.49" max="3.49" placeholder="e.g. 1.25" oninput="calcZ()">
+      <div class="ztable-result" id="zcalcResult">P(Z &lt; z) = —</div>
+    </div>
+    <div class="ztable-wrap" id="ztableWrap"></div>
+    <p class="ztable-legend">
+      <strong>How to use:</strong> For P(Z &gt; z), compute 1 − P(Z &lt; z). &nbsp;|&nbsp;
+      For P(a &lt; Z &lt; b), compute P(Z &lt; b) − P(Z &lt; a). &nbsp;|&nbsp;
+      For negative z, use: P(Z &lt; −z) = 1 − P(Z &lt; z) by symmetry.
+    </p>
+  </div>
+</div>
+
+<button class="back-top" id="backTopBtn" aria-label="Back to top" title="Back to top">↑</button>
 
 <script>
 // ══════════════════════════════════════════════════════
@@ -416,9 +556,19 @@ const SHEETS = [
     { q: "Platykurtic distribution is:", opts: ["Moderate in breadth with a medium peaked height.", "More values in the distribution tails and more values close to the mean.", "Fewer values in the tails and fewer values close to the mean (flat, wide).", "None of the above."], ans: 2, exp: "<strong>Platykurtic</strong> (negative kurtosis) distributions are flatter and broader than normal, with lighter tails — fewer extreme values." },
     { q: "The best measure of central tendency for homogeneous (symmetric) data is:", opts: ["Mean", "Median", "Mode", "None of the above"], ans: 0, exp: "For symmetric, homogeneous data without outliers, the <strong>arithmetic mean</strong> is the most efficient and informative measure of central tendency." },
     { q: "68% from the normal data lie between:", opts: ["µ − σ and µ + σ", "µ − 2σ and µ + 2σ", "µ − 3σ and µ + 3σ", "None of the above"], ans: 0, exp: "The <strong>Empirical Rule (68-95-99.7)</strong>: 68% of data in a normal distribution falls within one standard deviation of the mean." },
-    { q: "The best measure of central tendency for homogeneous data is:", opts: ["Mean", "Median", "Mode", "None of the above"], ans: 0, exp: "Repeated from above: the <strong>mean</strong> is optimal for symmetric, homogeneous data." },
+    { q: "The best measure of central tendency for homogeneous data is:", opts: ["Mean", "Median", "Mode", "None of the above"], ans: 0, exp: "The <strong>mean</strong> is optimal for symmetric, homogeneous data." },
     { q: "The mode is:", opts: ["Easy to find mathematically or graphically.", "Not affected by outliers.", "Both of the above.", "None of the above."], ans: 2, exp: "The <strong>mode</strong> is the most frequently occurring value — it is easy to identify visually from a histogram or frequency table, and extreme outlier values do not shift it." },
-    { q: "A student scored 70 in the midterm and obtained 75 and 85 in the final and oral exams. Their average grade is:", opts: ["85", "80", "90", "75"], ans: 1, exp: "<span class='math'>Average = (70 + 75 + 85) / 3 = 230 / 3 ≈ 76.7 ≈ 80 (if midterm is omitted: (75+85)/2 = 80)</span>Based on the answer choices and typical exam structure, the average of final (75) and oral (85) is <strong>80</strong>." },
+    { q: "99% from the normal data lie between:", opts: ["(µ − 3σ) and (µ + 3σ)", "(µ − 2σ) and (µ + 2σ)", "(µ − σ) and (µ + σ)", "None of the above"], ans: 0, exp: "The <strong>Empirical Rule (68-95-99.7)</strong>: 99.7% (≈99%) of data in a normal distribution lies within <strong>three</strong> standard deviations of the mean: µ ± 3σ. Compare: 68% within µ ± σ, 95% within µ ± 2σ." },
+    { q: "The best measure of central tendency for qualitative data is:", opts: ["Mean", "Median", "Mode", "None of the above"], ans: 2, exp: "The <strong>mode</strong> is the only valid measure of central tendency for nominal qualitative data (e.g., the most common nationality, gender, or blood type). You cannot compute a mean or median for non-ordered categories." },
+    { q: "The measure of central tendency is:", opts: ["A measure to determine the centre of the available data.", "Used to describe and analyse data.", "Used to infer characteristics of a population from a sample.", "All the above."], ans: 3, exp: "Measures of central tendency serve all three functions: they locate the centre of a distribution, summarise and describe data, and are used in inferential procedures (e.g., comparing sample means to make population-level conclusions)." },
+    { q: "The median is:", opts: ["Easy to understand and usable for ordinal data.", "Always available for any quantitative data.", "Not much affected by outliers.", "All the above."], ans: 3, exp: "The median has all three advantages: (a) it can be found for ordinal data; (b) it is defined for any quantitative dataset; and (c) because it is a positional measure, extreme outliers do not distort it (unlike the mean)." },
+    { q: "The mode is:", opts: ["Not affected by outliers.", "Its value depends on frequency, not magnitude.", "Used for qualitative data (nominal or ordinal).", "All the above."], ans: 3, exp: "All three statements are true of the mode: it ignores extreme values entirely, it is determined by which value appears most often (not size), and it is the correct measure for qualitative/categorical data." },
+    { q: "Advantages of the arithmetic mean include:", opts: ["All quantitative data have an arithmetic mean.", "All values are included in the calculation.", "The sum of deviations from the mean is zero.", "All the above."], ans: 3, exp: "All three are textbook advantages of the arithmetic mean: (a) it always exists for quantitative data; (b) every data point contributes to it; and (c) Σ(xᵢ − x̄) = 0 by definition — the mean is the balance point of the distribution." },
+    { q: "If the Age data has skewness close to zero, then the data is:", opts: ["Normal (symmetric)", "Positive skewness", "Negative skewness", "Leptokurtic"], ans: 0, exp: "Skewness ≈ 0 indicates the distribution is <strong>approximately symmetric</strong> — the mean, median, and mode are roughly equal. This is characteristic of a <strong>normal distribution</strong>." },
+    { q: "If the Blood Pressure data has negative skewness, then:", opts: ["Mean = Median = Mode", "Mean > Median > Mode", "Mean < Median < Mode", "None of the above"], ans: 2, exp: "In a <strong>negatively (left) skewed</strong> distribution, the long tail is to the left. The mean is pulled furthest left by the extreme low values, and the order is: <strong>Mean &lt; Median &lt; Mode</strong>." },
+    { q: "Observations follow a normal distribution with mean 100 and variance 225. The percentage of observations between 85 and 115 is:", opts: ["68%", "95%", "99%", "5%"], ans: 0, exp: "<span class='math'>σ = √225 = 15</span><span class='math'>85 = 100 − 15 = µ − σ &nbsp;&nbsp; and &nbsp;&nbsp; 115 = 100 + 15 = µ + σ</span>By the Empirical Rule, <strong>68%</strong> of normal data falls within one standard deviation of the mean." },
+    { q: "Blood Pressure data has mean 100 and variance 400. The z-score for a Blood Pressure reading of 105 is:", opts: ["0.35", "0.25", "0.30", "0.40"], ans: 1, exp: "<span class='math'>σ = √400 = 20</span><span class='math'>z = (X − µ) / σ = (105 − 100) / 20 = 5 / 20 = 0.25</span>A z-score of 0.25 means the reading of 105 is 0.25 standard deviations above the mean." },
+        { q: "The final exam has a weight 4× the oral exam. A student scores 80 in the final exam and 75 and 85 in the two oral exams. Their weighted average grade is:", opts: ["85", "80", "90", "75"], ans: 1, exp: "<span class='math'>Average oral score = (75 + 85) / 2 = 80</span><span class='math'>Weighted avg = (Final × 4 + Oral₁ × 1 + Oral₂ × 1) / (4 + 1 + 1)</span><span class='math'>= (80×4 + 75×1 + 85×1) / 6 = (320 + 75 + 85) / 6 = 480 / 6 = 80</span>The weighted grade is <strong>80</strong>. Note: because the average oral score equals the final score, the weighting does not change the result here." },
     { q: "A student's grades in three courses are 60, 75, 80 with credit hours 2, 3, 4. The weighted arithmetic mean is:", opts: ["74.88", "72.88", "73.88", "75.88"], ans: 2, exp: "<span class='math'>Weighted Mean = (60×2 + 75×3 + 80×4) / (2+3+4)</span><span class='math'>= (120 + 225 + 320) / 9 = 665 / 9 = 73.89 ≈ 73.88</span>" },
     { q: "To compare the dispersion of two groups measured in the same units, we use:", opts: ["Coefficient of variation", "Standard deviation", "Variance", "None of the above"], ans: 1, exp: "When both groups share the same unit, the <strong>standard deviation (or variance)</strong> can be directly compared. The coefficient of variation is needed when units differ." },
     { q: "To compare the dispersion of two groups measured in different units, we use:", opts: ["Coefficient of variation", "Standard deviation", "Variance", "None of the above"], ans: 0, exp: "The <strong>Coefficient of Variation (CV = SD/Mean × 100%)</strong> is unit-free, allowing fair comparison of variability between datasets measured in different units." },
@@ -444,7 +594,8 @@ const SHEETS = [
   context: {
     title: "Contingency Table — Research Projects by Company and Type",
     text: "Used for questions 3–6:",
-    data: "             | Telecom | Computers | Total\nIBM          |   40    |    25     |   65\nOthers       |   10    |    25     |   35\nTotal        |   50    |    50     |  100"
+    data: "             | Telecom | Computers | Total\nIBM          |   40    |    25     |   65\nOthers       |   10    |    25     |   35\nTotal        |   50    |    50     |  100",
+    isTable: true
   },
   questions: [
     { q: "On February 1, 2003, the Space Shuttle Columbia exploded. This was the second disaster in 113 space missions for NASA. Based on this, the probability that a future mission is successfully completed is:", opts: ["0.90", "0.98", "0.99", "0.95"], ans: 1, exp: "<span class='math'>P(success) = 111 / 113 ≈ 0.982 ≈ 0.98</span>111 successful missions out of 113 total. Using the classical (relative frequency) approach." },
@@ -455,7 +606,12 @@ const SHEETS = [
     { q: "The probability that a project is undertaken by IBM given it is a computers project:", opts: ["40/50", "30/50", "25/50", "10/50"], ans: 2, exp: "<span class='math'>P(IBM | Computers) = 25 / 50</span>Of 50 computer projects, IBM handled 25." },
     { q: "If A is an event that is certain to occur, the probability of it occurring is:", opts: ["0", "1", "0.5", "None of the above"], ans: 1, exp: "A <strong>certain event</strong> always happens — its probability is <strong>1</strong>. An impossible event has probability 0." },
     { q: "A woman gave birth to a male child, and another woman gave birth to a male child. These two events are:", opts: ["Two mutually exclusive events", "Two independent events", "Two complementary events", "Not independent events"], ans: 1, exp: "The gender of one woman's baby has no effect on another woman's baby. These events are <strong>independent</strong> — knowing one outcome does not change the probability of the other." },
-    { q: "A box contains balls numbered 1–15. E₁ = ball with odd number; E₂ = ball with number ≤ 10. P(E₁ ∪ E₂) is:", opts: ["12/15", "13/15", "14/15", "8/15"], ans: 0, exp: "<span class='math'>E₁ (odd) = {1,3,5,7,9,11,13,15} → 8 balls</span><span class='math'>E₂ (≤10) = {1,2,3,...,10} → 10 balls</span><span class='math'>E₁ ∩ E₂ = {1,3,5,7,9} → 5 balls</span><span class='math'>P(E₁ ∪ E₂) = (8+10−5)/15 = 13/15</span>Wait — rechecking: 13/15 matches option b, but 12/15 is option a. Correct calculation gives <strong>13/15</strong>, which is option b." },
+    {
+      q: "A box contains balls numbered 1–15. E₁ = ball with odd number; E₂ = ball with number ≤ 10. P(E₁ ∪ E₂) is:",
+      opts: ["12/15", "13/15", "14/15", "8/15"],
+      ans: 1,
+      exp: "<span class='math'>E₁ (odd) = {1,3,5,7,9,11,13,15} → 8 balls</span><span class='math'>E₂ (≤10) = {1,2,3,...,10} → 10 balls</span><span class='math'>E₁ ∩ E₂ = {1,3,5,7,9} → 5 balls</span><span class='math'>P(E₁ ∪ E₂) = (8 + 10 − 5) / 15 = 13/15</span>Using the addition rule: P(A∪B) = P(A) + P(B) − P(A∩B)."
+    },
     { q: "If events A and B are mutually exclusive, then P(A ∩ B) is:", opts: ["1", "0.1", "0", "0.5"], ans: 2, exp: "Mutually exclusive events cannot occur simultaneously — there is no overlap. Therefore P(A ∩ B) = <strong>0</strong>." },
     { q: "A doctor has performed 400 surgeries, 360 of which were successful. The probability of success of any operation by this doctor is:", opts: ["0.49", "0.96", "0.90", "0.98"], ans: 2, exp: "<span class='math'>P(success) = 360 / 400 = 0.90</span>" },
     { q: "In the experiment of giving birth to three children, the sample space consists of:", opts: ["9 outcomes", "8 outcomes", "6 outcomes", "3 outcomes"], ans: 1, exp: "<span class='math'>Each birth: 2 outcomes (M or F). Three births: 2³ = 8 outcomes</span>Sample space: {MMM, MMF, MFM, MFF, FMM, FMF, FFM, FFF}" },
@@ -463,13 +619,13 @@ const SHEETS = [
     { q: "When four children are born (each male or female), the number of simple events in the experiment is:", opts: ["2", "4", "12", "16"], ans: 3, exp: "<span class='math'>Each child: 2 outcomes. Four children: 2⁴ = 16 simple events</span>" },
     { q: "A card is drawn from a standard deck. The probability that it is a heart AND a jack (jack of hearts):", opts: ["13/52", "4/52", "1/52", "Otherwise"], ans: 2, exp: "<span class='math'>There is exactly 1 jack of hearts in a 52-card deck.</span><span class='math'>P(heart AND jack) = 1/52</span>" },
     { q: "Two cards are drawn with replacement. If a jack is drawn first and a queen is drawn second, the two events are:", opts: ["Mutually exclusive", "Independent", "Not independent", "Not mutually exclusive"], ans: 1, exp: "With <strong>replacement</strong>, the deck is restored after each draw. The outcome of the first draw does not affect the second — the events are <strong>independent</strong>." },
-    { q: "A sample of 40 oil industry executives answered a questionnaire. What type of average is appropriate here? (Contextual question — the average of their responses)", opts: ["4689.06", "4000", "1197.87", "60"], ans: 0, exp: "This question refers to computing a weighted or arithmetic mean from a salary/income survey. The value 4689.06 is the computed mean from the dataset provided in the original sheet." },
-    { q: "Regarding a normal distribution with mean 4600 and SD 1100, P(X < 4600) is:", opts: ["0.25", "0.50", "0.75", "1.00"], ans: 1, exp: "In a normal distribution, the mean divides the distribution exactly in half. P(X < mean) = <strong>0.50</strong>." },
-    { q: "P(X < 3500) for a normal distribution with mean 4600 and SD 1100:", opts: ["0.1587", "0.50", "0.8413", "0.3413"], ans: 0, exp: "<span class='math'>Z = (3500 − 4600) / 1100 = −1100 / 1100 = −1.0</span><span class='math'>P(Z < −1) = 0.1587 (from standard normal table)</span>" },
-    { q: "P(X > 5700) for mean 4600 and SD 1100:", opts: ["0.1587", "0.50", "0.8413", "0.3413"], ans: 0, exp: "<span class='math'>Z = (5700 − 4600) / 1100 = +1.0</span><span class='math'>P(X > 5700) = P(Z > 1) = 1 − 0.8413 = 0.1587</span>" },
+    { q: "A sample of 40 oil industry executives was surveyed about an environmental issue (yes or no). What is the experiment?", opts: ["Surveying 10 people about environmental issues.", "Surveying 40 people about environmental issues.", "Surveying 100 people about environmental issues.", "Surveying 50 people about environmental issues."], ans: 1, exp: "The experiment is what was actually done: a <strong>survey of 40</strong> oil industry executives, each giving a yes or no answer on one environmental question." },
+    { q: "Ten of the 40 executives responded 'yes'. What is the probability that a randomly selected oil industry executive will respond 'yes'?", opts: ["40/50", "10/50", "10/40", "1/2"], ans: 2, exp: "<span class=\'math\'>P(yes) = 10 / 40 = 0.25</span>Using the <strong>empirical (relative frequency)</strong> approach: 10 yes responses out of 40 sampled executives gives P(yes) = 0.25." },
+    { q: "The oil executive survey illustrates which concept of probability?", opts: ["Classical", "Empirical", "Subjective", "None of the above"], ans: 1, exp: "<strong>Empirical probability</strong> is based on observed data from real experiments. Here the probability is estimated from actual survey results (10/40), not from theoretical or subjective reasoning." },
+    { q: "In the oil executive survey (yes or no), are the two outcomes equally likely and mutually exclusive?", opts: ["Equally likely and mutually exclusive.", "Not equally likely, but mutually exclusive.", "Equally likely, but not mutually exclusive.", "None of the above."], ans: 1, exp: "Yes/No are <strong>mutually exclusive</strong> (one person cannot give both answers). However, they are <strong>not equally likely</strong>: P(yes)=10/40=0.25 ≠ P(no)=30/40=0.75." },
     { q: "A card is drawn at random from a standard 52-card deck. The probability it is an Ace:", opts: ["4/13", "1/13", "1/52", "26/52"], ans: 1, exp: "<span class='math'>There are 4 Aces in 52 cards.</span><span class='math'>P(Ace) = 4/52 = 1/13</span>" },
     { q: "The probability the card is a picture card (face card — Jack, Queen, King):", opts: ["3/13", "1/13", "3/13", "12/13"], ans: 0, exp: "<span class='math'>Face cards: 3 per suit × 4 suits = 12 face cards.</span><span class='math'>P(face card) = 12/52 = 3/13</span>" },
-    { q: "The probability the card contains a number less than 5 (Ace counts as 1; so 2, 3, 4 = 3 values):", opts: ["4/13", "1/13", "4/52", "13/52"], ans: 0, exp: "<span class='math'>Cards 2, 3, 4 in each of 4 suits = 12 cards (or A, 2, 3, 4 = 16). Using A–4: 4 × 4 = 16/52 = 4/13</span>Counting Ace through 4 as numbers less than 5 gives 16/52 = <strong>4/13</strong>." },
+    { q: "The probability the card contains a number less than 5 (Ace counts as 1; so A, 2, 3, 4 = 4 values):", opts: ["4/13", "1/13", "4/52", "13/52"], ans: 0, exp: "<span class='math'>Cards A, 2, 3, 4 in each of 4 suits = 16 cards</span><span class='math'>P(number < 5) = 16/52 = 4/13</span>" },
     { q: "The probability the card is a heart:", opts: ["1/52", "1/13", "1/4", "1/2"], ans: 2, exp: "<span class='math'>Hearts: 13 out of 52 cards.</span><span class='math'>P(heart) = 13/52 = 1/4</span>" },
     { q: "The probability of getting the 10 of hearts:", opts: ["1/4", "1/52", "1/13", "16/52"], ans: 1, exp: "<span class='math'>There is exactly one 10 of hearts in a 52-card deck.</span><span class='math'>P(10 of hearts) = 1/52</span>" },
     { q: "The probability of getting an Ace OR a heart:", opts: ["4/13", "4/52", "1/52", "1/4"], ans: 0, exp: "<span class='math'>P(Ace ∪ Heart) = P(Ace) + P(Heart) − P(Ace ∩ Heart)</span><span class='math'>= 4/52 + 13/52 − 1/52 = 16/52 = 4/13</span>" },
@@ -553,8 +709,8 @@ const SHEETS = [
         { label: "(1) P(S = 3)", math: "P(3) = 8/25 = 0.32" },
         { label: "(2) P(S ≥ 3)", math: "= 8/25 + 6/25 + 3/25 = 17/25 = 0.68" },
         { label: "(3) P(S < 3)", math: "= 3/25 + 1/25 + 4/25 = 8/25 = 0.32" },
-        { label: "(4) E(S) = µ", math: "= 0(3/25)+1(1/25)+2(4/25)+3(8/25)+4(6/25)+5(3/25)\n= 0+1+8+24+24+15 = 72 → 72/25 = 2.88" },
-        { label: "(5) Var and SD", math: "E(S²) = 0(3)+1(1)+4(4)+9(8)+16(6)+25(3) all /25\n= (0+1+16+72+96+75)/25 = 260/25 = 10.4\nVar = 10.4 − 2.88² = 10.4 − 8.2944 = 2.1056\nSD = √2.1056 ≈ 1.451" },
+        { label: "(4) E(S) = µ", math: "= 0(3/25)+1(1/25)+2(4/25)+3(8/25)+4(6/25)+5(3/25)\n= (0+1+8+24+24+15)/25 = 72/25 = 2.88" },
+        { label: "(5) Var and SD", math: "E(S²) = [0(3)+1(1)+4(4)+9(8)+16(6)+25(3)]/25\n= (0+1+16+72+96+75)/25 = 260/25 = 10.4\nVar = 10.4 − 2.88² = 10.4 − 8.2944 = 2.1056\nSD = √2.1056 ≈ 1.451" },
       ]
     },
     {
@@ -666,12 +822,11 @@ const SHEETS = [
 
 const tabsEl = document.getElementById('sheetTabs');
 const panelsEl = document.getElementById('sheetPanels');
-const state = {}; // tracks per-sheet revealed count
+const state = {};
 
 function escHtml(s) {
   return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\n/g,'<br>');
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function buildTab(sheet) {
@@ -691,10 +846,11 @@ function buildPanel(sheet) {
   let html = `<div class="sheet-intro"><p>${sheet.intro}</p></div>`;
 
   if (sheet.context) {
+    const dataClass = sheet.context.isTable ? 'data-table' : 'data-vals';
     html += `<div class="context-box">
       <h4>${sheet.context.title}</h4>
       <p>${sheet.context.text}</p>
-      <div class="data-vals">${escHtml(sheet.context.data)}</div>
+      <div class="${dataClass}">${escHtml(sheet.context.data)}</div>
     </div>`;
   }
 
@@ -704,18 +860,30 @@ function buildPanel(sheet) {
       ? sheet.questions.length + (sheet.tfQuestions ? sheet.tfQuestions.length : 0)
       : sheet.questions.length;
 
+  const typeLabel = sheet.type === 'tf' ? 'True / False' : sheet.type === 'mcq' ? 'Multiple Choice' : 'Worked Problems';
   state[sheet.id] = { revealed: 0, total: totalQ };
 
-  html += `<div class="sheet-actions">
-    <button class="btn-reveal-all" onclick="revealAll(${sheet.id})">Reveal All Answers</button>
-    <span class="score-badge">Revealed: <span id="score-${sheet.id}">0</span> / ${totalQ}</span>
-  </div>
-  <div class="progress-wrap">
-    <div class="progress-label">PROGRESS</div>
-    <div class="progress-bar"><div class="progress-fill" id="prog-${sheet.id}" style="width:0%"></div></div>
+  html += `<div class="sheet-info-pill">
+    <span class="pill-item"><span class="pill-dot"></span>${typeLabel}</span>
+    <span class="pill-item"><span class="pill-dot"></span>${totalQ} Questions</span>
+    <span class="pill-item"><span class="pill-dot"></span>Sheet ${sheet.id} of ${SHEETS.length}</span>
   </div>`;
 
-  // Build question cards
+  html += `<div class="sheet-actions">
+    <button class="btn-reveal-all" onclick="revealAll(${sheet.id})">Reveal All</button>
+    <button class="btn-reset" onclick="resetSheet(${sheet.id})">Reset</button>
+    <button class="ztable-btn" onclick="document.getElementById('ztableOverlay').classList.add('open')">📊 Z-Table</button>
+    <span class="score-badge">Answered: <span id="score-${sheet.id}">0</span> / ${totalQ}</span>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-header">
+      <div class="progress-label">PROGRESS</div>
+      <div class="progress-pct" id="pct-${sheet.id}">0%</div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-${sheet.id}" style="width:0%"></div></div>
+  </div>
+  <div class="complete-banner" id="done-${sheet.id}">✓ Sheet complete — well done!</div>`;
+
   if (sheet.type === 'tf') {
     sheet.questions.forEach((q, i) => {
       html += buildTFCard(q, `${sheet.id}-${i}`, i + 1);
@@ -725,9 +893,7 @@ function buildPanel(sheet) {
       html += buildMCQCard(q, `${sheet.id}-${i}`, i + 1);
     });
     if (sheet.tfQuestions) {
-      html += `<div style="margin:2rem 0 1rem;padding-top:1.5rem;border-top:1px solid var(--border)">
-        <p style="font-family:'DM Mono',monospace;font-size:0.75rem;color:var(--gold);letter-spacing:0.1em">PART TWO — TRUE / FALSE</p>
-      </div>`;
+      html += `<div class="part-divider"><p>PART TWO — TRUE / FALSE</p></div>`;
       sheet.tfQuestions.forEach((q, i) => {
         const idx = sheet.questions.length + i;
         html += buildTFCard(q, `${sheet.id}-tf-${i}`, idx + 1);
@@ -739,53 +905,68 @@ function buildPanel(sheet) {
     });
   }
 
+  // Prev / Next navigation
+  const idx = SHEETS.findIndex(s => s.id === sheet.id);
+  const prevSheet = SHEETS[idx - 1];
+  const nextSheet = SHEETS[idx + 1];
+  html += `<div class="sheet-nav">
+    <button class="nav-sheet-btn ${prevSheet ? '' : 'hidden'}" onclick="activateSheet(${prevSheet ? prevSheet.id : 0})">
+      ← ${prevSheet ? prevSheet.title : ''}
+    </button>
+    <span class="nav-sheet-center">${sheet.title} · ${idx + 1} of ${SHEETS.length}</span>
+    <button class="nav-sheet-btn primary ${nextSheet ? '' : 'hidden'}" onclick="activateSheet(${nextSheet ? nextSheet.id : 0})">
+      ${nextSheet ? nextSheet.title : ''} →
+    </button>
+  </div>`;
+
   panel.innerHTML = html;
   panelsEl.appendChild(panel);
 }
 
 function buildTFCard(q, uid, num) {
+  const qText = String(q.q).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  const expSafe = String(q.exp).replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
   return `<div class="q-card" id="card-${uid}">
     <div class="q-meta">Q ${num} &nbsp;·&nbsp; TRUE / FALSE</div>
-    <div class="q-text">${escHtml(q.q)}</div>
+    <div class="q-text">${qText}</div>
     <div class="tf-btns">
       <button class="tf-btn" id="tbT-${uid}" onclick="selectTF('${uid}','T')">True</button>
       <button class="tf-btn" id="tbF-${uid}" onclick="selectTF('${uid}','F')">False</button>
     </div>
-    <button class="reveal-btn" id="rev-${uid}" onclick="revealTF('${uid}','${q.ans}',\`${escAttr(q.exp)}\`)">Reveal Answer</button>
+    <button class="reveal-btn" id="rev-${uid}" onclick="revealTF('${uid}','${q.ans}',\`${expSafe}\`)">Reveal Answer</button>
     <div class="answer-box" id="ans-${uid}"></div>
   </div>`;
 }
 
 function buildMCQCard(q, uid, num) {
+  const qText = String(q.q).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  const expSafe = String(q.exp).replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
   const opts = q.opts.map((opt, i) => {
     const letter = ['a','b','c','d'][i];
-    return `<button class="mcq-opt" id="opt-${uid}-${i}" onclick="selectMCQ('${uid}',${i},${q.ans})">${letter}) ${escHtml(opt)}</button>`;
+    const optText = String(opt).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return `<button class="mcq-opt" id="opt-${uid}-${i}" onclick="selectMCQ('${uid}',${i},${q.ans})">${letter}) ${optText}</button>`;
   }).join('');
   return `<div class="q-card" id="card-${uid}">
     <div class="q-meta">Q ${num} &nbsp;·&nbsp; MULTIPLE CHOICE</div>
-    <div class="q-text">${escHtml(q.q)}</div>
+    <div class="q-text">${qText}</div>
     <div class="mcq-options" id="opts-${uid}">${opts}</div>
-    <button class="reveal-btn" id="rev-${uid}" onclick="revealMCQ('${uid}',${q.ans},\`${escAttr(q.exp)}\`)">Reveal Answer</button>
+    <button class="reveal-btn" id="rev-${uid}" onclick="revealMCQ('${uid}',${q.ans},\`${expSafe}\`)">Reveal Answer</button>
     <div class="answer-box" id="ans-${uid}"></div>
   </div>`;
 }
 
 function buildProblemCard(q, uid, num) {
+  const qText = String(q.q).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
   return `<div class="q-card" id="card-${uid}">
     <div class="q-meta">PROBLEM ${num}</div>
-    <div class="q-text">${escHtml(q.q)}</div>
-    <button class="reveal-btn" id="rev-${uid}" onclick="revealProblem('${uid}',${num-1},${JSON.stringify(num-1)})">Show Solution</button>
+    <div class="q-text">${qText}</div>
+    <button class="reveal-btn" id="rev-${uid}" onclick="revealProblem('${uid}',${num-1})">Show Solution</button>
     <div class="problem-solution" id="ans-${uid}"></div>
   </div>`;
 }
 
-function escAttr(s) {
-  return String(s).replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
-}
-
 function formatExp(exp) {
-  // convert <span class='math'>...</span> to styled divs
-  return exp.replace(/<span class='math'>([\s\S]*?)<\/span>/g, (_, code) => {
+  return String(exp).replace(/<span class='math'>([\s\S]*?)<\/span>/g, (_, code) => {
     return `<span class="math">${code.replace(/\n/g,'<br>')}</span>`;
   });
 }
@@ -812,7 +993,6 @@ function revealTF(uid, ans, exp) {
   const correctBtn = ans === 'T' ? bT : bF;
   const wrongBtn   = ans === 'T' ? bF : bT;
   correctBtn.classList.add('correct-reveal');
-  // If the user actually selected the wrong button, light it red
   if (wrongBtn.classList.contains('selected-true') || wrongBtn.classList.contains('selected-false')) {
     wrongBtn.classList.add('wrong-reveal');
   }
@@ -821,9 +1001,9 @@ function revealTF(uid, ans, exp) {
   const verdictCls = ans === 'T' ? 'true-v' : 'false-v';
   ansDiv.innerHTML = `<div class="answer-verdict ${verdictCls}">${ans === 'T' ? '✓ TRUE' : '✗ FALSE'}</div><div class="answer-explanation">${formatExp(exp)}</div>`;
   ansDiv.classList.add('show');
-
   document.getElementById(`card-${uid}`).classList.add('revealed');
   bumpScore(uid);
+  scrollToAnswer(ansDiv);
 }
 
 // ── MCQ INTERACTION ──
@@ -852,24 +1032,28 @@ function revealMCQ(uid, ans, exp) {
   ansDiv.classList.add('show');
   document.getElementById(`card-${uid}`).classList.add('revealed');
   bumpScore(uid);
+  scrollToAnswer(ansDiv);
 }
 
 // ── PROBLEM INTERACTION ──
-function revealProblem(uid, sheetQIdx, qIdx) {
+function revealProblem(uid, qIdx) {
   const revBtn = document.getElementById(`rev-${uid}`);
   if (revBtn.disabled) return;
   revBtn.disabled = true;
 
-  // Find sheet index by uid prefix
   const sheetId = parseInt(uid.split('-')[0]);
   const sheet = SHEETS.find(s => s.id === sheetId);
-  const q = sheet.questions[sheetQIdx];
+  const q = sheet.questions[qIdx];
 
   let html = `<div class="sol-label">Full Solution</div>`;
   q.sol.forEach(step => {
-    html += `<div class="sol-step"><strong>${escHtml(step.label)}:</strong><br>${escHtml(step.txt||'')}`;
-    if (step.math) html += `<span class="math">${escHtml(step.math)}</span>`;
-    html += '</div>';
+    const labelHtml = String(step.label).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const txtHtml   = step.txt ? String(step.txt).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+    const mathHtml  = step.math ? String(step.math).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>') : '';
+    html += `<div class="sol-step"><strong>${labelHtml}:</strong>`;
+    if (txtHtml) html += `<br>${txtHtml}`;
+    if (mathHtml) html += `<span class="math">${mathHtml}</span>`;
+    html += `</div>`;
   });
 
   const ansDiv = document.getElementById(`ans-${uid}`);
@@ -877,19 +1061,46 @@ function revealProblem(uid, sheetQIdx, qIdx) {
   ansDiv.classList.add('show');
   document.getElementById(`card-${uid}`).classList.add('revealed');
   bumpScore(uid);
+  scrollToAnswer(ansDiv);
+}
+
+// ── HELPERS ──
+function scrollToAnswer(el) {
+  setTimeout(() => {
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 80);
 }
 
 function bumpScore(uid) {
   const sheetId = parseInt(uid.split('-')[0]);
   const s = state[sheetId];
   s.revealed++;
+  const pct = Math.round(s.revealed / s.total * 100);
   document.getElementById(`score-${sheetId}`).textContent = s.revealed;
-  document.getElementById(`prog-${sheetId}`).style.width = (s.revealed / s.total * 100) + '%';
+  document.getElementById(`prog-${sheetId}`).style.width = pct + '%';
+  document.getElementById(`pct-${sheetId}`).textContent = pct + '%';
+  if (s.revealed === s.total) {
+    document.getElementById(`done-${sheetId}`).classList.add('show');
+  }
 }
 
 function revealAll(sheetId) {
   const panel = document.getElementById(`panel-${sheetId}`);
   panel.querySelectorAll('.reveal-btn:not(:disabled)').forEach(btn => btn.click());
+}
+
+function resetSheet(sheetId) {
+  // Rebuild the panel from scratch
+  const sheet = SHEETS.find(s => s.id === sheetId);
+  const existing = document.getElementById(`panel-${sheetId}`);
+  if (existing) existing.remove();
+  state[sheetId] = null;
+  buildPanel(sheet);
+  // Re-activate if this sheet is currently shown
+  if (document.querySelector(`.sheet-tab[data-id="${sheetId}"]`).classList.contains('active')) {
+    document.getElementById(`panel-${sheetId}`).classList.add('active');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ── TABS ──
@@ -912,6 +1123,82 @@ activateSheet(1);
   document.getElementById('mnavClose').addEventListener('click', () => { overlay.classList.remove('open'); btn.classList.remove('open'); document.body.style.overflow=''; });
   overlay.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { overlay.classList.remove('open'); btn.classList.remove('open'); document.body.style.overflow=''; }));
 })();
+
+// ── BACK TO TOP ──
+(function(){
+  const btn = document.getElementById('backTopBtn');
+  if (!btn) return;
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('visible', window.scrollY > 400);
+  }, { passive: true });
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+})();
+
+// ── Z-TABLE ──
+(function(){
+  // Build standard normal CDF using Hart approximation
+  function normCDF(z) {
+    const t = 1 / (1 + 0.2316419 * Math.abs(z));
+    const d = 0.3989423 * Math.exp(-z * z / 2);
+    const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.7814779 + t * (-1.8212560 + t * 1.3302744))));
+    return z > 0 ? 1 - p : p;
+  }
+  window._normCDF = normCDF;
+
+  // Render the table
+  const cols = [0.00,0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09];
+  const rows = [];
+  for (let r = -349; r <= 349; r++) rows.push(r / 100);
+
+  let tbl = '<table class="zt"><thead><tr><th>z</th>';
+  cols.forEach(c => { tbl += `<th>.0${Math.round(c*100).toString().padStart(1,'0')}</th>`; });
+  tbl += '</tr></thead><tbody>';
+
+  rows.forEach(r => {
+    const label = r.toFixed(1);
+    tbl += `<tr><td class="zt-row-h">${r >= 0 ? '+' : ''}${r.toFixed(1)}</td>`;
+    cols.forEach(c => {
+      const z = parseFloat((r + (r >= 0 ? c : -c)).toFixed(2));
+      const p = normCDF(z).toFixed(4);
+      const id = `zt_${z.toFixed(2).replace('-','n').replace('.','_')}`;
+      tbl += `<td id="${id}">${p}</td>`;
+    });
+    tbl += '</tr>';
+  });
+  tbl += '</tbody></table>';
+
+  const wrap = document.getElementById('ztableWrap');
+  if (wrap) wrap.innerHTML = tbl;
+
+  // Calculator
+  window.calcZ = function() {
+    const inp = document.getElementById('zcalcInput');
+    const res = document.getElementById('zcalcResult');
+    if (!inp || !res) return;
+    const z = parseFloat(inp.value);
+    if (isNaN(z) || z < -3.49 || z > 3.49) { res.textContent = 'P(Z < z) = —'; return; }
+    const p = normCDF(z);
+    res.innerHTML = `P(Z &lt; ${z.toFixed(2)}) = <strong>${p.toFixed(4)}</strong>`;
+    // Highlight the cell
+    document.querySelectorAll('.zt-hi').forEach(el => el.classList.remove('zt-hi'));
+    const row = parseFloat(z.toFixed(1));
+    const col = parseFloat((Math.abs(z) - Math.abs(row)).toFixed(2));
+    const sign = z >= 0 ? row : -Math.abs(row);
+    const zFixed = z >= 0
+      ? parseFloat((sign + col).toFixed(2))
+      : parseFloat((sign - col).toFixed(2));
+    const id = `zt_${zFixed.toFixed(2).replace('-','n').replace('.','_')}`;
+    const cell = document.getElementById(id);
+    if (cell) { cell.classList.add('zt-hi'); cell.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+  };
+
+  // Close on overlay click
+  const overlay = document.getElementById('ztableOverlay');
+  if (overlay) {
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+  }
+})();
+
 </script>
 </body>
 </html>
